@@ -152,9 +152,21 @@ body {
     flex-direction: column;
 }
 
+.frame.vertical-auto {
+    height: auto;
+}
+
+.frame.horizontal-auto {
+    width: auto;
+}
+
 .element {
     margin-top: 6px;
     margin-left: 12px;
+}
+
+.element:last-of-type {
+    margin-bottom: 6px;
 }
 
 /* =========================== */

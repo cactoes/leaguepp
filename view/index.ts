@@ -1,5 +1,5 @@
 namespace ui {
-    const noTarget = (target: string) => console.error(`CreateFrame: Failed to find target "${target}"`);
+    const noTarget = (target: string) => console.error(`Error: Failed to find target "${target}"`);
 
     export function createFrame(name: string, id: string, layout: string, target: string): void {
         const element = document.getElementById(target);
@@ -50,6 +50,16 @@ namespace ui {
         label.appendChild(p);
     
         element.appendChild(label);
+    }
+
+    export function updateLabel(text: string, id: string): void {
+        const element = document.getElementById(id) as HTMLDivElement | null;
+        if (!element)
+            return noTarget(id);
+
+        const p = document.createElement("p");
+        p.innerText = text;
+        element.replaceChildren(p);
     }
     
     export function createCheckBox(label: string, id: string, onclick: string, target: string): void {
@@ -222,6 +232,10 @@ function uiCreateLabel(text: string, id: string, target: string): void {
     ui.createLabel(text, id, target);
 }
 
+function uiUpdateLabel(text: string, id: string): void {
+    ui.updateLabel(text, id);
+}
+
 function uiCreateCheckBox(label: string, id: string, onclick: string, target: string): void {
     ui.createCheckBox(label, id, onclick, target);
 }
@@ -242,6 +256,7 @@ async function main() {
     register(uiCreateFrame);
     register(uiCreateButton);
     register(uiCreateLabel);
+    register(uiUpdateLabel);
     register(uiCreateCheckBox);
     register(uiCreateSlider);
     register(uiCreateDropDown);
