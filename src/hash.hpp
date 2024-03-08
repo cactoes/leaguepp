@@ -13,7 +13,7 @@ namespace hash {
         return hash;
     }
 
-    uint64_t Fnv1a64Hash(const char* str, uint64_t hash = 14695981039346656037ULL) {
+    static uint64_t Fnv1a64Hash(const char* str, uint64_t hash = 14695981039346656037ULL) {
         int i = 0;
         while (str[i] != '\0') {
             hash ^= static_cast<uint64_t>(str[i]);
