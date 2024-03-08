@@ -1,15 +1,5 @@
 #include "layoutmanager.hpp"
 
-void layout_manager::Setup(browser::browser* handle) {
-    handle->RegisterFunction("GetMainLayout", CREATE_REGISTRATION_MEMBER(layout_manager::PushLayout));
-
-    m_frameMain.AddComponent<ui::label>("test label");
-}
-
-void layout_manager::PushLayout(browser::browser* handle, browser::js_args_t args) {
-    m_frameMain.Register(handle);
-}
-
 // void OnToggleCheckBox1(bool state) {
 //     std::cout << "switched state to: " << state << "\n";
 // }
@@ -54,3 +44,26 @@ void layout_manager::PushLayout(browser::browser* handle, browser::js_args_t arg
 //     mainFrame.Register(handle);
 //     frame2.Register(handle);
 // }
+
+void layout_manager::Setup(browser::browser* handle) {
+    handle->RegisterFunction("GetMainLayout", CREATE_REGISTRATION_MEMBER(layout_manager::PushLayout));
+
+    m_frameMain = std::make_shared<ui::frame>("", ui::FL_HORIZONTAL, FRAME_TARGET_MAIN);
+
+    auto basicFrame = std::make_shared<ui::frame>("basic", ui::FL_VERTICAL);
+    basicFrame->SetId("BasicFrame");
+    m_frameMain->AddComponent<ui::frame>(std::move(basicFrame));
+
+    auto statsFrame = std::make_shared<ui::frame>("stats", ui::FL_VERTICAL);
+    statsFrame->SetId("StatsFrame");
+
+    m_frameMain->AddComponent<ui::frame>(std::move(statsFrame));
+}
+
+void layout_manager::PushLayout(browser::browser* handle, browser::js_args_t args) {
+    m_frameMain->Register(handle);
+}
+
+std::shared_ptr<ui::frame> layout_manager::GetFrame() {
+    return m_frameMain;
+}

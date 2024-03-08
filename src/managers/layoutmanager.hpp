@@ -1,6 +1,8 @@
 #ifndef __LAYOUTMANAGER_HPP__
 #define __LAYOUTMANAGER_HPP__
 
+#include <memory>
+
 #include "../ui/frame.hpp"
 #include "../ui/button.hpp"
 #include "../ui/label.hpp"
@@ -10,6 +12,7 @@
 #include "../ui/selector.hpp"
 
 #include "../browser/browser.hpp"
+#undef interface
 
 class layout_manager {
 public:
@@ -17,8 +20,10 @@ public:
 
     void PushLayout(browser::browser* handle, browser::js_args_t args);
 
+    std::shared_ptr<ui::frame> GetFrame();
+
 private:
-    ui::frame m_frameMain = ui::frame("", ui::FL_VERTICAL, FRAME_TARGET_MAIN);
+    std::shared_ptr<ui::frame> m_frameMain;
 };
 
 #endif // __LAYOUTMANAGER_HPP__
