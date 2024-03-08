@@ -19,6 +19,7 @@ namespace ui {
 
         component_type GetType() const override;
         void Register(browser::browser* handle) override;
+        void Update(browser::browser* handle) override;
 
         void HandleChange(browser::browser*, browser::js_args_t args);
 

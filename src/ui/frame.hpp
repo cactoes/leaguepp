@@ -39,18 +39,18 @@ namespace ui {
         template <typename Ty, typename... Args>
         std::enable_if_t<std::is_base_of_v<component, Ty> | std::is_constructible_v<Ty, Args..., std::string>, void>
         AddComponent(Args&&... args) {
-            m_children.push_back(std::make_unique<Ty>(std::forward<Args>(args)..., GetId()));
+            m_children.push_back(std::make_shared<Ty>(std::forward<Args>(args)..., GetId()));
         }
 
         template <typename Ty>
         std::enable_if_t<std::is_base_of_v<component, Ty>, void>
-        AddComponent(std::unique_ptr<Ty> comp) {
+        AddComponent(std::shared_ptr<Ty> comp) {
             comp->m_target = GetId();
             m_children.push_back(std::move(comp));
         }
 
     private:
-        std::vector<std::unique_ptr<component>> m_children = {};
+        std::vector<std::shared_ptr<component>> m_children = {};
 
         std::string m_name;
         frame_layout m_layout;

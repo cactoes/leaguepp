@@ -15,6 +15,9 @@ namespace ui {
 
         component_type GetType() const override;
         void Register(browser::browser* handle) override;
+        void Update(browser::browser* handle) override;
+
+        void SetText(const std::string& text);
 
     private:
         std::string m_text;

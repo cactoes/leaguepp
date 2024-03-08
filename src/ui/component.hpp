@@ -44,6 +44,7 @@ namespace ui {
     public:
         virtual component_type GetType() const = 0;
         virtual void Register(browser::browser* handle) = 0;
+        virtual void Update(browser::browser* handle) = 0;
 
         const std::string& GetId() const { return m_id; }
 

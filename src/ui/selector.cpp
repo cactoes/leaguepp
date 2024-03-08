@@ -9,6 +9,10 @@ void ui::selector::Register(browser::browser* handle) {
     handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &selector::HandleChange, this);
 }
 
+void ui::selector::Update(browser::browser* handle) {
+    
+}
+
 void ui::selector::HandleChange(browser::browser*, browser::js_args_t args) {
     m_callbackHolder.Run(args.Get<0, std::string>());
 }
