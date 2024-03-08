@@ -23,3 +23,7 @@ void browser_manager::Start() {
 browser::browser* browser_manager::GetHandle() {
     return m_handle.get();
 }
+
+void browser_manager::CallJS(const std::string& name, const std::vector<std::any>& args) {
+    m_handle->CallJSFunction(name, args);
+}

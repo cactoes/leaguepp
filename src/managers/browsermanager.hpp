@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "../browser/browser.hpp"
+#undef interface
 
 class browser_manager {
 public:
@@ -11,6 +12,8 @@ public:
     void Start();
 
     browser::browser* GetHandle();
+
+    void CallJS(const std::string& name, const std::vector<std::any>& args);
 
 private:
     std::shared_ptr<browser::browser> m_handle = nullptr;
