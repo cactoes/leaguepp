@@ -2,6 +2,7 @@
 #define __EVENTMANAGER_HPP__
 
 #include "../browser/browser.hpp"
+#undef interface
 
 class event_manager {
 public:

@@ -1,8 +1,6 @@
 #include "eventmanager.hpp"
 
 void event_manager::Setup(browser::browser* handle) {
-    // HandleWindowEvent
-
     handle->RegisterFunction("HandleWindowEvent", CREATE_REGISTRATION_MEMBER(event_manager::HandleWindowEvent));
 }
 
