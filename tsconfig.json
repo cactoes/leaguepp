@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "./build/ts",
+    "rootDir": "./view",
+    "noEmitOnError": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+  },
+  "exclude": ["build", "lib", "node_modules"]
+}
