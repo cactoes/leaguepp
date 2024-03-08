@@ -46,6 +46,7 @@ namespace ui {
         virtual void Register(browser::browser* handle) = 0;
         virtual void Update(browser::browser* handle) = 0;
 
+        const void SetId(const std::string& id) { m_id = id; };
         const std::string& GetId() const { return m_id; }
 
     public:
