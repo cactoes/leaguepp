@@ -1,0 +1,17 @@
+{
+  "name": "leaguepp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "build:debug": "tsc && node --no-deprecation view_compiler.js -c Debug",
+    "build:release": "tsc && node --no-deprecation view_compiler.js -c Release"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "fs-extra": "^11.2.0",
+    "terser": "^5.29.1"
+  }
+}
