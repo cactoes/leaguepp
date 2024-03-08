@@ -2,6 +2,9 @@
 #define __CONNECTORMANAGER_HPP__
 
 #include "../callbackholder.hpp"
+#include "../ui/label.hpp"
+
+#undef interface
 
 class connector_manager {
 public:
@@ -16,6 +19,8 @@ private:
 
 private:
     bool m_isConnected = false;
+
+    std::shared_ptr<ui::label> m_connectionLabel;
 };
 
 #endif // __CONNECTORMANAGER_HPP__
