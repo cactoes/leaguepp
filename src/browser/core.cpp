@@ -80,6 +80,7 @@ std::shared_ptr<browser::browser> browser::CreateBrowser(const browser_config_t&
                             Callback<ICoreWebView2DOMContentLoadedEventHandler>(
                                 [_browser](ICoreWebView2*, ICoreWebView2DOMContentLoadedEventArgs*) -> HRESULT {
                                     _browser->OnDomContentLoaded();
+                                    _browser->m_isReady = true;
                                     return S_OK;
                                 }
                             ).Get(), nullptr

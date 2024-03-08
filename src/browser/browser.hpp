@@ -161,6 +161,8 @@ namespace browser {
 
         std::unordered_map<std::string, std::function<std::any(browser*, js_args_t)>> m_methodMap = {};
         std::unordered_map<std::string, std::vector<std::function<void(browser*)>>> m_eventMethodMap = {};
+
+        bool m_isReady = false;
     };
 
     std::shared_ptr<browser> CreateBrowser(const browser_config_t& browserConfig, const window_config_t& windowConfig);
