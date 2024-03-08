@@ -155,15 +155,15 @@ namespace browser {
         HWND m_windowHandle;
         event_bus m_bus = {};
         
-        wil::com_ptr<ICoreWebView2Controller> m_webViewController;
-        wil::com_ptr<ICoreWebView2> m_webView2;
-        wil::com_ptr<ICoreWebView2_2> m_webView2_2;
+        wil::com_ptr<ICoreWebView2Controller> m_webViewController = nullptr;
+        wil::com_ptr<ICoreWebView2> m_webView2 = nullptr;
+        wil::com_ptr<ICoreWebView2_2> m_webView2_2 = nullptr;
 
         std::unordered_map<std::string, std::function<std::any(browser*, js_args_t)>> m_methodMap = {};
         std::unordered_map<std::string, std::vector<std::function<void(browser*)>>> m_eventMethodMap = {};
     };
 
-    std::unique_ptr<browser> CreateBrowser(const browser_config_t& browserConfig, const window_config_t& windowConfig);
+    std::shared_ptr<browser> CreateBrowser(const browser_config_t& browserConfig, const window_config_t& windowConfig);
 }; // namespace browser
 
 #endif // __BROWSER_HPP__

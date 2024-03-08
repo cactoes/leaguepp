@@ -21,11 +21,11 @@ static std::wstring GetRelativePath(const char* relPath) {
     return std::wstring(uriBstr.get());
 };
 
-std::unique_ptr<browser::browser> browser::CreateBrowser(const browser_config_t& browserConfig, const window_config_t& windowConfig) {
+std::shared_ptr<browser::browser> browser::CreateBrowser(const browser_config_t& browserConfig, const window_config_t& windowConfig) {
     if (!HAS_FLAG(browserConfig.flags, browser_flags::BF_ENABLE_DEBUG_CONSOLE))
         FreeConsole();
 
-    auto _browser = std::make_unique<browser>();
+    auto _browser = std::make_shared<browser>();
 
     _browser->m_windowHandle = window::Create(
         HAS_FLAG(windowConfig.flags, WF_RESIZEABLE),
@@ -42,10 +42,10 @@ std::unique_ptr<browser::browser> browser::CreateBrowser(const browser_config_t&
     options->put_AdditionalBrowserArguments(L"--disable-web-security");
 
     (void)CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, options.Get(),
-        Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>([&_browser, &browserConfig](HRESULT, ICoreWebView2Environment* environment) -> HRESULT {
+        Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>([_browser, browserConfig](HRESULT, ICoreWebView2Environment* environment) -> HRESULT {
             return environment->CreateCoreWebView2Controller(_browser->m_windowHandle,
             Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
-                [&_browser, &browserConfig](HRESULT, ICoreWebView2Controller* controller) -> HRESULT {
+                [_browser, browserConfig](HRESULT, ICoreWebView2Controller* controller) -> HRESULT {
                     if (controller != nullptr) {
                         _browser->m_webViewController = controller;
                         _browser->m_webViewController->get_CoreWebView2(&_browser->m_webView2);
@@ -78,7 +78,7 @@ std::unique_ptr<browser::browser> browser::CreateBrowser(const browser_config_t&
                     if (!FAILED(_browser->m_webView2->QueryInterface(IID_PPV_ARGS(&_browser->m_webView2_2)))) {
                         _browser->m_webView2_2->add_DOMContentLoaded(
                             Callback<ICoreWebView2DOMContentLoadedEventHandler>(
-                                [&_browser](ICoreWebView2*, ICoreWebView2DOMContentLoadedEventArgs*) -> HRESULT {
+                                [_browser](ICoreWebView2*, ICoreWebView2DOMContentLoadedEventArgs*) -> HRESULT {
                                     _browser->OnDomContentLoaded();
                                     return S_OK;
                                 }
@@ -98,7 +98,7 @@ std::unique_ptr<browser::browser> browser::CreateBrowser(const browser_config_t&
 
                     _browser->m_webView2->add_WebMessageReceived(
                         Callback<ICoreWebView2WebMessageReceivedEventHandler>(
-                            [&_browser](ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args) -> HRESULT {
+                            [_browser](ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args) -> HRESULT {
                                 wil::unique_cotaskmem_string comptrWebMessageRaw;
                                 args->get_WebMessageAsJson(&comptrWebMessageRaw);
 
