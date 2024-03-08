@@ -9,7 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # main
 # ================
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*)
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} resources.rc)
 
 # ================
 # library: WebView 2

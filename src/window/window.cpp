@@ -1,7 +1,9 @@
 #include "window.hpp"
 #include "../browser/browser.hpp"
 
-HWND window::Create(bool isResizeable, bool hideTitleBar, bool show, int width, int height, int startX, int startY, const char* name, browser::browser* handle) {
+HWND window::Create(bool isResizeable, bool hideTitleBar, bool show, int width, int height, int startX, int startY, const char* name, int icon, browser::browser* handle) {
+    HICON hIcon = icon >= 0 ? LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(icon)) : LoadIcon(GetModuleHandle(nullptr), IDI_APPLICATION);
+
     WNDCLASSEX windowClassEx{};
     windowClassEx.cbSize = sizeof(WNDCLASSEX);
     windowClassEx.style = (isResizeable ? (CS_HREDRAW | CS_VREDRAW) : 0);
@@ -13,6 +15,9 @@ HWND window::Create(bool isResizeable, bool hideTitleBar, bool show, int width, 
     windowClassEx.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     windowClassEx.lpszMenuName = nullptr;
     windowClassEx.lpszClassName = "WindowClass";
+
+    windowClassEx.hIcon = hIcon;
+    windowClassEx.hIconSm = LoadIcon(windowClassEx.hInstance, IDI_APPLICATION);
 
     if (RegisterClassEx(&windowClassEx) == 0)
         return nullptr;

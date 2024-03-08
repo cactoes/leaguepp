@@ -34,6 +34,7 @@ std::unique_ptr<browser::browser> browser::CreateBrowser(const browser_config_t&
         windowConfig.width, windowConfig.height,
         windowConfig.startX, windowConfig.startY,
         windowConfig.name,
+        windowConfig.icon,
         _browser.get()
     );
 

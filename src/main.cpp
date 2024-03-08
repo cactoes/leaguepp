@@ -84,12 +84,14 @@ void HandleWindowEvent(browser::browser* browser, browser::js_args_t args) {
 
 int main() {
     browser::window_config_t windowConfig = {};
+    windowConfig.icon = 1;
     windowConfig.name = "league++";
     windowConfig.flags = browser::window_flags::WF_SHOW | browser::window_flags::WF_HIDE_TITLE_BAR;
 
     browser::browser_config_t browserConfig = {};
-    browserConfig.flags = browser::browser_flags::BF_ALLOW_DEV_TOOLS;
+
 #ifdef _DEBUG
+    SET_FLAG(browserConfig.flags, browser::browser_flags::BF_ALLOW_DEV_TOOLS);
     SET_FLAG(browserConfig.flags, browser::browser_flags::BF_ENABLE_DEBUG_CONSOLE);
 #endif
 
