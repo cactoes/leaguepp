@@ -1,5 +1,3 @@
-/* @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900'); */
-
 * {
     margin: 0;
     border: 0;
@@ -10,18 +8,17 @@
     font-family: 'MS Sans Serif';
     /* font-family: 'Segoe UI'; */
 
-    --bg-secondary: #1b1b1b;
-    --bg-primary: #353535;
-    --bg-light: #4b4b4b;
-    --bg-dark: #181818;
-    --text-primary: #ebebeb;
-
-    --color-pink: #af7cbf;
-    --color-blue: #7c9abf;
+    --text: #ebebeb;
+    --background-primary: #141414;
+    --background-secondary: #010101;
+    --trim: #292929;
+    --primary: #98add9;
+    --secondary: #4f6187;
+    --accent: #af7dbf;
 
     --font-size-default: 13px;
 
-    color: var(--text-primary);
+    color: var(--text);
 }
 
 .drag {
@@ -48,19 +45,23 @@ body {
     width: 100vw;
     height: 100vh;
 
-    border: 2px solid var(--bg-primary);
+    border: 2px solid var(--background-primary);
 }
+
+/* =========================== */
+/* TITLEBAR STYLING */
+/* =========================== */
 
 #titlebar {
     width: 100%;
     height: 26px;
-    background-color: var(--bg-secondary);
+    background-color: var(--background-secondary);
 
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 
-    border-bottom: 2px solid var(--bg-primary);
+    border-bottom: 2px solid var(--background-primary);
 }
 
 #titlebar > .info {
@@ -97,7 +98,7 @@ body {
     height: 19px;
     width: 19px;
     margin-right: 2px;
-    background-color: var(--bg-primary);
+    background-color: var(--background-primary);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -115,15 +116,23 @@ body {
     filter: invert(0%) sepia(100%) saturate(100%) hue-rotate(0deg) brightness(80%) contrast(100%);
 }
 
+/* =========================== */
+/* MAIN BODY STYLING */
+/* =========================== */
+
 #main {
     display: flex;
     width: 100%;
     height: 100%;
-    background-color: var(--bg-primary);
+    background-color: var(--background-primary);
 }
 
+/* =========================== */
+/* FRAME STYLING */
+/* =========================== */
+
 .frame {
-    border: 1px solid var(--bg-light);
+    border: 1px solid var(--trim);
 
     width: calc(100% - 12px);
     height: calc(100% - 12px);
@@ -139,9 +148,9 @@ body {
     position: absolute;
     top: -9px;
     font-size: var(--font-size-default);
-    background-color: var(--bg-primary);
-    border-left: 4px solid var(--bg-primary);
-    border-right: 4px solid var(--bg-primary);
+    background-color: var(--background-primary);
+    border-left: 4px solid var(--background-primary);
+    border-right: 4px solid var(--background-primary);
 }
 
 .frame.horizontal {
@@ -160,13 +169,17 @@ body {
     width: auto;
 }
 
+/* =========================== */
+/* ELEMENT STYLING */
+/* =========================== */
+
 .element {
-    margin-top: 6px;
+    margin-top: 8px;
     margin-left: 12px;
 }
 
 .element:last-of-type {
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 /* =========================== */
@@ -175,16 +188,17 @@ body {
 
 .button > button {
     padding: 4px 16px;
-    background-color: var(--bg-dark);
-    border: 1px solid var(--bg-dark);
+
+    background-color: var(--primary);
+    color: var(--background-primary);
+
     transition: all .15s ease;
     font-size: var(--font-size-default);
 }
 
 .button > button:hover {
     cursor: pointer;
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--color-blue);
+    filter: brightness(120%);
 }
 
 /* =========================== */
@@ -212,9 +226,9 @@ body {
 }
 
 .checkbox > label > span {
-    width: 16px;
-    height: 16px;
-    background-color: var(--bg-dark);
+    width: 18px;
+    height: 18px;
+    background-color: var(--background-secondary);
     position: absolute;
     top: 0;
     left: 0;
@@ -226,22 +240,23 @@ body {
     width: 12px;
     height: 12px;
     opacity: 0;
-    margin-top: 2px;
-    margin-left: 2px;
-    background-color: var(--bg-dark);
+    margin-top: 3px;
+    margin-left: 3px;
+    background-color: var(--background-secondary);
     transition: all .15s ease;
 }
 
 .checkbox > label:hover > span::after {
     transition: all .15s ease;
     opacity: 1;
-    background-color: var(--color-blue);
+    background-color: var(--primary);
+    filter: brightness(120%);
 }
 
 .checkbox > label input[type="checkbox"]:checked + span::after {
     transition: all .15s ease;
     opacity: 1;
-    background-color: var(--color-blue);
+    background-color: var(--primary);
 }
 
 .checkbox > p {
@@ -262,12 +277,17 @@ body {
 }
 
 .slider > input {
-    -webkit-appearance: none;
+    appearance: none;
     width: 100px;
     height: 16px;
-    background: var(--bg-dark);
+    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
     outline: none;
     overflow: hidden;
+    cursor: pointer;
+}
+
+.slider > input:hover {
+    filter: brightness(120%);
 }
 
 .slider > span {
@@ -286,9 +306,9 @@ body {
     -webkit-appearance: none;
     width: 1px;
     height: 16px;
-    background: var(--color-blue);
+    background: rgba(0,0,0,0);
     cursor: pointer;
-    box-shadow: -100px 0 0 100px var(--color-blue);
+    box-shadow: 100px 0 0 100px var(--background-secondary);
 }
 
 /* =========================== */
@@ -300,6 +320,7 @@ body {
 
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .dropdown > p {
@@ -312,10 +333,10 @@ body {
 
 .dropdown > div > input {
     width: 100px;
-    background-color: var(--bg-dark);
-    border-bottom: 1px solid var(--bg-dark);
-    padding: 2px 10px;
-    color: var(--color-blue);
+    background-color: var(--background-secondary);
+    border-bottom: 1px solid var(--background-secondary);
+    padding: 3px 10px;
+    color: var(--text);
     text-overflow: ellipsis;
     overflow: hidden;
     font-size: 12px;
@@ -328,9 +349,7 @@ body {
     min-width: 100px;
     max-width: 100px;
 
-    padding-top: 3px;
-
-    background-color: var(--bg-secondary);
+    background-color: var(--background-secondary);
 
     z-index: 1;
 }
@@ -338,19 +357,19 @@ body {
 .dropdown > div > .content > p {
     cursor: pointer;
 
-    height: 19px;
-    padding: 0px 8px;
+    padding: 4px 10px;
     font-size: 12px;
 
     transition: all .15s ease;
 }
 
 .dropdown > div > .content > p.selected {
-    color: var(--color-blue);
+    color: var(--primary);
 }
 
 .dropdown > div > .content > p:hover {
-    color: var(--color-blue);
+    color: var(--primary);
+    filter: brightness(120%);
 }
 
 .dropdown > div:hover > .content {
@@ -358,7 +377,7 @@ body {
 }
 
 .dropdown > div:hover > input {
-    border-bottom: 1px solid var(--bg-primary);
+    border-bottom: 1px solid var(--trim);
 }
 
 /* =========================== */
@@ -368,6 +387,7 @@ body {
 .selector {
     display: flex;
     flex-direction: row;
+    align-items: center;
 
     font-size: var(--font-size-default);
 }
@@ -376,11 +396,11 @@ body {
     display: flex;
     align-items: center;
 
-    background-color: var(--bg-dark);
+    background-color: var(--background-secondary);
 }
 
 .selector > div > p {
-    background-color: var(--bg-dark);
+    background-color: var(--background-secondary);
 
     transition: all .15s ease;
 
@@ -388,19 +408,20 @@ body {
 
     font-size: 12px;
 
-    padding: 2px 10px;
-    color: var(--text-primary);
+    padding: 3px 10px;
+    color: var(--text);
 }
 
 .selector > div > p:hover {
     cursor: pointer;
-    background-color: var(--color-blue);
-    color: var(--bg-dark);
+    background-color: var(--primary);
+    color: var(--background-primary);
+    filter: brightness(120%);
 }
 
 .selector > div > p.selected {
-    background-color: var(--color-blue);
-    color: var(--bg-dark);
+    background-color: var(--primary);
+    color: var(--background-primary);
 }
 
 .selector > p {
