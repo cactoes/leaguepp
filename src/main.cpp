@@ -14,14 +14,10 @@ int main() {
 
     interface::GetHolder<layout_manager>(from_singleton)->Setup(browserManager->GetHandle());
     interface::GetHolder<event_manager>(from_singleton)->Setup(browserManager->GetHandle());
-
-    auto connectorManager = interface::GetHolder<connector_manager>(from_singleton);
-    connectorManager->Setup();
+    interface::GetHolder<connector_manager>(from_singleton)->Setup();
 
     // blocking until window is closed
     browserManager->Start();
-
-    connectorManager->Shutdown();
 
     return 0;
 }

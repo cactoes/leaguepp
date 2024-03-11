@@ -13,6 +13,8 @@ public:
 
     bool IsConnected();
 
+    ~connector_manager() { Shutdown(); };
+
 private:
     void ConnectHandler();
     void DisconnectHandler();
