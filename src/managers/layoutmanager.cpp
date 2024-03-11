@@ -1,5 +1,10 @@
 #include "layoutmanager.hpp"
 
+#include "../interface/holder.hpp"
+#include "configmanager.hpp"
+
+// #include <iostream>
+
 // void OnToggleCheckBox1(bool state) {
 //     std::cout << "switched state to: " << state << "\n";
 // }
@@ -28,22 +33,14 @@
 //     }
 // };
 
-// void GetMainLayout(browser::browser* handle, browser::js_args_t) {
 //     static testClass g_tc{};
 
-//     static ui::frame mainFrame = ui::frame("frame name", ui::FL_VERTICAL, FRAME_TARGET_MAIN);
-//     static ui::frame frame2 = ui::frame("", ui::FL_HORIZONTAL, FRAME_TARGET_MAIN);
-
-//     mainFrame.AddComponent<ui::button>(std::make_unique<ui::button>("btn", ui::button_callback_t(&testClass::OnClickButton, &g_tc)));
-//     mainFrame.AddComponent<ui::label>("test label");
-//     mainFrame.AddComponent<ui::checkbox>("checkbox", ui::checkbox_callback_t(&OnToggleCheckBox1));
-//     mainFrame.AddComponent<ui::slider>("slider", 0, 100, ui::slider_callback_t(&testClass::OnSliderChange, &g_tc));
-//     mainFrame.AddComponent<ui::dropdown>("dropdown", std::vector<std::string>{ "opt1", "opt2", "opt3" }, ui::dropdown_callback_t(&testClass::OnDropdownChange, &g_tc));
-//     mainFrame.AddComponent<ui::selector>("selector", std::vector<std::string>{ "opt1", "opt2", "opt3" }, ui::selector_callback_t(&testClass::SelectorChange, &g_tc));
-
-//     mainFrame.Register(handle);
-//     frame2.Register(handle);
-// }
+// basicFrame->AddComponent<ui::button>(std::make_shared<ui::button>("btn", ui::button_callback_t(&testClass::OnClickButton, &g_tc)));
+// basicFrame->AddComponent<ui::label>("test label");
+// basicFrame->AddComponent<ui::checkbox>("checkbox", ui::checkbox_callback_t(&OnToggleCheckBox1));
+// basicFrame->AddComponent<ui::slider>("slider", 0, 100, ui::slider_callback_t(&testClass::OnSliderChange, &g_tc));
+// basicFrame->AddComponent<ui::dropdown>("dropdown", std::vector<std::string>{ "opt1", "opt2", "opt3" }, ui::dropdown_callback_t(&testClass::OnDropdownChange, &g_tc));
+// basicFrame->AddComponent<ui::selector>("selector", std::vector<std::string>{ "opt1", "opt2", "opt3" }, ui::selector_callback_t(&testClass::SelectorChange, &g_tc));
 
 void layout_manager::Setup(browser::browser* handle) {
     handle->RegisterFunction("GetMainLayout", CREATE_REGISTRATION_MEMBER(layout_manager::PushLayout));
@@ -52,11 +49,20 @@ void layout_manager::Setup(browser::browser* handle) {
 
     auto basicFrame = std::make_shared<ui::frame>("basic", ui::FL_VERTICAL);
     basicFrame->SetId("BasicFrame");
+
+    // TODO: fix this syntax
+    auto configManager = interface::GetHolder<config_manager>(from_singleton);
+    auto cfg = configManager->GetConfig("cfg");
+
+    basicFrame->AddComponent<ui::checkbox>("auto accept", cfg->GetVar<bool>("lobby::autoAccept"), ui::checkbox_callback_t([configManager, cfg](bool state) {
+        cfg->SetVar("lobby::autoAccept", state);
+        configManager->DumpConfig(cfg);
+    }));
+
     m_frameMain->AddComponent<ui::frame>(std::move(basicFrame));
 
     auto statsFrame = std::make_shared<ui::frame>("stats", ui::FL_VERTICAL);
     statsFrame->SetId("StatsFrame");
-
     m_frameMain->AddComponent<ui::frame>(std::move(statsFrame));
 }
 
