@@ -62,7 +62,7 @@ namespace ui {
         element.replaceChildren(p);
     }
     
-    export function createCheckBox(label: string, id: string, onclick: string, target: string): void {
+    export function createCheckBox(label: string, state: boolean, id: string, onclick: string, target: string): void {
         const element = document.getElementById(target);
         if (!element)
             return noTarget(target);
@@ -74,6 +74,7 @@ namespace ui {
         const lbl = document.createElement("label");
         const input = document.createElement("input");
         input.type = "checkbox";
+        input.checked = state;
         input.onclick = (e: MouseEvent) => {
             invoke(onclick, [ (e.currentTarget as HTMLInputElement).checked ])
         }
@@ -236,8 +237,8 @@ function uiUpdateLabel(text: string, id: string): void {
     ui.updateLabel(text, id);
 }
 
-function uiCreateCheckBox(label: string, id: string, onclick: string, target: string): void {
-    ui.createCheckBox(label, id, onclick, target);
+function uiCreateCheckBox(label: string, state: boolean, id: string, onclick: string, target: string): void {
+    ui.createCheckBox(label, state, id, onclick, target);
 }
 
 function uiCreateSlider(label: string, id: string, onchange: string, min: number, max: number, target: string): void {
