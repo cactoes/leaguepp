@@ -4,8 +4,6 @@
 #include "../callbackholder.hpp"
 #include "../ui/label.hpp"
 
-#undef interface
-
 class connector_manager {
 public:
     void Setup();

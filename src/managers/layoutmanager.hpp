@@ -12,7 +12,6 @@
 #include "../ui/selector.hpp"
 
 #include "../browser/browser.hpp"
-#undef interface
 
 class layout_manager {
 public:

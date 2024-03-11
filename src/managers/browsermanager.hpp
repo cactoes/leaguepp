@@ -4,7 +4,6 @@
 #include <memory>
 
 #include "../browser/browser.hpp"
-#undef interface
 
 class browser_manager {
 public:

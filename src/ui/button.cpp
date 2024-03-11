@@ -9,7 +9,7 @@ void ui::button::Register(browser::browser* handle) {
     handle->RegisterFunction(COMPONENT_CALLER_ID(HandleClick), &button::HandleClick, this);
 }
 
-void ui::button::Update(browser::browser* handle) {
+void ui::button::Update(browser::browser*) {
     
 }
 
