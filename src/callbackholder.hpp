@@ -8,10 +8,16 @@ class callback_holder {
 public:
     typedef void(*basic_t)(Args...);
 
+    typedef std::function<void(Args...)> lambda_t;
+
     template <typename C>
     using class_t = void(C::*)(Args...);
 
     explicit callback_holder(basic_t callback) {
+        m_callback = callback;
+    }
+
+    explicit callback_holder(lambda_t callback) {
         m_callback = callback;
     }
 
