@@ -5,11 +5,11 @@ ui::component_type ui::checkbox::GetType() const {
 }
 
 void ui::checkbox::Register(browser::browser* handle) {
-    handle->CallJSFunction("uiCreateCheckBox", { m_label, GetId(), COMPONENT_CALLER_ID(HandleChange), m_target });
+    handle->CallJSFunction("uiCreateCheckBox", { m_label, m_state, GetId(), COMPONENT_CALLER_ID(HandleChange), m_target });
     handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &checkbox::HandleChange, this);
 }
 
-void ui::checkbox::Update(browser::browser* handle) {
+void ui::checkbox::Update(browser::browser*) {
     
 }
 

@@ -10,8 +10,8 @@ namespace ui {
 
     class checkbox : public component {
     public:
-        checkbox(const std::string& label, const checkbox_callback_t& callbackHolder, const std::string& target = "") :
-            m_label(label), m_callbackHolder(callbackHolder) {
+        checkbox(const std::string& label, bool state, const checkbox_callback_t& callbackHolder, const std::string& target = "") :
+            m_state(state), m_label(label), m_callbackHolder(callbackHolder) {
             m_target = target;
         }
 
@@ -22,6 +22,7 @@ namespace ui {
         void HandleChange(browser::browser*, browser::js_args_t args);
 
     private:
+        bool m_state;
         std::string m_label;
         checkbox_callback_t m_callbackHolder;
     };
