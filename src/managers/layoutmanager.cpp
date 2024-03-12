@@ -46,20 +46,22 @@ void layout_manager::Setup(browser::browser* handle) {
     handle->RegisterFunction("GetMainLayout", CREATE_REGISTRATION_MEMBER(layout_manager::PushLayout));
 
     m_frameMain = std::make_shared<ui::frame>("", ui::FL_HORIZONTAL, FRAME_TARGET_MAIN);
+    m_frameMain->SetId("MainFrame");
 
-    auto basicFrame = std::make_shared<ui::frame>("basic", ui::FL_VERTICAL);
-    basicFrame->SetId("BasicFrame");
+    auto lobbyFrame = std::make_shared<ui::frame>("lobby", ui::FL_VERTICAL);
+    lobbyFrame->SetId("LobbyFrame");
 
     // TODO: fix this syntax
     auto configManager = interface::GetHolder<config_manager>(from_singleton);
     auto cfg = configManager->GetConfig("cfg");
 
-    basicFrame->AddComponent<ui::checkbox>("auto accept", cfg->GetVar<bool>("lobby::autoAccept"), ui::checkbox_callback_t([configManager, cfg](bool state) {
+    lobbyFrame->AddComponent<ui::checkbox>("auto accept", cfg->GetVar<bool>("lobby::autoAccept"), ui::checkbox_callback_t([configManager, cfg](bool state) {
         cfg->SetVar("lobby::autoAccept", state);
         configManager->DumpConfig(cfg);
+        return state;
     }));
 
-    m_frameMain->AddComponent<ui::frame>(std::move(basicFrame));
+    m_frameMain->AddComponent<ui::frame>(std::move(lobbyFrame));
 
     auto statsFrame = std::make_shared<ui::frame>("stats", ui::FL_VERTICAL);
     statsFrame->SetId("StatsFrame");
