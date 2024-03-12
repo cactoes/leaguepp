@@ -1,8 +1,5 @@
 #include "connectormanager.hpp"
 
-#include <iostream>
-#include <connector.hpp>
-
 #include "../interface/holder.hpp"
 #include "browsermanager.hpp"
 #include "layoutmanager.hpp"
@@ -45,4 +42,12 @@ void connector_manager::DisconnectHandler() {
 
 bool connector_manager::IsConnected() {
     return m_isConnected;
+}
+
+void connector_manager::AddEventListener(const std::string& endpoint, client_callback_t callback) {
+    connector::AddEventHandler(endpoint, callback.GetCallback());
+}
+
+connector::result_t connector_manager::MakeRequest(connector::request_type type, const std::string& endpoint, const std::string& data) {
+    return connector::MakeRequest(type, endpoint, data);
 }
