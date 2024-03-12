@@ -9,7 +9,7 @@ void ui::dropdown::Register(browser::browser* handle) {
     handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &dropdown::HandleChange, this);
 }
 
-void ui::dropdown::Update(browser::browser* handle) {
+void ui::dropdown::Update(browser::browser*) {
     
 }
 
