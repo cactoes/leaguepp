@@ -50,17 +50,6 @@ void layout_manager::Setup(browser::browser* handle) {
 
     auto lobbyFrame = std::make_shared<ui::frame>("lobby", ui::FL_VERTICAL);
     lobbyFrame->SetId("LobbyFrame");
-
-    // TODO: fix this syntax
-    auto configManager = interface::GetHolder<config_manager>(from_singleton);
-    auto cfg = configManager->GetConfig("cfg");
-
-    lobbyFrame->AddComponent<ui::checkbox>("auto accept", cfg->GetVar<bool>("lobby::autoAccept"), ui::checkbox_callback_t([configManager, cfg](bool state) {
-        cfg->SetVar("lobby::autoAccept", state);
-        configManager->DumpConfig(cfg);
-        return state;
-    }));
-
     m_frameMain->AddComponent<ui::frame>(std::move(lobbyFrame));
 
     auto statsFrame = std::make_shared<ui::frame>("stats", ui::FL_VERTICAL);
