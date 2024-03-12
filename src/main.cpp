@@ -28,10 +28,14 @@ int main() {
     interface::GetHolder<event_manager>(from_singleton)->Setup(browserManager->GetHandle());
 
     // setup league connector & try to connect
-    interface::GetHolder<connector_manager>(from_singleton)->Setup();
+    auto connectionManager = interface::GetHolder<connector_manager>(from_singleton);
+    connectionManager->Setup();
 
     // start the browser
     browserManager->Start();
+
+    // stop the connector
+    connectionManager->Shutdown();
 
     return 0;
 }
