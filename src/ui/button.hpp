@@ -6,7 +6,7 @@
 #include "component.hpp"
 
 namespace ui {
-    typedef callback_holder<> button_callback_t;
+    typedef callback_holder<void> button_callback_t;
 
     class button : public component {
     public:

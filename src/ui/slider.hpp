@@ -6,7 +6,7 @@
 #include "component.hpp"
 
 namespace ui {
-    typedef callback_holder<int> slider_callback_t;
+    typedef callback_holder<void, int> slider_callback_t;
 
     class slider : public component {
     public:

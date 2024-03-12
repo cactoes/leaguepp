@@ -6,7 +6,7 @@
 #include "component.hpp"
 
 namespace ui {
-    typedef callback_holder<bool> checkbox_callback_t;
+    typedef callback_holder<bool, bool> checkbox_callback_t;
 
     class checkbox : public component {
     public:

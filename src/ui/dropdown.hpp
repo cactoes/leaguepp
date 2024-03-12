@@ -8,7 +8,7 @@
 #include "component.hpp"
 
 namespace ui {
-    typedef callback_holder<std::string, bool, std::vector<std::string>> dropdown_callback_t;
+    typedef callback_holder<void, std::string, bool, std::vector<std::string>> dropdown_callback_t;
 
     class dropdown : public component {
     public:

@@ -14,5 +14,5 @@ void ui::checkbox::Update(browser::browser*) {
 }
 
 void ui::checkbox::HandleChange(browser::browser*, browser::js_args_t args) {
-    m_callbackHolder.Run(args.Get<0, bool>());
+    m_state = m_callbackHolder.Run(args.Get<0, bool>());
 }
