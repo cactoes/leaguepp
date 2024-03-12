@@ -42,6 +42,10 @@ public:
         return m_callback(std::forward<Args>(args)...);
     }
 
+    std::function<RTy(Args...)> GetCallback() {
+        return m_callback;
+    }
+
 private:
     std::function<RTy(Args...)> m_callback;
 };
