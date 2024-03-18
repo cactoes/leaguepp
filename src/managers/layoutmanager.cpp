@@ -48,9 +48,17 @@ void layout_manager::Setup(browser::browser* handle) {
     m_frameMain = std::make_shared<ui::frame>("", ui::FL_HORIZONTAL, FRAME_TARGET_MAIN);
     m_frameMain->SetId("MainFrame");
 
+    auto holderFrame = std::make_shared<ui::frame>("", ui::FL_VERTICAL);
+    holderFrame->SetId("HolderFrame");
+    m_frameMain->AddComponent<ui::frame>(holderFrame);
+
     auto lobbyFrame = std::make_shared<ui::frame>("lobby", ui::FL_VERTICAL);
     lobbyFrame->SetId("LobbyFrame");
-    m_frameMain->AddComponent<ui::frame>(std::move(lobbyFrame));
+    holderFrame->AddComponent<ui::frame>(std::move(lobbyFrame));
+
+    auto autoPickerFrame = std::make_shared<ui::frame>("auto picker", ui::FL_VERTICAL);
+    autoPickerFrame->SetId("AutoPickerFrame");
+    holderFrame->AddComponent<ui::frame>(std::move(autoPickerFrame));
 
     auto statsFrame = std::make_shared<ui::frame>("stats", ui::FL_VERTICAL);
     statsFrame->SetId("StatsFrame");
