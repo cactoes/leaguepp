@@ -76,6 +76,7 @@ namespace ui {
         input.type = "checkbox";
         input.checked = state;
         input.onclick = (e: MouseEvent) => {
+            // state that gets returned is ignored
             invoke(onclick, [ (e.currentTarget as HTMLInputElement).checked ])
         }
         lbl.appendChild(input);
@@ -181,7 +182,7 @@ namespace ui {
         element.appendChild(dropdown);
     }
 
-    export function createSelector(label: string, id: string, onchange: string, target: string, items: string[]): void {
+    export function createSelector(label: string, state: number, id: string, onchange: string, target: string, items: string[]): void {
         const element = document.getElementById(target);
         if (!element)
             return noTarget(target);
@@ -194,9 +195,15 @@ namespace ui {
         selectorContent.id = id + "content"
         selectorContent.className = "noselect"
 
-        for (const item of items) {
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
             const p = document.createElement("p");
             p.innerText = item;
+
+            if (i == state)
+                p.className = "selected";
+
             p.onclick = () => {
                 if (p.className == "selected")
                     return;
@@ -205,7 +212,8 @@ namespace ui {
                     element.className = "";
     
                 p.className = "selected";
-    
+                
+                // state that gets returned is ignored
                 invoke(onchange, [ p.innerText ]);
             }
             selectorContent.appendChild(p);
@@ -249,8 +257,12 @@ function uiCreateDropDown(label: string, id: string, onchange: string, target: s
     ui.createDropDown(label, id, onchange, target, items);
 }
 
-function uiCreateSelector(label: string, id: string, onchange: string, target: string, items: string[]): void {
-    ui.createSelector(label, id, onchange, target, items);
+function uiCreateSelector(label: string, state: number, id: string, onchange: string, target: string, items: string[]): void {
+    ui.createSelector(label, state, id, onchange, target, items);
+}
+
+function createNotification(text: string, typeId: number) {
+    console.log(text, typeId);
 }
 
 async function main() {
@@ -262,6 +274,8 @@ async function main() {
     register(uiCreateSlider);
     register(uiCreateDropDown);
     register(uiCreateSelector);
+
+    register(createNotification);
 
     for (const button of (document.getElementsByClassName("button") as HTMLCollectionOf<HTMLDivElement>))
         button.addEventListener("click", () => invoke("HandleWindowEvent", [ button.id ]))
