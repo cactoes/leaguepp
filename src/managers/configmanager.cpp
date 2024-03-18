@@ -80,10 +80,13 @@ config::data_t config::Data() {
 }
 
 void config_manager::Setup() {
-    auto cfg = CreateConfig("cfg");
-    cfg->AddTemplate<bool>("lobby::autoAccept");
-    cfg->AddTemplate<int>("bot::mode");
-    cfg->AddTemplate<int>("bot::strictness");
+    auto cfg = CreateConfig(CONFIG_BASIC);
+    cfg->AddTemplate<bool>("lobby::bAutoAccept");
+
+    cfg->AddTemplate<int>("autoPicker::nMode");
+    cfg->AddTemplate<int>("autoPicker::nStrictness");
+    cfg->AddTemplate<std::vector<int>>("autoPicker::banIds");
+    cfg->AddTemplate<std::vector<int>>("autoPicker::pickIds");
 
     if (!LoadConfig(cfg))
         DumpConfig(cfg);

@@ -8,6 +8,8 @@
 
 #include "../hash.hpp"
 
+#define CONFIG_BASIC "cfg"
+
 template<typename Ty>
 struct is_valid_type : std::disjunction<
     std::is_same<Ty, int>,
