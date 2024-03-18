@@ -36,13 +36,13 @@ namespace ui {
         element.appendChild(button);
     }
     
-    export function createLabel(text: string, id: string, target: string): void {
+    export function createLabel(text: string, pos: string, id: string, target: string): void {
         const element = document.getElementById(target);
         if (!element)
             return noTarget(target);
     
         const label = document.createElement("div");
-        label.className = "label element";
+        label.className = "label element " + pos;
         label.id = id;
     
         const p = document.createElement("p");
@@ -237,8 +237,8 @@ function uiCreateButton(label: string, id: string, onclick: string, target: stri
     ui.createButton(label, id, onclick, target);
 }
 
-function uiCreateLabel(text: string, id: string, target: string): void {
-    ui.createLabel(text, id, target);
+function uiCreateLabel(text: string, pos: string, id: string, target: string): void {
+    ui.createLabel(text, pos, id, target);
 }
 
 function uiUpdateLabel(text: string, id: string): void {

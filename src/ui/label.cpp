@@ -5,7 +5,7 @@ ui::component_type ui::label::GetType() const {
 }
 
 void ui::label::Register(browser::browser* handle) {
-    handle->CallJSFunction("uiCreateLabel", { m_text, GetId(), m_target });
+    handle->CallJSFunction("uiCreateLabel", { m_text, m_pos, GetId(), m_target });
 }
 
 void ui::label::Update(browser::browser* handle) {

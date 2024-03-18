@@ -11,7 +11,7 @@ void connector_manager::Setup() {
     connectorConfig.disconnectHandler = std::bind(&connector_manager::DisconnectHandler, this);
 
     // persistent components
-    m_connectionLabel = std::make_shared<ui::label>("-- disconnected --");
+    m_connectionLabel = std::make_shared<ui::label>("-- disconnected --", "left");
 
     // custom frame
     auto frame = std::make_shared<ui::frame>("connection", ui::FL_VERTICAL_AUTO);

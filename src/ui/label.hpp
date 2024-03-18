@@ -8,8 +8,8 @@
 namespace ui {
     class label : public component {
     public:
-        label(const std::string& text, const std::string& target = "") :
-            m_text(text) {
+        label(const std::string& text, const std::string& pos, const std::string& target = "") :
+            m_text(text), m_pos(pos) {
             m_target = target;
         }
 
@@ -21,6 +21,7 @@ namespace ui {
 
     private:
         std::string m_text;
+        std::string m_pos;
     };
 }; // namespace ui
 

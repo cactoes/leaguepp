@@ -205,6 +205,18 @@ body {
 /* LABEL STYLING */
 /* =========================== */
 
+.label.center {
+    text-align: center;
+}
+
+.label.left {
+    text-align: left;
+}
+
+.label.right {
+    text-align: right;
+}
+
 .label > p {
     font-size: var(--font-size-default);
 }
