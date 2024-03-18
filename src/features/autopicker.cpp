@@ -8,11 +8,23 @@
 #include "../managers/browsermanager.hpp"
 
 #include "../ui/selector.hpp"
+#include "../ui/button.hpp"
+#include "../ui/label.hpp"
 
 void feature::auto_picker::Setup(std::shared_ptr<ui::frame> frame) {
-    // auto connectorManager = interface::GetHolder<connector_manager>(from_singleton);
+    auto connectorManager = interface::GetHolder<connector_manager>(from_singleton);
     auto configManager = interface::GetHolder<config_manager>(from_singleton);
     auto cfg = configManager->GetConfig(CONFIG_BASIC);
+
+    connectorManager->AddEventListener(
+        "/lol-gameflow/v1/gameflow-phase",
+        client_callback_t([this, cfg, connectorManager](nlohmann::json data) {
+            if (auto currentGameFlow = data.get<std::string>(); currentGameFlow != "ChampSelect")
+                return;
+
+            // TODO: handlers for champselect suff
+        })
+    );
 
     frame->AddComponent<ui::selector>(
         "mode", cfg->GetVar<int>("autoPicker::nMode"), m_modes,
@@ -24,14 +36,20 @@ void feature::auto_picker::Setup(std::shared_ptr<ui::frame> frame) {
         })
     );
 
-    // frame->AddComponent<ui::checkbox>(
-    //     GetName(), cfg->GetVar<bool>("lobby::bAutoAccept"),
-    //     ui::checkbox_callback_t([this, configManager, cfg](bool state) {
-    //         cfg->SetVar("lobby::bAutoAccept", state);
-    //         configManager->DumpConfig(cfg);
-    //         return state;
-    //     })
-    // );
+    frame->AddComponent<ui::button>(
+        "dodge", ui::button_callback_t([this, connectorManager]() {
+            // TODO: create notification to let user know if it failed
+
+            auto result = connectorManager->MakeRequest(connector::request_type::GET, "/lol-gameflow/v1/gameflow-phases");
+            if (result.status != 200 || result.data.get<std::string>() != "ChampSelect")
+                return;
+
+            // TODO: do we need to specify the data twice?
+            (void)connectorManager->MakeRequest(connector::request_type::POST,
+                "/lol-login/v1/session/invoke?destination=lcdsServiceProxy&method=call&args=[\"\",\"teambuilder-draft\",\"quitV2\",\"\"]",
+                "[\"\",\"teambuilder-draft\",\"quitV2\",\"\"]");
+        })
+    );
 }
 
 std::string feature::auto_picker::GetName() {
