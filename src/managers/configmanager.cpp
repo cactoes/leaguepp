@@ -123,11 +123,10 @@ bool config_manager::LoadConfig(std::shared_ptr<config> config) {
         uint64_t size = 0;
         stream.read(reinterpret_cast<char*>(&size), sizeof(size));
 
-        if (config->HasVar(hash)) {
+        if (config->HasVar(hash))
             stream.read(config->m_data.at(hash)->Data(), sizeof(size));
-        } else {
+        else
             stream.ignore(size);
-        }
 
         const auto blocksize = sizeof(hash) + sizeof(size) + size;
         if ((blocksize % 8) != 0 && (blocksize % 2) != 0) {

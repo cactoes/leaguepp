@@ -8,6 +8,7 @@
 #include "component.hpp"
 
 namespace ui {
+    // void DropDownCallback(std::string item, bool newItemState, std::vector<std::string> list)
     typedef callback_holder<void, std::string, bool, std::vector<std::string>> dropdown_callback_t;
 
     class dropdown : public component {

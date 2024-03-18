@@ -6,6 +6,7 @@
 #include "component.hpp"
 
 namespace ui {
+    // int SelectorCallback(std::string currentItem)
     typedef callback_holder<int, std::string> selector_callback_t;
 
     class selector : public component {
