@@ -6,12 +6,12 @@
 #include "component.hpp"
 
 namespace ui {
-    typedef callback_holder<void, std::string> selector_callback_t;
+    typedef callback_holder<int, std::string> selector_callback_t;
 
     class selector : public component {
     public:
-        selector(const std::string& label, const std::vector<std::string>& values, const selector_callback_t& callbackHolder, const std::string& target = "") :
-            m_label(label), m_values(values), m_callbackHolder(callbackHolder) {
+        selector(const std::string& label, int state, const std::vector<std::string>& values, const selector_callback_t& callbackHolder, const std::string& target = "") :
+            m_state(state), m_label(label), m_values(values), m_callbackHolder(callbackHolder) {
             m_target = target;
         }
 
@@ -22,6 +22,7 @@ namespace ui {
         void HandleChange(browser::browser*, browser::js_args_t args);
 
     private:
+        int m_state;
         std::string m_label;
         std::vector<std::string> m_values;
         selector_callback_t m_callbackHolder;
