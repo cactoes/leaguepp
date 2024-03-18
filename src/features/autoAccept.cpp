@@ -1,4 +1,4 @@
-#include "autoAccept.hpp"
+#include "autoaccept.hpp"
 
 #include "../interface/holder.hpp"
 #include "../managers/configmanager.hpp"

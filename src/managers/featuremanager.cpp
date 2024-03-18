@@ -2,7 +2,7 @@
 
 #include "../interface/holder.hpp"
 #include "layoutmanager.hpp"
-#include "../features/autoAccept.hpp"
+#include "../features/autoaccept.hpp"
 #include "../features/autopicker.hpp"
 
 void feature_manager::Setup() {
