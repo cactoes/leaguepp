@@ -230,7 +230,7 @@ namespace ui {
 
     export function createNotificationBox(title: string, description: string, typeId: number, parent: HTMLDivElement): HTMLDivElement {
         const notification = document.createElement("div");
-        notification.className = "notification";
+        notification.className = "notification noselect";
 
         const content = document.createElement("div");
         content.className = "content";
@@ -247,9 +247,15 @@ namespace ui {
 
         notification.appendChild(content);
 
+        let isRemoving = false;
+
         const clearThisElement = () => {
-            notification.classList.add("fade");
-            setTimeout(() => parent.removeChild(notification), 300);
+            if (!isRemoving) {
+                isRemoving = true;
+
+                notification.classList.add("fade");
+                setTimeout(() => parent.removeChild(notification), 300);
+            }
         }
 
         let timeout = setTimeout(clearThisElement, 4700);
@@ -304,8 +310,6 @@ function createNotification(title: string, description: string, typeId: number) 
     const target = document.getElementById("notification_wrapper") as HTMLDivElement;
     const box = ui.createNotificationBox(title, description, typeId, target);
     target.appendChild(box);
-
-    console.log(box);
 }
 
 async function main() {
