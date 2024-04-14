@@ -5,6 +5,8 @@
 #include "../ui/checkbox.hpp"
 #undef interface
 
+// ref madoka
+
 namespace feature {
     class auto_picker : public feature {
     public:

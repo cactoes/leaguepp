@@ -9,7 +9,7 @@
 #include "../callbackholder.hpp"
 #include "../ui/label.hpp"
 
-typedef callback_holder<void, nlohmann::json> client_callback_t;
+typedef callback_holder<void, std::string, nlohmann::json> client_callback_t;
 
 class connector_manager {
 public:

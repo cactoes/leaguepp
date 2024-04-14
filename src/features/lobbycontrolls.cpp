@@ -15,7 +15,7 @@ void feature::lobby_controlls::Setup(std::shared_ptr<ui::frame> frame) {
 
     connectorManager->AddEventListener(
         "/lol-gameflow/v1/gameflow-phase",
-        client_callback_t([this, cfg, connectorManager](nlohmann::json data) {
+        client_callback_t([this, cfg, connectorManager](std::string, nlohmann::json data) {
             auto currentGameFlow = data.get<std::string>();
             if (cfg->GetVar<bool>("lobby::bAutoAccept") && currentGameFlow == "ReadyCheck") {
                 connector::result_t result = connectorManager->MakeRequest(connector::request_type::POST, "/lol-matchmaking/v1/ready-check/accept");
