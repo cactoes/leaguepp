@@ -13,11 +13,11 @@ void layout_manager::Setup(browser::browser* handle) {
     holderFrame->SetId("HolderFrame");
     m_frameMain->AddComponent<ui::frame>(holderFrame);
 
-    auto lobbyFrame = std::make_shared<ui::frame>("lobby", ui::FL_VERTICAL);
+    auto lobbyFrame = std::make_shared<ui::frame>("lobby", ui::FL_VERTICAL_AUTO);
     lobbyFrame->SetId("LobbyFrame");
     holderFrame->AddComponent<ui::frame>(std::move(lobbyFrame));
 
-    auto autoPickerFrame = std::make_shared<ui::frame>("auto picker", ui::FL_VERTICAL);
+    auto autoPickerFrame = std::make_shared<ui::frame>("auto picker", ui::FL_VERTICAL_AUTO);
     autoPickerFrame->SetId("AutoPickerFrame");
     holderFrame->AddComponent<ui::frame>(std::move(autoPickerFrame));
 
