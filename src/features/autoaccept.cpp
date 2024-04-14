@@ -15,10 +15,9 @@ void feature::auto_accept::Setup(std::shared_ptr<ui::frame> frame) {
         client_callback_t([this, cfg, connectorManager](nlohmann::json data) {
             auto currentGameFlow = data.get<std::string>();
             if (cfg->GetVar<bool>("lobby::bAutoAccept") && currentGameFlow == "ReadyCheck") {
-                (void)connectorManager->MakeRequest(connector::request_type::POST, "/lol-matchmaking/v1/ready-check/accept");
-                // connector::result_t result;
-                // if (result.status == 200)
-                // interface::GetHolder<browser_manager>(from_singleton)->CallJS("createNotification", { "Notification title", 10 });
+                connector::result_t result = connectorManager->MakeRequest(connector::request_type::POST, "/lol-matchmaking/v1/ready-check/accept");
+                if (result.status == 200)
+                    interface::GetHolder<browser_manager>(from_singleton)->CreateNotification("accepted match", "the match has been automatically accepted", notification_type::SUCCESS);
             }
         })
     );
