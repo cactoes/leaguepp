@@ -11,6 +11,8 @@
 #include "../ui/button.hpp"
 #include "../ui/label.hpp"
 
+#include "../debugutils.hpp"
+
 void feature::auto_picker::Setup(std::shared_ptr<ui::frame> frame) {
     auto connectorManager = interface::GetHolder<connector_manager>(from_singleton);
     auto configManager = interface::GetHolder<config_manager>(from_singleton);
@@ -36,18 +38,26 @@ void feature::auto_picker::Setup(std::shared_ptr<ui::frame> frame) {
         })
     );
 
+    // TODO: move ts shit
     frame->AddComponent<ui::button>(
         "dodge", ui::button_callback_t([this, connectorManager]() {
             // TODO: create notification to let user know if it failed
 
+            auto browserManager = interface::GetHolder<browser_manager>(from_singleton);
+
             auto result = connectorManager->MakeRequest(connector::request_type::GET, "/lol-gameflow/v1/gameflow-phases");
-            if (result.status != 200 || result.data.get<std::string>() != "ChampSelect")
+            if (result.status != 200 || result.data.get<std::string>() != "ChampSelect") {
+                browserManager->CreateNotification("failed to dodge", "not in a match", notification_type::NONE);
                 return;
+            }
 
             // TODO: do we need to specify the data twice?
-            (void)connectorManager->MakeRequest(connector::request_type::POST,
+            result = connectorManager->MakeRequest(connector::request_type::POST,
                 "/lol-login/v1/session/invoke?destination=lcdsServiceProxy&method=call&args=[\"\",\"teambuilder-draft\",\"quitV2\",\"\"]",
                 "[\"\",\"teambuilder-draft\",\"quitV2\",\"\"]");
+
+            if (result.status != 200)
+                browserManager->CreateNotification("failed to dodge", "the current match cannot be dodged", notification_type::NONE);
         })
     );
 }
