@@ -124,14 +124,14 @@ bool config_manager::LoadConfig(std::shared_ptr<config> config) {
         stream.read(reinterpret_cast<char*>(&size), sizeof(size));
 
         if (config->HasVar(hash))
-            stream.read(config->m_data.at(hash)->Data(), sizeof(size));
+            stream.read(config->m_data.at(hash)->Data(), size);
         else
             stream.ignore(size);
 
-        const auto blocksize = sizeof(hash) + sizeof(size) + size;
-        if ((blocksize % 8) != 0 && (blocksize % 2) != 0) {
-            stream.ignore(8 - (blocksize % 8));
-        }
+        // memory alignment is not needed ww
+        // const auto blocksize = sizeof(hash) + sizeof(size) + size;
+        // if ((blocksize % 8) != 0 && (blocksize % 2) != 0)
+        //     stream.ignore(8 - (blocksize % 8));
     }
 
     return true;
