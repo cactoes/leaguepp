@@ -27,3 +27,7 @@ browser::browser* browser_manager::GetHandle() {
 void browser_manager::CallJS(const std::string& name, const std::vector<std::any>& args) {
     m_handle->CallJSFunction(name, args);
 }
+
+void browser_manager::CreateNotification(const std::string& title, const std::string& description, notification_type type) {
+    m_handle->CallJSFunction("createNotification", { title, description, (int)type });
+}

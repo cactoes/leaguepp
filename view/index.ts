@@ -227,6 +227,45 @@ namespace ui {
 
         element.appendChild(selector);
     }
+
+    export function createNotificationBox(title: string, description: string, typeId: number, parent: HTMLDivElement): HTMLDivElement {
+        const notification = document.createElement("div");
+        notification.className = "notification";
+
+        const content = document.createElement("div");
+        content.className = "content";
+
+        const contentTitle = document.createElement("p");
+        contentTitle.className = "contentTitle";
+        contentTitle.innerText = title;
+        content.appendChild(contentTitle);
+
+        const contentDescription = document.createElement("p");
+        contentDescription.className = "contentDescription";
+        contentDescription.innerText = description;
+        content.appendChild(contentDescription);
+
+        notification.appendChild(content);
+
+        const clearThisElement = () => {
+            notification.classList.add("fade");
+            setTimeout(() => parent.removeChild(notification), 300);
+        }
+
+        let timeout = setTimeout(clearThisElement, 4700);
+
+        notification.onclick = () => {
+            clearTimeout(timeout);
+            clearThisElement();
+        }
+
+        const statusBar = document.createElement("div");
+        statusBar.className = "statusbar";
+        statusBar.appendChild(document.createElement("div"));
+        notification.appendChild(statusBar);
+
+        return notification;
+    }
 }; // namespace ui
 
 function uiCreateFrame(name: string, id: string, layout: string, target: string): void {
@@ -261,8 +300,12 @@ function uiCreateSelector(label: string, state: number, id: string, onchange: st
     ui.createSelector(label, state, id, onchange, target, items);
 }
 
-function createNotification(text: string, typeId: number) {
-    console.log(text, typeId);
+function createNotification(title: string, description: string, typeId: number) {
+    const target = document.getElementById("notification_wrapper") as HTMLDivElement;
+    const box = ui.createNotificationBox(title, description, typeId, target);
+    target.appendChild(box);
+
+    console.log(box);
 }
 
 async function main() {

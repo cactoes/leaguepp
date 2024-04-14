@@ -5,6 +5,13 @@
 
 #include "../browser/browser.hpp"
 
+enum class notification_type {
+    NONE,
+    ERR,
+    WARNING,
+    SUCCESS
+};
+
 class browser_manager {
 public:
     void Setup();
@@ -13,6 +20,7 @@ public:
     browser::browser* GetHandle();
 
     void CallJS(const std::string& name, const std::vector<std::any>& args);
+    void CreateNotification(const std::string& title, const std::string& description, notification_type type);
 
 private:
     std::shared_ptr<browser::browser> m_handle = nullptr;

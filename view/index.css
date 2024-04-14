@@ -9,6 +9,7 @@
     /* font-family: 'Segoe UI'; */
 
     --text: #ebebeb;
+    --text-secondary: #b3b3b3;
     --background-primary: #141414;
     --background-secondary: #010101;
     --trim: #292929;
@@ -62,6 +63,8 @@ body {
     justify-content: space-between;
 
     border-bottom: 2px solid var(--background-primary);
+
+    z-index: 2;
 }
 
 #titlebar > .info {
@@ -125,6 +128,106 @@ body {
     width: 100%;
     height: 100%;
     background-color: var(--background-primary);
+    z-index: 0;
+}
+
+/* =========================== */
+/* NOTIFICATION STYLING */
+/* =========================== */
+
+#notification_wrapper {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+
+    position: absolute;
+    width: 35vw;
+    /* 26px for the titlebar */
+    height: calc(100vh - 26px);
+    padding: 14px;
+
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+}
+
+.notification {
+    cursor: pointer;
+
+    width: 100%;
+
+    background-color: var(--background-primary);
+    border: 1px solid var(--trim);
+
+    padding: 8px;
+
+    position: relative;
+
+    opacity: 1;
+    transition: all .2s ease;
+}
+
+.notification:not(:first-child) {
+    margin-bottom: 8px;
+}
+
+.notification:hover {
+    filter: brightness(110%);
+    transform: translateX(-2px) translateY(-5px);
+}
+
+.notification.fade {
+    opacity: 1;
+    animation: fadeOut .3s linear forwards;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.notification > .statusbar {
+    position: absolute;
+    bottom: 8px;
+    /* 16px is the padding */
+    width: calc(100% - 16px);
+    height: 6px;
+    background-color: var(--background-secondary);
+}
+
+.notification > .statusbar > div {
+    animation: progress 5s linear forwards;
+    background-color: var(--accent);
+    height: 100%;
+    width: 100%;
+}
+
+@keyframes progress {
+    0% {
+        width: calc(100% - 16px);
+    }
+
+    100% {
+        width: 1%;
+    }
+}
+
+.notification > .content {
+    display: flex;
+    flex-direction: column;
+    font-size: var(--font-size-default);
+
+    /* 6px for statusbar 8px for padding */
+    margin-bottom: calc(6px + 8px);
+}
+
+.notification > .content > .contentDescription {
+    color: var(--text-secondary);
 }
 
 /* =========================== */
@@ -163,10 +266,12 @@ body {
 
 .frame.vertical-auto {
     height: auto;
+    flex-direction: column;
 }
 
 .frame.horizontal-auto {
     width: auto;
+    flex-direction: row;
 }
 
 /* =========================== */
