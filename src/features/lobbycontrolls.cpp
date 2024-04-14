@@ -26,7 +26,7 @@ void feature::lobby_controlls::Setup(std::shared_ptr<ui::frame> frame) {
     );
 
     frame->AddComponent<ui::checkbox>(
-        GetName(), cfg->GetVar<bool>("lobby::bAutoAccept"),
+        "auto accept", cfg->GetVar<bool>("lobby::bAutoAccept"),
         ui::checkbox_callback_t([this, configManager, cfg](bool state) {
             cfg->SetVar("lobby::bAutoAccept", state);
             configManager->DumpConfig(cfg);
