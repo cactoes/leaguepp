@@ -31,13 +31,17 @@ void connector_manager::Shutdown() {
 }
 
 void connector_manager::ConnectHandler() {
+    auto browserManager = interface::GetHolder<browser_manager>(from_singleton);
     m_connectionLabel->SetText("-- connected --");
-    m_connectionLabel->Update(interface::GetHolder<browser_manager>(from_singleton)->GetHandle());
+    m_connectionLabel->Update(browserManager->GetHandle());
+    browserManager->CreateNotification("connected", "the client has connected to league", notification_type::SUCCESS);
 }
 
 void connector_manager::DisconnectHandler() {
+    auto browserManager = interface::GetHolder<browser_manager>(from_singleton);
     m_connectionLabel->SetText("-- disconnected --");
     m_connectionLabel->Update(interface::GetHolder<browser_manager>(from_singleton)->GetHandle());
+    browserManager->CreateNotification("disconnected", "the client has disconnected from league", notification_type::SUCCESS);
 }
 
 bool connector_manager::IsConnected() {
