@@ -2,7 +2,7 @@
 
 #include "../interface/holder.hpp"
 #include "layoutmanager.hpp"
-#include "../features/autoaccept.hpp"
+#include "../features/lobbycontrolls.hpp"
 #include "../features/autopicker.hpp"
 
 void feature_manager::Setup() {
@@ -12,6 +12,6 @@ void feature_manager::Setup() {
     auto lobbyFrame = targetFrame->GetComponent<ui::frame>("LobbyFrame");
     auto autoPickerFrame = targetFrame->GetComponent<ui::frame>("AutoPickerFrame");
 
-    CreateFeature<feature::auto_accept>(lobbyFrame);
+    CreateFeature<feature::lobby_controlls>(lobbyFrame);
     CreateFeature<feature::auto_picker>(autoPickerFrame);
 }

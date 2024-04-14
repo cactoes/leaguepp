@@ -37,29 +37,6 @@ void feature::auto_picker::Setup(std::shared_ptr<ui::frame> frame) {
             return newModeIndex;
         })
     );
-
-    // TODO: move ts shit
-    frame->AddComponent<ui::button>(
-        "dodge", ui::button_callback_t([this, connectorManager]() {
-            // TODO: create notification to let user know if it failed
-
-            auto browserManager = interface::GetHolder<browser_manager>(from_singleton);
-
-            auto result = connectorManager->MakeRequest(connector::request_type::GET, "/lol-gameflow/v1/gameflow-phases");
-            if (result.status != 200 || result.data.get<std::string>() != "ChampSelect") {
-                browserManager->CreateNotification("failed to dodge", "not in a match", notification_type::NONE);
-                return;
-            }
-
-            // TODO: do we need to specify the data twice?
-            result = connectorManager->MakeRequest(connector::request_type::POST,
-                "/lol-login/v1/session/invoke?destination=lcdsServiceProxy&method=call&args=[\"\",\"teambuilder-draft\",\"quitV2\",\"\"]",
-                "[\"\",\"teambuilder-draft\",\"quitV2\",\"\"]");
-
-            if (result.status != 200)
-                browserManager->CreateNotification("failed to dodge", "the current match cannot be dodged", notification_type::NONE);
-        })
-    );
 }
 
 std::string feature::auto_picker::GetName() {
