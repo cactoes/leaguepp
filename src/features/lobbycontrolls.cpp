@@ -19,7 +19,7 @@ void feature::lobby_controlls::Setup(std::shared_ptr<ui::frame> frame) {
             auto currentGameFlow = data.get<std::string>();
             if (cfg->GetVar<bool>("lobby::bAutoAccept") && currentGameFlow == "ReadyCheck") {
                 connector::result_t result = connectorManager->MakeRequest(connector::request_type::POST, "/lol-matchmaking/v1/ready-check/accept");
-                if (result.status == 200)
+                if (result.status == 204)
                     interface::GetHolder<browser_manager>(from_singleton)->CreateNotification("accepted match", "the match has been automatically accepted", notification_type::SUCCESS);
             }
         })
@@ -38,7 +38,7 @@ void feature::lobby_controlls::Setup(std::shared_ptr<ui::frame> frame) {
         "dodge", ui::button_callback_t([this, connectorManager]() {
             auto browserManager = interface::GetHolder<browser_manager>(from_singleton);
 
-            auto result = connectorManager->MakeRequest(connector::request_type::GET, "/lol-gameflow/v1/gameflow-phases");
+            auto result = connectorManager->MakeRequest(connector::request_type::GET, "/lol-gameflow/v1/gameflow-phase");
             if (result.status != 200 || result.data.get<std::string>() != "ChampSelect") {
                 browserManager->CreateNotification("failed to dodge", "not in a match", notification_type::NONE);
                 return;
