@@ -10,7 +10,10 @@
 #include "managers/featuremanager.hpp"
 #include "managers/configmanager.hpp"
 
-int main() {
+int main(int argc, char** argv) {
+    UNREFERENCED_PARAMETER(argc);
+    UNREFERENCED_PARAMETER(argv);
+
     // setup the browser
     auto browserManager = interface::GetHolder<browser_manager>(from_singleton);
     browserManager->Setup();

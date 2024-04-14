@@ -13,6 +13,8 @@ public:
     template <typename C>
     using class_t = RTy(C::*)(Args...);
 
+    callback_holder() = default;
+
     explicit callback_holder(basic_t callback) {
         m_callback = callback;
     }
@@ -47,7 +49,7 @@ public:
     }
 
 private:
-    std::function<RTy(Args...)> m_callback;
+    std::function<RTy(Args...)> m_callback = nullptr;
 };
 
 #endif // __CALLBACKHOLDER_HPP__
