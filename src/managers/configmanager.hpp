@@ -135,9 +135,9 @@ public:
     std::shared_ptr<config> GetConfig(const std::string& name);
 
     template <typename Ty>
-    void TrackedSetVar(std::shared_ptr<config> config, const std::string& key, Ty value) {
-        config->SetVar(name, value);
-        DumpConfig();
+    void TrackedSetVar(std::shared_ptr<config> config, const char* key, Ty value) {
+        config->SetVar(key, value);
+        DumpConfig(config);
     }
 
 private:
