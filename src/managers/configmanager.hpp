@@ -26,6 +26,7 @@ constexpr bool is_valid_type_v = is_valid_type<Ty>::value;
 class icvar {
 public:
     virtual char* Data() { return nullptr; }
+    virtual void SetData(char*, size_t) {}
     virtual uint64_t Size() { return 0ULL; }
 };
 
@@ -36,6 +37,7 @@ public:
     cvar(const Ty& value = Ty{}) : m_value(value) {}
 
     char* Data() override { return (char*)&m_value; }
+    void SetData(char* data, size_t size) override { memcpy(Data(), data, size); };
     uint64_t Size() override { return sizeof(Ty); }
 
     cvar<Ty>& operator=(const Ty& value) {

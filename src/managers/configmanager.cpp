@@ -18,6 +18,12 @@ inline char* cvar<std::vector<int>>::Data() {
 }
 
 template <>
+inline void cvar<std::vector<int>>::SetData(char* data, size_t size) {
+    m_value.reserve(size / sizeof(int));
+    memcpy(Data(), data, size);
+}
+
+template <>
 inline uint64_t cvar<std::vector<int>>::Size() {
     return sizeof(int) * m_value.size();
 }
@@ -25,6 +31,12 @@ inline uint64_t cvar<std::vector<int>>::Size() {
 template <>
 inline char* cvar<std::vector<float>>::Data() {
     return reinterpret_cast<char*>(m_value.data());
+}
+
+template <>
+inline void cvar<std::vector<float>>::SetData(char* data, size_t size) {
+    m_value.reserve(size / sizeof(float));
+    memcpy(Data(), data, size);
 }
 
 template <>
@@ -123,10 +135,14 @@ bool config_manager::LoadConfig(std::shared_ptr<config> config) {
         uint64_t size = 0;
         stream.read(reinterpret_cast<char*>(&size), sizeof(size));
 
-        if (config->HasVar(hash))
-            stream.read(config->m_data.at(hash)->Data(), size);
-        else
+        auto data = std::make_unique<char[]>(size);
+
+        if (config->HasVar(hash)) {
+            stream.read(data.get(), size);
+            config->m_data.at(hash)->SetData(data.get(), size);
+        } else {
             stream.ignore(size);
+        }
 
         // memory alignment is not needed ww
         // const auto blocksize = sizeof(hash) + sizeof(size) + size;
