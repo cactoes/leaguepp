@@ -15,23 +15,23 @@ int main(int argc, char** argv) {
     UNREFERENCED_PARAMETER(argv);
 
     // setup the browser
-    auto browserManager = interface::GetHolder<browser_manager>(from_singleton);
+    auto browserManager = interface<browser_manager>::Get();
     browserManager->Setup();
 
     // load user settings
-    interface::GetHolder<config_manager>(from_singleton)->Setup();
+    interface<config_manager>::Get()->Setup();
 
     // create frames
-    interface::GetHolder<layout_manager>(from_singleton)->Setup(browserManager->GetHandle());
+    interface<layout_manager>::Get()->Setup(browserManager->GetHandle());
 
     // setup features
-    interface::GetHolder<feature_manager>(from_singleton)->Setup();
+    interface<feature_manager>::Get()->Setup();
 
     // setup window events
-    interface::GetHolder<event_manager>(from_singleton)->Setup(browserManager->GetHandle());
+    interface<event_manager>::Get()->Setup(browserManager->GetHandle());
 
     // setup league connector & try to connect
-    auto connectionManager = interface::GetHolder<connector_manager>(from_singleton);
+    auto connectionManager = interface<connector_manager>::Get();
     connectionManager->Setup();
 
     // start the browser

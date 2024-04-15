@@ -9,8 +9,8 @@
 #include "../ui/button.hpp"
 
 void feature::lobby_controlls::Setup(std::shared_ptr<ui::frame> frame) {
-    auto connectorManager = interface::GetHolder<connector_manager>(from_singleton);
-    auto configManager = interface::GetHolder<config_manager>(from_singleton);
+    auto connectorManager = interface<connector_manager>::Get();
+    auto configManager = interface<config_manager>::Get();
     auto cfg = configManager->GetConfig(CONFIG_BASIC);
 
     connectorManager->AddEventListener(
@@ -20,7 +20,7 @@ void feature::lobby_controlls::Setup(std::shared_ptr<ui::frame> frame) {
             if (cfg->GetVar<bool>("lobby::bAutoAccept") && currentGameFlow == "ReadyCheck") {
                 connector::result_t result = connectorManager->MakeRequest(connector::request_type::POST, "/lol-matchmaking/v1/ready-check/accept");
                 if (result.status == 204)
-                    interface::GetHolder<browser_manager>(from_singleton)->CreateNotification("accepted match", "the match has been automatically accepted", notification_type::SUCCESS);
+                    interface<browser_manager>::Get()->CreateNotification("accepted match", "the match has been automatically accepted", notification_type::SUCCESS);
             }
         })
     );
@@ -36,7 +36,7 @@ void feature::lobby_controlls::Setup(std::shared_ptr<ui::frame> frame) {
 
     frame->AddComponent<ui::button>(
         "dodge", ui::button_callback_t([this, connectorManager]() {
-            auto browserManager = interface::GetHolder<browser_manager>(from_singleton);
+            auto browserManager = interface<browser_manager>::Get();
 
             auto result = connectorManager->MakeRequest(connector::request_type::GET, "/lol-gameflow/v1/gameflow-phase");
             if (result.status != 200 || result.data.get<std::string>() != "ChampSelect") {

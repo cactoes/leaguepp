@@ -18,7 +18,7 @@ void connector_manager::Setup() {
     frame->AddComponent<ui::label>(m_connectionLabel);
 
     // bind to stats frame
-    interface::GetHolder<layout_manager>(from_singleton)
+    interface<layout_manager>::Get()
         ->GetFrame()
         ->GetComponent<ui::frame>("StatsFrame")
         ->AddComponent(std::move(frame));
@@ -31,16 +31,16 @@ void connector_manager::Shutdown() {
 }
 
 void connector_manager::ConnectHandler() {
-    auto browserManager = interface::GetHolder<browser_manager>(from_singleton);
+    auto browserManager = interface<browser_manager>::Get();
     m_connectionLabel->SetText("-- connected --");
     m_connectionLabel->Update(browserManager->GetHandle());
     browserManager->CreateNotification("connected", "the client has connected to league", notification_type::SUCCESS);
 }
 
 void connector_manager::DisconnectHandler() {
-    auto browserManager = interface::GetHolder<browser_manager>(from_singleton);
+    auto browserManager = interface<browser_manager>::Get();
     m_connectionLabel->SetText("-- disconnected --");
-    m_connectionLabel->Update(interface::GetHolder<browser_manager>(from_singleton)->GetHandle());
+    m_connectionLabel->Update(interface<browser_manager>::Get()->GetHandle());
     browserManager->CreateNotification("disconnected", "the client has disconnected from league", notification_type::SUCCESS);
 }
 
