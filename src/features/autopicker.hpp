@@ -84,8 +84,8 @@ namespace feature {
         lane_state GetLaneState(const champselect::Session& session, const lobby::Lobby& lobby);
         bool ValidateLaneState(lane_state state, int strictness);
         
-        void RunAutoPicker(const champselect::Session& session, const lobby::Lobby& lobby, std::shared_ptr<config> cfg);
-        int MakeAction(const champselect::Session& session, action_type type, bool commit, const std::vector<int> options);
+        void HandleFrame(const champselect::Session& session, const lobby::Lobby& lobby);
+        int MakeAction(const champselect::Session& session, action_type type, const std::vector<int> options, bool commit);
         int GetNextPick(const std::vector<int>& list);
         bool DoAction(int actionId, int championId, bool commit);
 
@@ -95,6 +95,7 @@ namespace feature {
         const std::vector<std::string> m_modes = { "manual", "semi", "auto" };
         const std::vector<std::string> m_strictnesses = { "none", "loose", "strict" };
         lobby_info_t m_lobby_info = {};
+        std::shared_ptr<config> m_config = nullptr;
     };
 }; // namespace feature
 
