@@ -1,7 +1,5 @@
 #include "autopicker.hpp"
 
-#include <ranges>
-
 #include "../interface/holder.hpp"
 #include "../managers/configmanager.hpp"
 #include "../managers/connectormanager.hpp"
@@ -11,14 +9,7 @@
 #include "../ui/button.hpp"
 #include "../ui/label.hpp"
 
-#include "../debugutils.hpp"
-
-// CLEAN: move
-static bool StringCompareI(std::string_view a, std::string_view b) {
-    return std::ranges::equal(a, b, [](char a, char b) {
-        return std::tolower(static_cast<int>(a)) == std::tolower(static_cast<int>(b));
-    });
-}
+#include "../utils.hpp"
 
 void feature::auto_picker::Setup(std::shared_ptr<ui::frame> frame) {
     auto connectorManager = interface<connector_manager>::Get();
