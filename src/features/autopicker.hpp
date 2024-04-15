@@ -51,12 +51,8 @@ namespace feature {
         OTHER_POSITION
     };
 
-    struct lobby_state_t {
-        std::vector<int64_t> lockedChampions = {};
-        player_state playerState = player_state::INVALID;
-        lane_state laneState = lane_state::INVALID;
-        bool isLaneValid = false;
-
+    struct lobby_info_t {
+        std::vector<int> lockedChampions = {};
         // gets set in gameflow hook
         bool isInChampSelect = false;
     };
@@ -83,22 +79,22 @@ namespace feature {
         std::string GetName() override;
 
     private:
-        void UpdateLobbyState(const champselect::Session& data, int strictness);
-        
-        void RunAutoPicker(const champselect::Session& data, std::shared_ptr<config> cfg);
-        bool MakeAction(const champselect::Session& data, action_type type, bool commit, const std::vector<int> options);
-        int GetNextPick(const std::vector<int>& list);
-
-        player_state GetPlayerState(const champselect::Session& data);
+        std::vector<int> GetLockedChampions(const champselect::Session& session);
+        player_state GetPlayerState(const champselect::Session& session);
         lane_state GetLaneState(const champselect::Session& session, const lobby::Lobby& lobby);
-        bool ValidateLaneState(int strictness);
-
+        bool ValidateLaneState(lane_state state, int strictness);
+        
+        void RunAutoPicker(const champselect::Session& session, const lobby::Lobby& lobby, std::shared_ptr<config> cfg);
+        int MakeAction(const champselect::Session& session, action_type type, bool commit, const std::vector<int> options);
+        int GetNextPick(const std::vector<int>& list);
         bool DoAction(int actionId, int championId, bool commit);
+
+        void NotifyUser(const std::string& title, const std::string& message);
 
     private:
         const std::vector<std::string> m_modes = { "manual", "semi", "auto" };
         const std::vector<std::string> m_strictnesses = { "none", "loose", "strict" };
-        lobby_state_t m_lobby_state = {};
+        lobby_info_t m_lobby_info = {};
     };
 }; // namespace feature
 
