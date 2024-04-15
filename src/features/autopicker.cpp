@@ -42,8 +42,7 @@ void feature::auto_picker::Setup(std::shared_ptr<ui::frame> frame) {
         "mode", cfg->GetVar<int>("autoPicker::nMode"), m_modes,
         ui::selector_callback_t([this, cfg, configManager](std::string newMode) {
             auto newModeIndex = (int)std::distance(m_modes.begin(), std::ranges::find(m_modes, newMode));
-            cfg->SetVar("autoPicker::nMode", newModeIndex);
-            configManager->DumpConfig(cfg);
+            configManager->TrackedSetVar(cfg, "autoPicker::nMode", newModeIndex);
             return newModeIndex;
         })
     );
@@ -52,8 +51,7 @@ void feature::auto_picker::Setup(std::shared_ptr<ui::frame> frame) {
         "strictness", cfg->GetVar<int>("autoPicker::nStrictness"), m_strictnesses,
         ui::selector_callback_t([this, cfg, configManager](std::string newStrictness) {
             auto newStrictnessIndex = (int)std::distance(m_strictnesses.begin(), std::ranges::find(m_strictnesses, newStrictness));
-            cfg->SetVar("autoPicker::nStrictness", newStrictnessIndex);
-            configManager->DumpConfig(cfg);
+            configManager->TrackedSetVar(cfg, "autoPicker::nStrictness", newStrictnessIndex);
             return newStrictnessIndex;
         })
     );
@@ -85,6 +83,8 @@ void feature::auto_picker::RunAutoPicker(const champselect::Session& data, std::
 
     if (mode == BOT_MANUAL || !m_lobby_state.isInChampSelect || !m_lobby_state.isLaneValid)
         return;
+
+    // TODO: notif the user with the banned / picked champ name
 
     switch (m_lobby_state.playerState) {
         case player_state::DECLARING:
@@ -119,12 +119,10 @@ bool feature::auto_picker::MakeAction(const champselect::Session& data, action_t
             if (action.championId.value())
                 continue;
 
-            // TODO: get the champion we want to pick
-            const int championId = GetNextPick(options);
-            if (championId == -1)
-                continue;
-
-            return DoAction(static_cast<int>(action.id.value()), championId, commit);
+            
+            if (const int championId = GetNextPick(options); championId != -1) {
+                return DoAction(static_cast<int>(action.id.value()), championId, commit);
+            }
         }
     }
     
@@ -215,6 +213,7 @@ bool feature::auto_picker::ValidateLaneState(int strictness) {
     if (strictness == 0)
         return true;
 
+    // the lane aint there yo
     if (m_lobby_state.laneState == lane_state::INVALID)
         return false;
 
