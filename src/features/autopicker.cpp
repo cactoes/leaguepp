@@ -26,8 +26,8 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame) {
     // TODO: change the selectors
     // TODO: add inputs for the bans & picks
 
-    m_config->SetVar("autoPicker::banIds", std::vector<int>{ }); // 22, 74, 17
-    m_config->SetVar("autoPicker::pickIds", std::vector<int>{ 51 });
+    m_config->SetVar("autoPicker::banIds", std::vector<int>{ 22, 74, 17, 103, 84 }); // 22, 74, 17, 103, 84
+    m_config->SetVar("autoPicker::pickIds", std::vector<int>{ 51 }); // 51
 
     // setup hooks
 
@@ -156,6 +156,8 @@ feature::lane_state feature::AutoPicker::GetLaneState(const champselect::Session
 
     std::string assignedPosition = myTeamIterator->assignedPosition.value();
 
+    // FIXME: if lane is fill it will register as other position
+
     // do lane based checks
     if (StringCompareI(assignedPosition, lobby.localMember->firstPositionPreference.value()))
         return lane_state::ASSIGNED_PRIMARY_POSITION;
@@ -179,6 +181,10 @@ bool feature::AutoPicker::ValidateLaneState(lane_state state, int strictness) {
     // strictness 1 means we only want to run
     // if we have our secondary or primary lane
     if (strictness == 1) {
+        // we cant pick a lane but we aren't concerned with it
+        if (state == lane_state::NO_PICKABLE_LANE)
+            return true;
+
         // in old logic we checked if lanestate was not "NoPickableLane"
         // but this seems better
         return state == lane_state::ASSIGNED_PRIMARY_POSITION ||
@@ -224,22 +230,26 @@ void feature::AutoPicker::HandleFrame(const champselect::Session& session, const
 }
 
 int feature::AutoPicker::MakeAction(const champselect::Session& session, action_type type, const std::vector<int> options, bool commit) {
+    const auto& localPlayerCellId = session.localPlayerCellId.value();
+
     for (const auto& pair : session.actions.value()) {
         for (const auto& action : pair) {
             if (action.completed.value())
                 continue;
 
-            if (action.actorCellId.value() != session.localPlayerCellId.value())
+            if (action.actorCellId.value() != localPlayerCellId)
                 continue;
 
             if ((type == action_type::PICK && action.type.value() != "pick") ||
                 (type == action_type::BAN && action.type.value() != "ban"))
                 continue;
 
-            if (action.championId.value())
+            const int championId = GetNextPick(options);
+            const auto& selectedChampionId = action.championId.value();
+            if (selectedChampionId != 0 && selectedChampionId != championId)
                 continue;
             
-            if (const int championId = GetNextPick(options); championId != -1)
+            if (championId != -1)
                 return DoAction(static_cast<int>(action.id.value()), championId, commit)
                     ? championId : -1;
         }
