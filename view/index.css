@@ -25,6 +25,10 @@
     color: var(--text);
 }
 
+::selection {
+    background: var(--secondary);
+}
+
 .drag {
     --webkit-app-region: drag;
 }
@@ -570,7 +574,7 @@ body {
 
     height: 100%;
 
-    font-size: 12px;
+    font-size: calc(var(--font-size-default) - 1px);
 
     padding: 3px 10px;
     color: var(--text);
@@ -593,4 +597,43 @@ body {
 .selector > div > p.selected {
     background-color: var(--primary);
     color: var(--background-primary);
+}
+
+/* =========================== */
+/* INPUT STYLING */
+/* =========================== */
+
+.input {
+    display: flex;
+    flex-direction: column;
+
+    font-size: var(--font-size-default);
+}
+
+.input > div {
+    /* 12px is the element left padding */
+    width: calc(100% - var(--item-offset-left)*2 - 12px);
+
+    margin-left: var(--item-offset-left);
+    margin-top: var(--item-offset-label);
+}
+
+.input > div > input {
+    outline: none;
+    width: 100%;
+
+    border: 1px solid var(--trim);
+    background-color: var(--background-secondary);
+
+    padding: 3px 10px;
+
+    font-size: var(--font-size-default);
+
+    transition: all .15s ease;
+}
+
+.input > div > input:hover,
+.input > div > input:focus {
+    /* filter: brightness(120%); */
+    border: 1px solid var(--accent);
 }

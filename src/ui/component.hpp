@@ -20,7 +20,8 @@ namespace ui {
         CT_CHECKBOX,
         CT_SLIDER,
         CT_DROPDOWN,
-        CT_SELECTOR
+        CT_SELECTOR,
+        CT_INPUT
     };
 
     template <std::int32_t I>

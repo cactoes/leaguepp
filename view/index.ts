@@ -350,6 +350,45 @@ namespace ui {
         element.appendChild(selector);
     }
 
+    export function createInput(label: string, id: string, value: string, onchange: string, target: string): void {
+        const element = document.getElementById(target);
+        if (!element)
+            return noTarget(target);
+    
+        const input = document.createElement("div");
+        input.className = "input element"
+        input.id = id;
+
+        //     <p class="label">${label}</p>
+        const p = document.createElement("p");
+        p.className = "label";
+        p.innerText = label;
+        input.appendChild(p);
+
+        //     <span class="shadow">${label}</span>
+        const shadow = document.createElement("span");
+        shadow.className = "shadow";
+        shadow.innerText = label;
+        input.appendChild(shadow);
+
+        const container = document.createElement("div");
+
+        const inputField = document.createElement("input");
+        inputField.type = "text";
+        inputField.value = value;
+        inputField.spellcheck = false;
+        inputField.autocapitalize = "false";
+        inputField.autocomplete = "off";
+        inputField.onblur = () => {
+            invoke(onchange, [ inputField.value ]);
+        }
+        container.appendChild(inputField);
+
+        input.appendChild(container);
+
+        element.appendChild(input);
+    }
+
     export function createNotificationBox(title: string, description: string, typeId: number, parent: HTMLDivElement): HTMLDivElement {
         const notification = document.createElement("div");
         notification.className = "notification noselect";
@@ -428,6 +467,10 @@ function uiCreateSelector(label: string, state: number, id: string, onchange: st
     ui.createSelector(label, state, id, onchange, target, items);
 }
 
+function uiCreateInput(label: string, id: string, value: string, onchange: string, target: string): void {
+    ui.createInput(label, id, value, onchange, target);
+}
+
 function createNotification(title: string, description: string, typeId: number) {
     const target = document.getElementById("notification_wrapper") as HTMLDivElement;
     const box = ui.createNotificationBox(title, description, typeId, target);
@@ -443,6 +486,7 @@ async function main() {
     register(uiCreateSlider);
     register(uiCreateDropDown);
     register(uiCreateSelector);
+    register(uiCreateInput);
 
     register(createNotification);
 
