@@ -1,4 +1,4 @@
-#include "stats.hpp"
+#include "profile.hpp"
 
 #include "../interface/holder.hpp"
 
@@ -17,7 +17,7 @@
 #include "../ui/selector.hpp"
 #include "../ui/slider.hpp"
 
-void feature::Stats::Setup(std::shared_ptr<ui::Frame> frame) {
+void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame) {
     auto connectorManager = interface<ConnectorManager>::Get();
     auto browserManager = interface<BrowserManager>::Get();
 
@@ -29,22 +29,31 @@ void feature::Stats::Setup(std::shared_ptr<ui::Frame> frame) {
 
     frame->AddComponent<ui::Label>(label);
 
-    // frame->AddComponent<ui::Button>("test button", ui::button_callback([this](){}));
+    frame->AddComponent<ui::Button>(
+        "clear tokens",
+        ui::button_callback([this, connectorManager, browserManager]() { 
+            auto result = connectorManager->MakeRequest(connector::request_type::POST, "/lol-challenges/v1/update-player-preferences/", "{\"challengeIds\": []}");
+            if (result.status == 204)
+                browserManager->CreateNotification("cleared", "the tokens have been cleared", notification_type::NONE);
+            else
+                browserManager->CreateNotification("failed to clear", "the tokens could no be cleared", notification_type::NONE);
+        })
+    );
     
     // frame->AddComponent<ui::Checkbox>(
     //     "test checkbox", true,
     //     ui::checkbox_callback([this](bool state) { return state; })
     // );
 
+    // auto items = std::vector<std::string>{ "item1", "item2", "item3", "item4" };
+
     // frame->AddComponent<ui::Dropdown>(
-    //     "test dropdown",
-    //     std::vector<std::string>{ "1", "2", "3" },
+    //     "test dropdown", items,
     //     ui::dropdown_callback([this](std::string item, bool newItemState, std::vector<std::string> list) {
     //         DEBUG_LOG("interacted with dropdown");
     //     })
     // );
 
-    // auto items = std::vector<std::string>{ "item1", "item2", "item3" };
     // frame->AddComponent<ui::Selector>(
     //     "test Selector", 1, items,
     //     ui::selector_callback([this, items](std::string newMode) {
@@ -74,6 +83,6 @@ void feature::Stats::Setup(std::shared_ptr<ui::Frame> frame) {
     );
 }
 
-std::string feature::Stats::GetName() {
-    return "stats";
+std::string feature::Profile::GetName() {
+    return "profile";
 }
