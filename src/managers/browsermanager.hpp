@@ -17,9 +17,9 @@ enum class notification_type {
     SUCCESS
 };
 
-class browser_manager {
+class BrowserManager {
 public:
-    void Setup();
+    bool Init();
     void Start();
 
     browser::Browser* GetHandle();

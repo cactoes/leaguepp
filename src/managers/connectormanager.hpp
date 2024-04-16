@@ -3,14 +3,13 @@
 
 #include <memory>
 #include <connector.hpp>
+#include <vector>
 
 #include "../callbackholder.hpp"
 
-namespace ui {
-    class Label;
-}; // namespace ui
-
-typedef callback_holder<void, std::string, nlohmann::json> client_callback_t;
+typedef callback_holder<void, std::string, nlohmann::json> client_callback;
+typedef callback_holder<void> client_connect;
+typedef callback_holder<void> client_disconnect;
 
 class ConnectorManager {
 public:
@@ -19,7 +18,10 @@ public:
 
     bool IsConnected();
 
-    void AddEventListener(const std::string& endpoint, client_callback_t callback);
+    void AddConnectHandler(client_connect callback);
+    void AddDisconnectHandler(client_disconnect callback);
+
+    void AddEventListener(const std::string& endpoint, client_callback callback);
     connector::result_t MakeRequest(connector::request_type type, const std::string& endpoint, const std::string& data = "");
 
 private:
@@ -28,7 +30,8 @@ private:
 
 private:
     bool m_isConnected = false;
-    std::shared_ptr<ui::Label> m_connectionLabel;
+    std::vector<client_connect> m_connectHandlers = {};
+    std::vector<client_disconnect> m_disconnectHandlers = {};
 };
 
 #endif // __CONNECTORMANAGER_HPP__

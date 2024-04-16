@@ -7,8 +7,6 @@
 #include <string>
 #include <any>
 
-#undef GetMessage
-
 class EventBus {
 public:
     struct message_t {
@@ -22,7 +20,7 @@ public:
         m_bus.push(message);
     }
 
-    bool GetMessage(message_t* pMessage) {
+    bool Get(message_t* pMessage) {
         std::lock_guard<std::mutex> guard(m_mutex);
 
         if (m_bus.empty())

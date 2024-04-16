@@ -11,18 +11,19 @@
 #undef interface
 
 int main(UNUSED int argc, UNUSED char** argv) {
-    auto browserManager = interface<browser_manager>::Get();
-    browserManager->Setup();
+    auto browserManager = interface<BrowserManager>::Get();
+    browserManager->Init();
+
+    auto connectorManager = interface<ConnectorManager>::Get();
+    connectorManager->Init();
 
     interface<ConfigManager>::Get()->Init();
+    
     interface<LayoutManager>::Get()->Init();
     interface<FeatureManager>::Get()->Init();
 
-    auto connectionManager = interface<ConnectorManager>::Get();
-    connectionManager->Init();
-
     browserManager->Start();
-    connectionManager->Shutdown();
+    connectorManager->Shutdown();
 
     return 0;
 }

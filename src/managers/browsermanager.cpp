@@ -2,7 +2,7 @@
 
 #include "../browser/browser.hpp"
 
-void browser_manager::Setup() {
+bool BrowserManager::Init() {
     browser::window_config_t windowConfig = {};
     windowConfig.icon = 1;
     windowConfig.name = "league++";
@@ -16,20 +16,22 @@ void browser_manager::Setup() {
 #endif
 
     m_handle = browser::CreateBrowser(browserConfig, windowConfig);
+
+    return true;
 }
 
-void browser_manager::Start() {
+void BrowserManager::Start() {
     m_handle->Start();
 }
 
-browser::Browser* browser_manager::GetHandle() {
+browser::Browser* BrowserManager::GetHandle() {
     return m_handle.get();
 }
 
-void browser_manager::CallJS(const std::string& name, const std::vector<std::any>& args) {
+void BrowserManager::CallJS(const std::string& name, const std::vector<std::any>& args) {
     m_handle->CallJSFunction(name, args);
 }
 
-void browser_manager::CreateNotification(const std::string& title, const std::string& description, notification_type type) {
+void BrowserManager::CreateNotification(const std::string& title, const std::string& description, notification_type type) {
     m_handle->CallJSFunction("createNotification", { title, description, (int)type });
 }

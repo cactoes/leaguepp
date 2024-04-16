@@ -4,13 +4,12 @@
 #include "../ui/frame.hpp"
 #include "../browser/browser.hpp"
 
-#include "configmanager.hpp"
 #include "browsermanager.hpp"
 
 #undef interface
 
 bool LayoutManager::Init() {
-    auto browserManager = interface<browser_manager>::Get();
+    auto browserManager = interface<BrowserManager>::Get();
     browserManager->GetHandle()->RegisterFunction("GetMainLayout", CREATE_REGISTRATION_MEMBER(LayoutManager::PushLayout));
 
     m_frameMain = std::make_shared<ui::Frame>("", ui::FL_HORIZONTAL, FRAME_TARGET_MAIN);

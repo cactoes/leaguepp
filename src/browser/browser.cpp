@@ -15,7 +15,7 @@ void browser::Browser::Start() {
             DispatchMessage(&msg);
         }
 
-        while (m_isReady && m_bus.GetMessage(&eventMessage)) {
+        while (m_isReady && m_bus.Get(&eventMessage)) {
             std::string script = "__core_call_js__(\"" + eventMessage.name + "\",";
 
             for (const auto& arg : eventMessage.args)

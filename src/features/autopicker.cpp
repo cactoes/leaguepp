@@ -33,12 +33,12 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame) {
 
     connectorManager->AddEventListener(
         "/lol-gameflow/v1/gameflow-phase",
-        client_callback_t([this](std::string, nlohmann::json data) {
+        client_callback([this](std::string, nlohmann::json data) {
             m_lobby_info.isInChampSelect = data.get<std::string>() == "ChampSelect";
         })
     );
 
-    connectorManager->AddEventListener("/lol-champ-select/v1/session", client_callback_t([this, connectorManager](std::string, nlohmann::json data) {
+    connectorManager->AddEventListener("/lol-champ-select/v1/session", client_callback([this, connectorManager](std::string, nlohmann::json data) {
         const auto lobbyDataResult = connectorManager->MakeRequest(connector::request_type::GET, "/lol-lobby/v2/lobby");
         if (lobbyDataResult.status != 200) {
             NotifyUser("error", "failed to get lobby data");
@@ -264,5 +264,5 @@ bool feature::AutoPicker::DoAction(int actionId, int championId, bool commit) {
 }
 
 void feature::AutoPicker::NotifyUser(const std::string& title, const std::string& message) {
-    interface<browser_manager>::Get()->CreateNotification(title, message, notification_type::NONE);
+    interface<BrowserManager>::Get()->CreateNotification(title, message, notification_type::NONE);
 }
