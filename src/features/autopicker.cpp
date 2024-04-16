@@ -39,6 +39,9 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame) {
     );
 
     connectorManager->AddEventListener("/lol-champ-select/v1/session", client_callback([this, connectorManager](std::string, nlohmann::json data) {
+        if (!m_config->GetVar<bool>("autoPicker::bEnabled"))
+            return;
+
         const auto lobbyDataResult = connectorManager->MakeRequest(connector::request_type::GET, "/lol-lobby/v2/lobby");
         if (lobbyDataResult.status != 200) {
             NotifyUser("error", "failed to get lobby data");
@@ -49,6 +52,13 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame) {
     }));
 
     // setup ui
+
+    frame->AddComponent<ui::Checkbox>(
+        "enabled", m_config->GetVar<bool>("autoPicker::bEnabled"),
+        ui::checkbox_callback([this](bool newState) {
+            return interface<ConfigManager>::Get()->TrackedSetVar(m_config, "autoPicker::bEnabled", newState);
+        })
+    );
 
     frame->AddComponent<ui::Selector>(
         "mode", m_config->GetVar<int>("autoPicker::nMode"), m_modes,

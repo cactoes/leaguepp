@@ -95,6 +95,7 @@ bool ConfigManager::Init() {
     auto cfg = Create(CONFIG_BASIC);
     cfg->AddTemplate<bool>("lobby::bAutoAccept");
 
+    cfg->AddTemplate<bool>("autoPicker::bEnabled");
     cfg->AddTemplate<int>("autoPicker::nMode");
     cfg->AddTemplate<int>("autoPicker::nStrictness");
     cfg->AddTemplate<std::vector<int>>("autoPicker::banIds");
