@@ -1,8 +1,6 @@
 #ifndef __BUTTON_HPP__
 #define __BUTTON_HPP__
 
-#include <string>
-
 #include "component.hpp"
 
 namespace ui {
