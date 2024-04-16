@@ -18,3 +18,8 @@ The build process has 2 steps
 build the C++ first in either Debug / Release. this will create the base files for the 2nd step
 
 after that run the view compiler with the same config.
+
+## cloc
+```bash
+$ cloc src view -exclude-dir=endpointmappers
+```
