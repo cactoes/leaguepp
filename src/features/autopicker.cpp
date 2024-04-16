@@ -8,12 +8,19 @@
 #include "../ui/selector.hpp"
 #include "../ui/button.hpp"
 #include "../ui/label.hpp"
+#include "../ui/checkbox.hpp"
+#include "../ui/frame.hpp"
 
 #include "../utils.hpp"
 
-void feature::auto_picker::Setup(std::shared_ptr<ui::frame> frame) {
-    auto connectorManager = interface<connector_manager>::Get();
-    m_config = interface<config_manager>::Get()->GetConfig(CONFIG_BASIC);
+#include "endpointmappers/champselectsession.hpp"
+#include "endpointmappers/lobbylobby.hpp"
+
+#undef interface
+
+void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame) {
+    auto connectorManager = interface<ConnectorManager>::Get();
+    m_config = interface<ConfigManager>::Get()->Get(CONFIG_BASIC);
 
     // TODO: lane based bans & picks
     // TODO: change the selectors
@@ -43,30 +50,28 @@ void feature::auto_picker::Setup(std::shared_ptr<ui::frame> frame) {
 
     // setup ui
 
-    frame->AddComponent<ui::selector>(
+    frame->AddComponent<ui::Selector>(
         "mode", m_config->GetVar<int>("autoPicker::nMode"), m_modes,
-        ui::selector_callback_t([this](std::string newMode) {
+        ui::selector_callback([this](std::string newMode) {
             const auto newModeIndex = (int)std::distance(m_modes.begin(), std::ranges::find(m_modes, newMode));
-            interface<config_manager>::Get()->TrackedSetVar(m_config, "autoPicker::nMode", newModeIndex);
-            return newModeIndex;
+            return interface<ConfigManager>::Get()->TrackedSetVar(m_config, "autoPicker::nMode", newModeIndex);
         })
     );
 
-    frame->AddComponent<ui::selector>(
+    frame->AddComponent<ui::Selector>(
         "strictness", m_config->GetVar<int>("autoPicker::nStrictness"), m_strictnesses,
-        ui::selector_callback_t([this](std::string newStrictness) {
+        ui::selector_callback([this](std::string newStrictness) {
             const auto newStrictnessIndex = (int)std::distance(m_strictnesses.begin(), std::ranges::find(m_strictnesses, newStrictness));
-            interface<config_manager>::Get()->TrackedSetVar(m_config, "autoPicker::nStrictness", newStrictnessIndex);
-            return newStrictnessIndex;
+            return interface<ConfigManager>::Get()->TrackedSetVar(m_config, "autoPicker::nStrictness", newStrictnessIndex);
         })
     );
 }
 
-std::string feature::auto_picker::GetName() {
+std::string feature::AutoPicker::GetName() {
     return "auto picker";
 }
 
-std::vector<int> feature::auto_picker::GetLockedChampions(const champselect::Session& session) {
+std::vector<int> feature::AutoPicker::GetLockedChampions(const champselect::Session& session) {
     std::vector<int> lockedChampions = {};
     for (const auto& pair : session.actions.value())
         for (const auto& action : pair)
@@ -76,7 +81,7 @@ std::vector<int> feature::auto_picker::GetLockedChampions(const champselect::Ses
     return lockedChampions;
 }
 
-feature::player_state feature::auto_picker::GetPlayerState(const champselect::Session& session) {
+feature::player_state feature::AutoPicker::GetPlayerState(const champselect::Session& session) {
     const auto& currentPhase = session.timer->phase.value();
 
     if (currentPhase == "PLANNING")
@@ -109,7 +114,7 @@ feature::player_state feature::auto_picker::GetPlayerState(const champselect::Se
     return player_state::INVALID;
 }
 
-feature::lane_state feature::auto_picker::GetLaneState(const champselect::Session& session, const lobby::Lobby& lobby) {
+feature::lane_state feature::AutoPicker::GetLaneState(const champselect::Session& session, const lobby::Lobby& lobby) {
     // verify the game config
     if (!lobby.gameConfig.has_value())
         return lane_state::INVALID;
@@ -142,7 +147,7 @@ feature::lane_state feature::auto_picker::GetLaneState(const champselect::Sessio
     return lane_state::OTHER_POSITION;
 }
 
-bool feature::auto_picker::ValidateLaneState(lane_state state, int strictness) {
+bool feature::AutoPicker::ValidateLaneState(lane_state state, int strictness) {
     // strictness 0 means we dont care
     // about what lane we are in
     if (strictness == 0)
@@ -167,7 +172,7 @@ bool feature::auto_picker::ValidateLaneState(lane_state state, int strictness) {
     return state == lane_state::ASSIGNED_PRIMARY_POSITION;
 }
 
-void feature::auto_picker::HandleFrame(const champselect::Session& session, const lobby::Lobby& lobby) {
+void feature::AutoPicker::HandleFrame(const champselect::Session& session, const lobby::Lobby& lobby) {
     const int mode = m_config->GetVar<int>("autoPicker::nMode");
     if (mode == BOT_MANUAL || !m_lobby_info.isInChampSelect)
         return;
@@ -199,7 +204,7 @@ void feature::auto_picker::HandleFrame(const champselect::Session& session, cons
     }
 }
 
-int feature::auto_picker::MakeAction(const champselect::Session& session, action_type type, const std::vector<int> options, bool commit) {
+int feature::AutoPicker::MakeAction(const champselect::Session& session, action_type type, const std::vector<int> options, bool commit) {
     for (const auto& pair : session.actions.value()) {
         for (const auto& action : pair) {
             if (action.completed.value())
@@ -224,7 +229,7 @@ int feature::auto_picker::MakeAction(const champselect::Session& session, action
     return -1;
 }
 
-int feature::auto_picker::GetNextPick(const std::vector<int>& list) {
+int feature::AutoPicker::GetNextPick(const std::vector<int>& list) {
     for (const auto& id : list)
         if (!std::ranges::count(m_lobby_info.lockedChampions, id) && id != -1)
             return id;
@@ -232,8 +237,8 @@ int feature::auto_picker::GetNextPick(const std::vector<int>& list) {
     return -1;
 }
 
-bool feature::auto_picker::DoAction(int actionId, int championId, bool commit) {
-    auto connectionManager = interface<connector_manager>::Get();
+bool feature::AutoPicker::DoAction(int actionId, int championId, bool commit) {
+    auto connectionManager = interface<ConnectorManager>::Get();
 
     const auto declareResult = connectionManager->MakeRequest(
         connector::request_type::PATCH,
@@ -258,6 +263,6 @@ bool feature::auto_picker::DoAction(int actionId, int championId, bool commit) {
     return true;
 }
 
-void feature::auto_picker::NotifyUser(const std::string& title, const std::string& message) {
+void feature::AutoPicker::NotifyUser(const std::string& title, const std::string& message) {
     interface<browser_manager>::Get()->CreateNotification(title, message, notification_type::NONE);
 }

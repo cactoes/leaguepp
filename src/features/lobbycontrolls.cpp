@@ -7,11 +7,14 @@
 
 #include "../ui/checkbox.hpp"
 #include "../ui/button.hpp"
+#include "../ui/frame.hpp"
 
-void feature::lobby_controlls::Setup(std::shared_ptr<ui::frame> frame) {
-    auto connectorManager = interface<connector_manager>::Get();
-    auto configManager = interface<config_manager>::Get();
-    auto cfg = configManager->GetConfig(CONFIG_BASIC);
+#undef interface
+
+void feature::LobbyControlls::Setup(std::shared_ptr<ui::Frame> frame) {
+    auto connectorManager = interface<ConnectorManager>::Get();
+    auto configManager = interface<ConfigManager>::Get();
+    auto cfg = configManager->Get(CONFIG_BASIC);
 
     connectorManager->AddEventListener(
         "/lol-gameflow/v1/gameflow-phase",
@@ -25,17 +28,15 @@ void feature::lobby_controlls::Setup(std::shared_ptr<ui::frame> frame) {
         })
     );
 
-    frame->AddComponent<ui::checkbox>(
+    frame->AddComponent<ui::Checkbox>(
         "auto accept", cfg->GetVar<bool>("lobby::bAutoAccept"),
-        ui::checkbox_callback_t([this, configManager, cfg](bool state) {
-            cfg->SetVar("lobby::bAutoAccept", state);
-            configManager->DumpConfig(cfg);
-            return state;
+        ui::checkbox_callback([this, configManager, cfg](bool state) {
+            return configManager->TrackedSetVar(cfg, "lobby::bAutoAccept", state);
         })
     );
 
-    frame->AddComponent<ui::button>(
-        "dodge", ui::button_callback_t([this, connectorManager]() {
+    frame->AddComponent<ui::Button>(
+        "dodge", ui::button_callback([this, connectorManager]() {
             auto browserManager = interface<browser_manager>::Get();
 
             auto result = connectorManager->MakeRequest(connector::request_type::GET, "/lol-gameflow/v1/gameflow-phase");
@@ -57,6 +58,6 @@ void feature::lobby_controlls::Setup(std::shared_ptr<ui::frame> frame) {
     );
 }
 
-std::string feature::lobby_controlls::GetName() {
+std::string feature::LobbyControlls::GetName() {
     return "lobby controlls";
 }

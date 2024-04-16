@@ -30,32 +30,32 @@ namespace ui {
     constexpr auto FL_VERTICAL = frame_layout::VERTICAL;
     constexpr auto FL_VERTICAL_AUTO = frame_layout::VERTICAL_AUTO;
 
-    class frame : public component {
+    class Frame : public Component {
     public:
-        frame(const std::string& name, const frame_layout& layout, const std::string& target = "") :
+        Frame(const std::string& name, const frame_layout& layout, const std::string& target = "") :
             m_name(name), m_layout(layout) {
             m_target = target;
         }
 
         component_type GetType() const override;
-        void Register(browser::browser* handle) override;
-        void Update(browser::browser*) override;
+        void Register(browser::Browser* handle) override;
+        void Update(browser::Browser*) override;
 
         template <typename Ty, typename... Args>
-        std::enable_if_t<std::is_base_of_v<component, Ty> | std::is_constructible_v<Ty, Args..., std::string>, void>
+        std::enable_if_t<std::is_base_of_v<Component, Ty> | std::is_constructible_v<Ty, Args..., std::string>, void>
         AddComponent(Args&&... args) {
             m_components.push_back(std::make_shared<Ty>(std::forward<Args>(args)..., GetId()));
         }
 
         template <typename Ty>
-        std::enable_if_t<std::is_base_of_v<component, Ty>, void>
+        std::enable_if_t<std::is_base_of_v<Component, Ty>, void>
         AddComponent(std::shared_ptr<Ty> comp) {
             comp->m_target = GetId();
             m_components.push_back(std::move(comp));
         }
 
         template <typename Ty>
-        std::enable_if_t<std::is_base_of_v<component, Ty>, std::shared_ptr<Ty>>
+        std::enable_if_t<std::is_base_of_v<Component, Ty>, std::shared_ptr<Ty>>
         GetComponent(const std::string& id) {
             for (auto& comp : m_components)
                 if (comp->GetId() == id)
@@ -65,7 +65,7 @@ namespace ui {
         }
 
     private:
-        std::vector<std::shared_ptr<component>> m_components = {};
+        std::vector<std::shared_ptr<Component>> m_components = {};
 
         std::string m_name;
         frame_layout m_layout;

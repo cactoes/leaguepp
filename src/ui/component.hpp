@@ -40,11 +40,11 @@ namespace ui {
         return randomString;
     }
 
-    class component {
+    class Component {
     public:
         virtual component_type GetType() const = 0;
-        virtual void Register(browser::browser* handle) = 0;
-        virtual void Update(browser::browser* handle) = 0;
+        virtual void Register(browser::Browser* handle) = 0;
+        virtual void Update(browser::Browser* handle) = 0;
 
         const void SetId(const std::string& id) { m_id = id; };
         const std::string& GetId() const { return m_id; }

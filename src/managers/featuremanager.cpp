@@ -4,14 +4,19 @@
 #include "layoutmanager.hpp"
 #include "../features/lobbycontrolls.hpp"
 #include "../features/autopicker.hpp"
+#include "../ui/frame.hpp"
 
-void feature_manager::Setup() {
-    auto frameMain = interface<layout_manager>::Get()->GetFrame();
-    auto targetFrame = frameMain->GetComponent<ui::frame>("HolderFrame");
+#undef interface
 
-    auto lobbyFrame = targetFrame->GetComponent<ui::frame>("LobbyFrame");
-    auto autoPickerFrame = targetFrame->GetComponent<ui::frame>("AutoPickerFrame");
+bool FeatureManager::Init() {
+    auto frameMain = interface<LayoutManager>::Get()->GetFrame();
+    auto targetFrame = frameMain->GetComponent<ui::Frame>("HolderFrame");
 
-    CreateFeature<feature::lobby_controlls>(lobbyFrame);
-    CreateFeature<feature::auto_picker>(autoPickerFrame);
+    auto lobbyFrame = targetFrame->GetComponent<ui::Frame>("LobbyFrame");
+    auto autoPickerFrame = targetFrame->GetComponent<ui::Frame>("AutoPickerFrame");
+
+    CreateFeature<feature::LobbyControlls>(lobbyFrame);
+    CreateFeature<feature::AutoPicker>(autoPickerFrame);
+
+    return true;
 }

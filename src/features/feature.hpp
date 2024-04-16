@@ -4,13 +4,14 @@
 #include <memory>
 #include <string>
 
-#include "../ui/component.hpp"
-#include "../ui/frame.hpp"
+namespace ui {
+    class Frame;
+}; // namespace ui
 
 namespace feature {
-    class feature {
+    class Feature {
     public:
-        virtual void Setup(std::shared_ptr<ui::frame> frame) = 0;
+        virtual void Setup(std::shared_ptr<ui::Frame> frame) = 0;
         virtual std::string GetName() = 0;
     };
 }; // namespace feature

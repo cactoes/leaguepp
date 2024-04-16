@@ -1,5 +1,7 @@
 #include "browsermanager.hpp"
 
+#include "../browser/browser.hpp"
+
 void browser_manager::Setup() {
     browser::window_config_t windowConfig = {};
     windowConfig.icon = 1;
@@ -20,7 +22,7 @@ void browser_manager::Start() {
     m_handle->Start();
 }
 
-browser::browser* browser_manager::GetHandle() {
+browser::Browser* browser_manager::GetHandle() {
     return m_handle.get();
 }
 

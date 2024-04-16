@@ -11,7 +11,7 @@
 #include <unordered_map>
 
 #include "webview.hpp"
-#include "../eventbus.hpp"
+#include "eventbus.hpp"
 
 #define SET_FLAG(_F, _V) ((_F) |= (_V))
 #define CLEAR_FLAG(_F, _V) ((_F) &= ~(_V))
@@ -112,17 +112,17 @@ namespace browser {
         uint64_t flags = 0ULL;
     };
 
-    class browser {
+    class Browser {
     public:
         // blocking. start the browser and wait until the program closes
         void Start();
 
-        void RegisterFunction(const std::string& name, std::function<std::any(browser*, js_args_t)> func);
+        void RegisterFunction(const std::string& name, std::function<std::any(Browser*, js_args_t)> func);
 
         template <typename Ty>
         std::enable_if_t<is_valid_type_v<Ty>, void>
-        RegisterFunction(const std::string& name, Ty(*func)(browser*, js_args_t)) {
-            RegisterFunction(name, [func](browser* handle, js_args_t args) {
+        RegisterFunction(const std::string& name, Ty(*func)(Browser*, js_args_t)) {
+            RegisterFunction(name, [func](Browser* handle, js_args_t args) {
                 if constexpr (std::is_void_v<Ty>) {
                     func(handle, args);
                     return std::any{};
@@ -134,8 +134,8 @@ namespace browser {
 
         template <typename Ty, typename C>
         std::enable_if_t<is_valid_type_v<Ty>, void>
-        RegisterFunction(const std::string& name, Ty(C::*func)(browser*, js_args_t), C* obj) {
-            RegisterFunction(name, [obj, func](browser* handle, js_args_t args) {
+        RegisterFunction(const std::string& name, Ty(C::*func)(Browser*, js_args_t), C* obj) {
+            RegisterFunction(name, [obj, func](Browser* handle, js_args_t args) {
                 if constexpr (std::is_void_v<Ty>) {
                     (obj->*func)(handle, args);
                     return std::any{};
@@ -146,26 +146,26 @@ namespace browser {
         }
 
         void CallJSFunction(const std::string& name, const std::vector<std::any>& args);
-        void AddDOMContentLoadedHandler(std::function<void(browser*)> func);
+        void AddDOMContentLoadedHandler(std::function<void(Browser*)> func);
 
-        void MoveWindow(browser*, js_args_t jsArgs);
+        void MoveWindow(Browser*, js_args_t jsArgs);
         void OnDomContentLoaded();
 
     public:
         HWND m_windowHandle;
-        event_bus m_bus = {};
+        EventBus m_bus = {};
         
         wil::com_ptr<ICoreWebView2Controller> m_webViewController = nullptr;
         wil::com_ptr<ICoreWebView2> m_webView2 = nullptr;
         wil::com_ptr<ICoreWebView2_2> m_webView2_2 = nullptr;
 
-        std::unordered_map<std::string, std::function<std::any(browser*, js_args_t)>> m_methodMap = {};
-        std::unordered_map<std::string, std::vector<std::function<void(browser*)>>> m_eventMethodMap = {};
+        std::unordered_map<std::string, std::function<std::any(Browser*, js_args_t)>> m_methodMap = {};
+        std::unordered_map<std::string, std::vector<std::function<void(Browser*)>>> m_eventMethodMap = {};
 
         bool m_isReady = false;
     };
 
-    std::shared_ptr<browser> CreateBrowser(const browser_config_t& browserConfig, const window_config_t& windowConfig);
+    std::shared_ptr<Browser> CreateBrowser(const browser_config_t& browserConfig, const window_config_t& windowConfig);
 }; // namespace browser
 
 #endif // __BROWSER_HPP__

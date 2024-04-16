@@ -6,16 +6,16 @@
 #include "component.hpp"
 
 namespace ui {
-    class label : public component {
+    class Label : public Component {
     public:
-        label(const std::string& text, const std::string& pos, const std::string& target = "") :
+        Label(const std::string& text, const std::string& pos, const std::string& target = "") :
             m_text(text), m_pos(pos) {
             m_target = target;
         }
 
         component_type GetType() const override;
-        void Register(browser::browser* handle) override;
-        void Update(browser::browser* handle) override;
+        void Register(browser::Browser* handle) override;
+        void Update(browser::Browser* handle) override;
 
         void SetText(const std::string& text);
 

@@ -1,6 +1,3 @@
-#include <iostream>
-
-#include "browser/browser.hpp"
 #include "interface/holder.hpp"
 
 #include "managers/layoutmanager.hpp"
@@ -9,26 +6,22 @@
 #include "managers/featuremanager.hpp"
 #include "managers/configmanager.hpp"
 
-int main(int argc, char** argv) {
-    UNREFERENCED_PARAMETER(argc);
-    UNREFERENCED_PARAMETER(argv);
+#include "utils.hpp"
 
-    // setup the browser
+#undef interface
+
+int main(UNUSED int argc, UNUSED char** argv) {
     auto browserManager = interface<browser_manager>::Get();
     browserManager->Setup();
 
-    interface<config_manager>::Get()->Setup();
-    interface<layout_manager>::Get()->Setup();
-    interface<feature_manager>::Get()->Setup();
+    interface<ConfigManager>::Get()->Init();
+    interface<LayoutManager>::Get()->Init();
+    interface<FeatureManager>::Get()->Init();
 
-    // setup league connector & try to connect
-    auto connectionManager = interface<connector_manager>::Get();
-    connectionManager->Setup();
+    auto connectionManager = interface<ConnectorManager>::Get();
+    connectionManager->Init();
 
-    // start the browser
     browserManager->Start();
-
-    // stop the connector
     connectionManager->Shutdown();
 
     return 0;

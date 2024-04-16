@@ -1,18 +1,18 @@
 #include "checkbox.hpp"
 
-ui::component_type ui::checkbox::GetType() const {
+ui::component_type ui::Checkbox::GetType() const {
     return CT_CHECKBOX;
 }
 
-void ui::checkbox::Register(browser::browser* handle) {
+void ui::Checkbox::Register(browser::Browser* handle) {
     handle->CallJSFunction("uiCreateCheckBox", { m_label, m_state, GetId(), COMPONENT_CALLER_ID(HandleChange), m_target });
-    handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &checkbox::HandleChange, this);
+    handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &Checkbox::HandleChange, this);
 }
 
-void ui::checkbox::Update(browser::browser*) {
+void ui::Checkbox::Update(browser::Browser*) {
     
 }
 
-void ui::checkbox::HandleChange(browser::browser*, browser::js_args_t args) {
+void ui::Checkbox::HandleChange(browser::Browser*, browser::js_args_t args) {
     m_state = m_callbackHolder.Run(args.Get<0, bool>());
 }

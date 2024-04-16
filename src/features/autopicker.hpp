@@ -5,12 +5,16 @@
 #include <memory>
 
 #include "feature.hpp"
-#include "../ui/checkbox.hpp"
-#include "endpointmappers/champselectsession.hpp"
-#include "endpointmappers/lobbylobby.hpp"
-#undef interface
 
-class config;
+namespace champselect {
+    struct Session;
+}; // namespace champselect
+
+namespace lobby {
+    struct Lobby;
+}; // namespace lobby
+
+class Config;
 
 // ref madoka
 
@@ -51,12 +55,6 @@ namespace feature {
         OTHER_POSITION
     };
 
-    struct lobby_info_t {
-        std::vector<int> lockedChampions = {};
-        // gets set in gameflow hook
-        bool isInChampSelect = false;
-    };
-
     enum bot_mode {
         // here the bot is disabled so we dont do anything
         BOT_MANUAL = 0,
@@ -73,9 +71,15 @@ namespace feature {
         BAN
     };
 
-    class auto_picker : public feature {
+    struct lobby_info_t {
+        std::vector<int> lockedChampions = {};
+        // gets set in gameflow hook
+        bool isInChampSelect = false;
+    };
+
+    class AutoPicker : public Feature {
     public:
-        void Setup(std::shared_ptr<ui::frame> frame) override;
+        void Setup(std::shared_ptr<ui::Frame> frame) override;
         std::string GetName() override;
 
     private:
@@ -95,7 +99,7 @@ namespace feature {
         const std::vector<std::string> m_modes = { "manual", "semi", "auto" };
         const std::vector<std::string> m_strictnesses = { "none", "loose", "strict" };
         lobby_info_t m_lobby_info = {};
-        std::shared_ptr<config> m_config = nullptr;
+        std::shared_ptr<Config> m_config = nullptr;
     };
 }; // namespace feature
 

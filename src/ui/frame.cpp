@@ -15,15 +15,15 @@ ui::frame_layout::operator std::string() const  {
     }
 }
 
-ui::component_type ui::frame::GetType() const {
+ui::component_type ui::Frame::GetType() const {
     return CT_FRAME;
 }
 
-void ui::frame::Register(browser::browser* handle) {
+void ui::Frame::Register(browser::Browser* handle) {
     handle->CallJSFunction("uiCreateFrame", { m_name, GetId(), std::string{ m_layout }, m_target });
 
     for (const auto& comp : m_components)
         comp->Register(handle);
 }
 
-void ui::frame::Update(browser::browser*) {}
+void ui::Frame::Update(browser::Browser*) {}

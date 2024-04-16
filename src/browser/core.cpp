@@ -21,11 +21,11 @@ static std::wstring GetRelativePath(const char* relPath) {
     return std::wstring(uriBstr.get());
 };
 
-std::shared_ptr<browser::browser> browser::CreateBrowser(const browser_config_t& browserConfig, const window_config_t& windowConfig) {
+std::shared_ptr<browser::Browser> browser::CreateBrowser(const browser_config_t& browserConfig, const window_config_t& windowConfig) {
     if (!HAS_FLAG(browserConfig.flags, browser_flags::BF_ENABLE_DEBUG_CONSOLE))
         FreeConsole();
 
-    auto _browser = std::make_shared<browser>();
+    auto _browser = std::make_shared<Browser>();
 
     _browser->m_windowHandle = window::Create(
         HAS_FLAG(windowConfig.flags, WF_RESIZEABLE),
@@ -95,7 +95,7 @@ std::shared_ptr<browser::browser> browser::CreateBrowser(const browser_config_t&
                     const auto coreFunctions = L"const __mouse_data__={pos:{x:0,y:0},isDragging:!1};document.addEventListener(\"mousedown\",(_=>{1!=_.button&&\"drag\"!=getComputedStyle(_.target,null).getPropertyValue(\"--webkit-app-region\")||(__mouse_data__.isDragging=!0,__mouse_data__.pos.x=_.clientX,__mouse_data__.pos.y=_.clientY,document.getElementsByTagName(\"body\")[0].style.cursor=\"grabbing\")})),document.addEventListener(\"mousemove\",(_=>{__mouse_data__.isDragging&&invoke(\"MoveWindow\",[_.clientX-__mouse_data__.pos.x,_.clientY-__mouse_data__.pos.y])})),document.addEventListener(\"mouseup\",(()=>{__mouse_data__.isDragging&&(__mouse_data__.isDragging=!1,document.getElementsByTagName(\"body\")[0].style.cursor=\"\")}));const __function_data__={resultMap:new Map,registerdFunctions:{}};function __core_result_handler__(_,e){__function_data__.resultMap.get(_).resolve(e),__function_data__.resultMap.delete(_)}function __core_call_js__(_,...e){__function_data__.registerdFunctions[_]?__function_data__.registerdFunctions[_](...e):console.error(`Function ${_} not registered`)}async function invoke(_,e){return new Promise(((t,n)=>{if(__function_data__.resultMap.get(_))return __function_data__.resultMap.get(_);__function_data__.resultMap.set(_,{resolve:t,reject:n}),window.chrome.webview.postMessage({__name__:_,__args__:e})}))}function register(_){__function_data__.registerdFunctions[_.name]=_}";
                     _browser->m_webView2->AddScriptToExecuteOnDocumentCreated(coreFunctions, nullptr);
 
-                    _browser->RegisterFunction("MoveWindow", &browser::MoveWindow, _browser.get());
+                    _browser->RegisterFunction("MoveWindow", &Browser::MoveWindow, _browser.get());
 
                     _browser->m_webView2->add_WebMessageReceived(
                         Callback<ICoreWebView2WebMessageReceivedEventHandler>(

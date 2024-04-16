@@ -3,26 +3,25 @@
 
 #include <memory>
 
-#include "../ui/frame.hpp"
-#include "../ui/button.hpp"
-#include "../ui/label.hpp"
-#include "../ui/checkbox.hpp"
-#include "../ui/slider.hpp"
-#include "../ui/dropdown.hpp"
-#include "../ui/selector.hpp"
+namespace ui {
+    class Frame;
+}; // namespace ui
 
-#include "../browser/browser.hpp"
+namespace browser {
+    class js_args_t;
+    class Browser;
+}; // namespace browser
 
-class layout_manager {
+class LayoutManager {
 public:
-    void Setup();
+    bool Init();
 
-    void PushLayout(browser::browser* handle, browser::js_args_t args);
+    void PushLayout(browser::Browser* handle, browser::js_args_t args);
 
-    std::shared_ptr<ui::frame> GetFrame();
+    std::shared_ptr<ui::Frame> GetFrame();
 
 private:
-    std::shared_ptr<ui::frame> m_frameMain;
+    std::shared_ptr<ui::Frame> m_frameMain;
 };
 
 #endif // __LAYOUTMANAGER_HPP__

@@ -2,8 +2,13 @@
 #define __BROWSERMANAGER_HPP__
 
 #include <memory>
+#include <any>
+#include <string>
+#include <vector>
 
-#include "../browser/browser.hpp"
+namespace browser {
+    class Browser;
+}; // namespace browser
 
 enum class notification_type {
     NONE,
@@ -17,13 +22,13 @@ public:
     void Setup();
     void Start();
 
-    browser::browser* GetHandle();
+    browser::Browser* GetHandle();
 
     void CallJS(const std::string& name, const std::vector<std::any>& args);
     void CreateNotification(const std::string& title, const std::string& description, notification_type type);
 
 private:
-    std::shared_ptr<browser::browser> m_handle = nullptr;
+    std::shared_ptr<browser::Browser> m_handle = nullptr;
 };
 
 #endif // __BROWSERMANAGER_HPP__

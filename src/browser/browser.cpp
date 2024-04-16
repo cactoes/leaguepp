@@ -3,11 +3,11 @@
 #include "../window/window.hpp"
 #include "typehelpers.hpp"
 
-void browser::browser::Start() {
+void browser::Browser::Start() {
     window::Init(this);
 
     MSG msg{};
-    event_bus::message_t eventMessage = {};
+    EventBus::message_t eventMessage = {};
 
     while (WM_QUIT != msg.message) {
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -15,7 +15,7 @@ void browser::browser::Start() {
             DispatchMessage(&msg);
         }
 
-        while (m_isReady && m_bus.getMessage(&eventMessage)) {
+        while (m_isReady && m_bus.GetMessage(&eventMessage)) {
             std::string script = "__core_call_js__(\"" + eventMessage.name + "\",";
 
             for (const auto& arg : eventMessage.args)
@@ -30,19 +30,19 @@ void browser::browser::Start() {
     window::Destroy(m_windowHandle);
 }
 
-void browser::browser::CallJSFunction(const std::string& name, const std::vector<std::any>& args) {
+void browser::Browser::CallJSFunction(const std::string& name, const std::vector<std::any>& args) {
     m_bus.AddMessage({ .name = name, .args = args });
 }
 
-void browser::browser::RegisterFunction(const std::string& name, std::function<std::any(browser*, js_args_t)> func) {
+void browser::Browser::RegisterFunction(const std::string& name, std::function<std::any(Browser*, js_args_t)> func) {
     m_methodMap[name] = func;
 }
 
-void browser::browser::AddDOMContentLoadedHandler(std::function<void(browser*)> func) {
+void browser::Browser::AddDOMContentLoadedHandler(std::function<void(Browser*)> func) {
     m_eventMethodMap["DOMContentLoaded"].emplace_back(func);
 }
 
-void browser::browser::MoveWindow(browser*, js_args_t jsArgs) {
+void browser::Browser::MoveWindow(Browser*, js_args_t jsArgs) {
     RECT rect;
     GetWindowRect(m_windowHandle, &rect);
 
@@ -55,7 +55,7 @@ void browser::browser::MoveWindow(browser*, js_args_t jsArgs) {
         SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
-void browser::browser::OnDomContentLoaded() {
+void browser::Browser::OnDomContentLoaded() {
     if (m_eventMethodMap.contains("DOMContentLoaded"))
         for (const auto& pFunction : m_eventMethodMap.at("DOMContentLoaded"))
             pFunction(this);

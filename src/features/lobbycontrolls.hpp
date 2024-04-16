@@ -2,13 +2,11 @@
 #define __LOBBYCONTROLLS_HPP__
 
 #include "feature.hpp"
-#include "../ui/frame.hpp"
-#undef interface
 
 namespace feature {
-    class lobby_controlls : public feature {
+    class LobbyControlls : public Feature {
     public:
-        void Setup(std::shared_ptr<ui::frame> frame) override;
+        void Setup(std::shared_ptr<ui::Frame> frame) override;
         std::string GetName() override;
     };
 }; // namespace feature

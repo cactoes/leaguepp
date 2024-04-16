@@ -1,37 +1,44 @@
 #include "layoutmanager.hpp"
 
 #include "../interface/holder.hpp"
+#include "../ui/frame.hpp"
+#include "../browser/browser.hpp"
+
 #include "configmanager.hpp"
 #include "browsermanager.hpp"
 
-void layout_manager::Setup() {
-    auto browserManager = interface<browser_manager>::Get();
-    browserManager->GetHandle()->RegisterFunction("GetMainLayout", CREATE_REGISTRATION_MEMBER(layout_manager::PushLayout));
+#undef interface
 
-    m_frameMain = std::make_shared<ui::frame>("", ui::FL_HORIZONTAL, FRAME_TARGET_MAIN);
+bool LayoutManager::Init() {
+    auto browserManager = interface<browser_manager>::Get();
+    browserManager->GetHandle()->RegisterFunction("GetMainLayout", CREATE_REGISTRATION_MEMBER(LayoutManager::PushLayout));
+
+    m_frameMain = std::make_shared<ui::Frame>("", ui::FL_HORIZONTAL, FRAME_TARGET_MAIN);
     m_frameMain->SetId("MainFrame");
 
-    auto holderFrame = std::make_shared<ui::frame>("", ui::FL_VERTICAL);
+    auto holderFrame = std::make_shared<ui::Frame>("", ui::FL_VERTICAL);
     holderFrame->SetId("HolderFrame");
-    m_frameMain->AddComponent<ui::frame>(holderFrame);
+    m_frameMain->AddComponent<ui::Frame>(holderFrame);
 
-    auto lobbyFrame = std::make_shared<ui::frame>("lobby", ui::FL_VERTICAL_AUTO);
+    auto lobbyFrame = std::make_shared<ui::Frame>("lobby", ui::FL_VERTICAL_AUTO);
     lobbyFrame->SetId("LobbyFrame");
-    holderFrame->AddComponent<ui::frame>(std::move(lobbyFrame));
+    holderFrame->AddComponent<ui::Frame>(std::move(lobbyFrame));
 
-    auto autoPickerFrame = std::make_shared<ui::frame>("auto picker", ui::FL_VERTICAL_AUTO);
+    auto autoPickerFrame = std::make_shared<ui::Frame>("auto picker", ui::FL_VERTICAL_AUTO);
     autoPickerFrame->SetId("AutoPickerFrame");
-    holderFrame->AddComponent<ui::frame>(std::move(autoPickerFrame));
+    holderFrame->AddComponent<ui::Frame>(std::move(autoPickerFrame));
 
-    auto statsFrame = std::make_shared<ui::frame>("stats", ui::FL_VERTICAL);
+    auto statsFrame = std::make_shared<ui::Frame>("stats", ui::FL_VERTICAL);
     statsFrame->SetId("StatsFrame");
-    m_frameMain->AddComponent<ui::frame>(std::move(statsFrame));
+    m_frameMain->AddComponent<ui::Frame>(std::move(statsFrame));
+
+    return true;
 }
 
-void layout_manager::PushLayout(browser::browser* handle, browser::js_args_t args) {
+void LayoutManager::PushLayout(browser::Browser* handle, browser::js_args_t args) {
     m_frameMain->Register(handle);
 }
 
-std::shared_ptr<ui::frame> layout_manager::GetFrame() {
+std::shared_ptr<ui::Frame> LayoutManager::GetFrame() {
     return m_frameMain;
 }

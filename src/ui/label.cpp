@@ -1,17 +1,17 @@
 #include "label.hpp"
 
-ui::component_type ui::label::GetType() const {
+ui::component_type ui::Label::GetType() const {
     return CT_LABEL;
 }
 
-void ui::label::Register(browser::browser* handle) {
+void ui::Label::Register(browser::Browser* handle) {
     handle->CallJSFunction("uiCreateLabel", { m_text, m_pos, GetId(), m_target });
 }
 
-void ui::label::Update(browser::browser* handle) {
+void ui::Label::Update(browser::Browser* handle) {
     handle->CallJSFunction("uiUpdateLabel", { m_text, GetId() });
 }
 
-void ui::label::SetText(const std::string& text) {
+void ui::Label::SetText(const std::string& text) {
     m_text = text;
 }

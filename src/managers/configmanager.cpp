@@ -3,56 +3,56 @@
 #include <fstream>
 
 template <>
-inline char* cvar<std::string>::Data() {
+inline char* Cvar<std::string>::Data() {
     return m_value.data();
 }
 
 template <>
-inline uint64_t cvar<std::string>::Size() {
+inline uint64_t Cvar<std::string>::Size() {
     return m_value.size();
 }
 
 template <>
-inline char* cvar<std::vector<int>>::Data() {
+inline char* Cvar<std::vector<int>>::Data() {
     return reinterpret_cast<char*>(m_value.data());
 }
 
 template <>
-inline void cvar<std::vector<int>>::SetData(char* data, size_t size) {
+inline void Cvar<std::vector<int>>::SetData(char* data, size_t size) {
     m_value.reserve(size / sizeof(int));
     memcpy(Data(), data, size);
 }
 
 template <>
-inline uint64_t cvar<std::vector<int>>::Size() {
+inline uint64_t Cvar<std::vector<int>>::Size() {
     return sizeof(int) * m_value.size();
 }
 
 template <>
-inline char* cvar<std::vector<float>>::Data() {
+inline char* Cvar<std::vector<float>>::Data() {
     return reinterpret_cast<char*>(m_value.data());
 }
 
 template <>
-inline void cvar<std::vector<float>>::SetData(char* data, size_t size) {
+inline void Cvar<std::vector<float>>::SetData(char* data, size_t size) {
     m_value.reserve(size / sizeof(float));
     memcpy(Data(), data, size);
 }
 
 template <>
-inline uint64_t cvar<std::vector<float>>::Size() {
+inline uint64_t Cvar<std::vector<float>>::Size() {
     return sizeof(float) * m_value.size();
 }
 
-bool config::HasVar(const char* key) {
+bool Config::HasVar(const char* key) {
     return HasVar(hash::Fnv1a64HashConst(key));
 }
 
-bool config::HasVar(uint64_t key) {
+bool Config::HasVar(uint64_t key) {
     return m_data.contains(key);
 }
 
-config::data_t config::Data() {
+Config::data_t Config::Data() {
     data_t data = {};
 
     for (auto& [k, v] : m_data) {
@@ -91,8 +91,8 @@ config::data_t config::Data() {
     return data;
 }
 
-void config_manager::Setup() {
-    auto cfg = CreateConfig(CONFIG_BASIC);
+bool ConfigManager::Init() {
+    auto cfg = Create(CONFIG_BASIC);
     cfg->AddTemplate<bool>("lobby::bAutoAccept");
 
     cfg->AddTemplate<int>("autoPicker::nMode");
@@ -100,29 +100,33 @@ void config_manager::Setup() {
     cfg->AddTemplate<std::vector<int>>("autoPicker::banIds");
     cfg->AddTemplate<std::vector<int>>("autoPicker::pickIds");
 
-    if (!LoadConfig(cfg))
-        DumpConfig(cfg);
+    if (!Load(cfg))
+        Dump(cfg);
+
+    return true;
 }
 
-void config_manager::DumpConfig(std::shared_ptr<config> config) {
+bool ConfigManager::Dump(config_handle config) {
     std::ofstream stream(config->m_name + ".bin", std::ios::binary);
     auto data = config->Data();
     stream.write(data.data.get(), data.size);
+
+    return true;
 }
 
-std::shared_ptr<config> config_manager::CreateConfig(const std::string& name) {
+config_handle ConfigManager::Create(const std::string& name) {
     if (m_configs.contains(name))
         return nullptr;
 
-    m_configs[name] = std::make_shared<config>(name);
-    return GetConfig(name);
+    m_configs[name] = std::make_shared<Config>(name);
+    return Get(name);
 }
 
-std::shared_ptr<config> config_manager::GetConfig(const std::string& name) {
+config_handle ConfigManager::Get(const std::string& name) {
     return m_configs.at(name);
 }
 
-bool config_manager::LoadConfig(std::shared_ptr<config> config) {
+bool ConfigManager::Load(config_handle config) {
     std::ifstream stream(config->m_name + ".bin", std::ios::binary);
 
     if (!stream.is_open() || stream.peek() == EOF)

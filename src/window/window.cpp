@@ -1,7 +1,7 @@
 #include "window.hpp"
 #include "../browser/browser.hpp"
 
-HWND window::Create(bool isResizeable, bool hideTitleBar, bool show, int width, int height, int startX, int startY, const char* name, int icon, browser::browser* handle) {
+HWND window::Create(bool isResizeable, bool hideTitleBar, bool show, int width, int height, int startX, int startY, const char* name, int icon, browser::Browser* handle) {
     HICON hIcon = icon >= 0 ? LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(icon)) : LoadIcon(GetModuleHandle(nullptr), IDI_APPLICATION);
 
     WNDCLASSEX windowClassEx{};
@@ -42,7 +42,7 @@ HWND window::Create(bool isResizeable, bool hideTitleBar, bool show, int width, 
 }
 
 LRESULT window::HandleWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    const auto handle = reinterpret_cast<browser::browser*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+    const auto handle = reinterpret_cast<browser::Browser*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
     switch (uMsg) {
         case WM_CLOSE:
@@ -65,12 +65,12 @@ void window::Destroy(HWND handle) {
         DestroyWindow(handle);
 }
 
-bool window::Init(browser::browser* handle) {
+bool window::Init(browser::Browser* handle) {
     handle->RegisterFunction("HandleWindowEvent", &window::HandleWindowEvent);
     return true;
 }
 
-bool window::HandleWindowEvent(browser::browser* handle, browser::js_args_t args) {
+bool window::HandleWindowEvent(browser::Browser* handle, browser::js_args_t args) {
     if (args.Size() < 1)
         return false;
 
