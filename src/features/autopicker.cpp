@@ -26,15 +26,24 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame) {
     // TODO: change the selectors
     // TODO: add inputs for the bans & picks
 
-    m_config->SetVar("autoPicker::banIds", std::vector<int>{ 22, 74, 17 });
+    m_config->SetVar("autoPicker::banIds", std::vector<int>{ }); // 22, 74, 17
     m_config->SetVar("autoPicker::pickIds", std::vector<int>{ 51 });
 
     // setup hooks
 
     connectorManager->AddEventListener(
         "/lol-gameflow/v1/gameflow-phase",
-        client_callback([this](std::string, nlohmann::json data) {
+        client_callback([this, connectorManager](std::string, nlohmann::json data) {
             m_lobby_info.isInChampSelect = data.get<std::string>() == "ChampSelect";
+
+            // for early declare
+            if (m_lobby_info.isInChampSelect) {
+                const auto sessionDataResult = connectorManager->MakeRequest(connector::request_type::GET, "/lol-champ-select/v1/session");
+                const auto lobbyDataResult = connectorManager->MakeRequest(connector::request_type::GET, "/lol-lobby/v2/lobby");
+
+                if (sessionDataResult.status == 200 && lobbyDataResult.status == 200)
+                    HandleFrame(sessionDataResult.data.get<champselect::Session>(), lobbyDataResult.data.get<lobby::Lobby>());
+            }
         })
     );
 

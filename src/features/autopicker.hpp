@@ -28,7 +28,7 @@ namespace feature {
     };
 
     enum class player_state {
-        INVALID,
+        INVALID = 0,
 
         // when are we declaring?
         DECLARING,
@@ -39,12 +39,12 @@ namespace feature {
     };
 
     enum class lane_state {
-        INVALID,
+        INVALID = 0,
         // only valid when in:
         // - solo/duo
         // - flex
         // - draft
-        ASSIGNED_PRIMARY_POSITION = 0,
+        ASSIGNED_PRIMARY_POSITION,
         ASSIGNED_SECONDARY_POSITION,
 
         // assume when there are no lanes to pre pick
