@@ -5,7 +5,6 @@
 
 #include "managers/layoutmanager.hpp"
 #include "managers/browsermanager.hpp"
-#include "managers/eventmanager.hpp"
 #include "managers/connectormanager.hpp"
 #include "managers/featuremanager.hpp"
 #include "managers/configmanager.hpp"
@@ -26,9 +25,6 @@ int main(int argc, char** argv) {
 
     // setup features
     interface<feature_manager>::Get()->Setup();
-
-    // setup window events
-    interface<event_manager>::Get()->Setup(browserManager->GetHandle());
 
     // setup league connector & try to connect
     auto connectionManager = interface<connector_manager>::Get();

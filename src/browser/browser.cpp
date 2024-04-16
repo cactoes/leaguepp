@@ -4,6 +4,8 @@
 #include "typehelpers.hpp"
 
 void browser::browser::Start() {
+    window::Init(this);
+
     MSG msg{};
     event_bus::message_t eventMessage = {};
 
