@@ -101,6 +101,9 @@ body {
 }
 
 #titlebar > .buttons > .button {
+    border-top: 1px solid var(--trim);
+    border-left: 1px solid var(--trim);
+    
     height: 19px;
     width: 19px;
     margin-right: 2px;
