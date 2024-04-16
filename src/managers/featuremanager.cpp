@@ -5,7 +5,7 @@
 
 #include "../features/lobbycontrolls.hpp"
 #include "../features/autopicker.hpp"
-#include "../features/stats.hpp"
+#include "../features/profile.hpp"
 
 #include "layoutmanager.hpp"
 
@@ -17,11 +17,11 @@ bool FeatureManager::Init() {
 
     auto lobbyFrame = targetFrame->GetComponent<ui::Frame>("LobbyFrame");
     auto autoPickerFrame = targetFrame->GetComponent<ui::Frame>("AutoPickerFrame");
-    auto statsFrame = frameMain->GetComponent<ui::Frame>("StatsFrame");
+    auto profileFrame = frameMain->GetComponent<ui::Frame>("ProfileFrame");
 
     CreateFeature<feature::LobbyControlls>(lobbyFrame);
     CreateFeature<feature::AutoPicker>(autoPickerFrame);
-    CreateFeature<feature::Stats>(statsFrame);
+    CreateFeature<feature::Profile>(profileFrame);
 
     return true;
 }

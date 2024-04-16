@@ -27,9 +27,9 @@ bool LayoutManager::Init() {
     autoPickerFrame->SetId("AutoPickerFrame");
     holderFrame->AddComponent<ui::Frame>(std::move(autoPickerFrame));
 
-    auto statsFrame = std::make_shared<ui::Frame>("stats", ui::FL_VERTICAL);
-    statsFrame->SetId("StatsFrame");
-    m_frameMain->AddComponent<ui::Frame>(std::move(statsFrame));
+    auto profileFrame = std::make_shared<ui::Frame>("profile", ui::FL_VERTICAL);
+    profileFrame->SetId("ProfileFrame");
+    m_frameMain->AddComponent<ui::Frame>(std::move(profileFrame));
 
     return true;
 }
