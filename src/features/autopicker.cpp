@@ -37,7 +37,7 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame) {
             m_lobby_info.isInChampSelect = data.get<std::string>() == "ChampSelect";
 
             // for early declare
-            if (m_lobby_info.isInChampSelect) {
+            if (m_lobby_info.isInChampSelect && m_config->GetVar<bool>("autoPicker::bEnabled")) {
                 const auto sessionDataResult = connectorManager->MakeRequest(connector::request_type::GET, "/lol-champ-select/v1/session");
                 const auto lobbyDataResult = connectorManager->MakeRequest(connector::request_type::GET, "/lol-lobby/v2/lobby");
 
