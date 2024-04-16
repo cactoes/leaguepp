@@ -16,6 +16,7 @@
 #include "../ui/dropdown.hpp"
 #include "../ui/selector.hpp"
 #include "../ui/slider.hpp"
+#include "../ui/input.hpp"
 
 void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame) {
     auto connectorManager = interface<ConnectorManager>::Get();
@@ -39,6 +40,12 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame) {
                 browserManager->CreateNotification("failed to clear", "the tokens could no be cleared", notification_type::NONE);
         })
     );
+
+    // frame->AddComponent<ui::Input>(
+    //     "test input", "initial value", ui::input_callback([this](std::string newValue) {
+    //         return newValue;
+    //     })
+    // );
     
     // frame->AddComponent<ui::Checkbox>(
     //     "test checkbox", true,
@@ -48,9 +55,16 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame) {
     // auto items = std::vector<std::string>{ "item1", "item2", "item3", "item4" };
 
     // frame->AddComponent<ui::Dropdown>(
-    //     "test dropdown", items,
-    //     ui::dropdown_callback([this](std::string item, bool newItemState, std::vector<std::string> list) {
-    //         DEBUG_LOG("interacted with dropdown");
+    //     "test multi dropdown", true, std::vector<std::string>{ "item1" }, items,
+    //     ui::dropdown_callback([this](std::string, bool, std::vector<std::string> list) {
+    //         return list;
+    //     })
+    // );
+
+    // frame->AddComponent<ui::Dropdown>(
+    //     "test single dropdown", false, std::vector<std::string>{ "item1" }, items,
+    //     ui::dropdown_callback([this](std::string, bool, std::vector<std::string> list) {
+    //         return list;
     //     })
     // );
 

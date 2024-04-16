@@ -5,7 +5,7 @@ ui::component_type ui::Dropdown::GetType() const {
 }
 
 void ui::Dropdown::Register(browser::Browser* handle) {
-    handle->CallJSFunction("uiCreateDropDown", { m_label, GetId(), COMPONENT_CALLER_ID(HandleChange), m_target, m_values });
+    handle->CallJSFunction("uiCreateDropDown", { m_label, GetId(), m_isMulti, m_activeValues, COMPONENT_CALLER_ID(HandleChange), m_target, m_values });
     handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &Dropdown::HandleChange, this);
 }
 
@@ -18,5 +18,5 @@ void ui::Dropdown::HandleChange(browser::Browser*, browser::js_args_t args) {
     for (auto& item : args.GetArray<2>())
         values.push_back(item.As<std::string>());
 
-    m_callbackHolder.Run(args.Get<0, std::string>(), args.Get<1, bool>(), std::move(values));
+    m_activeValues = m_callbackHolder.Run(args.Get<0, std::string>(), args.Get<1, bool>(), std::move(values));
 }

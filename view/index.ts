@@ -141,9 +141,8 @@ namespace ui {
         const input = document.createElement("input");
         input.type = "checkbox";
         input.checked = state;
-        input.onclick = (e: MouseEvent) => {
-            // state that gets returned is ignored
-            invoke(onclick, [ (e.currentTarget as HTMLInputElement).checked ])
+        input.onclick = () => {
+            invoke(onclick, [ input.checked ])
         }
         lbl.appendChild(input);
         const span = document.createElement("span");
@@ -231,7 +230,7 @@ namespace ui {
         element.appendChild(slider);
     }
     
-    export function createDropDown(label: string, id: string, onchange: string, target: string, items: string[]): void {
+    export function createDropDown(label: string, id: string, isMulti: boolean, activeValues: string[], onchange: string, target: string, items: string[]): void {
         const element = document.getElementById(target);
         if (!element)
             return noTarget(target);
@@ -264,26 +263,43 @@ namespace ui {
         const dropdownContent = document.createElement("div");
         dropdownContent.className = "content noselect";
         dropdownContent.id = id + "content";
+
+        const updateInput = () => {
+            const selectedItems: string[] = [];
+            for (const element of dropdownContent.children as HTMLCollectionOf<HTMLParagraphElement>)
+                if (element.className == "selected")
+                    selectedItems.push(element.innerText);
+
+            disabledInput.value = selectedItems.join(", ");
+
+            return selectedItems;
+        }
+
+        const gradient = colors.generateGradient(items.length);
     
-        for (const item of items) {
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
             const p = document.createElement("p");
             p.innerText = item;
-            p.onclick = () => {
-                p.className = p.className == "selected" ? "" : "selected";
+            p.style.color = gradient[i];
 
-                const selectedItems: string[] = [];
-                for (const element of document.getElementById(id + "content")!.children as HTMLCollectionOf<HTMLParagraphElement>) {
-                    if (element.className == "selected")
-                        selectedItems.push(element.innerText);
-                }
-    
-                const a = document.getElementById(id + "input")! as HTMLInputElement;
-                a.value = selectedItems.join(", ");
-    
+            if (activeValues.includes(item))
+                p.className = "selected";
+
+            p.onclick = () => {
+                if (!isMulti)
+                    for (const element of dropdownContent.children as HTMLCollectionOf<HTMLParagraphElement>)
+                        element.className = "";
+
+                p.className = p.className == "selected" ? "" : "selected";
+                const selectedItems = updateInput();
                 invoke(onchange, [ p.innerText, p.className == "selected", selectedItems ]);
             }
             dropdownContent.appendChild(p);
         }
+
+        updateInput();
     
         dropDownDiv.appendChild(dropdownContent);
     
@@ -459,8 +475,8 @@ function uiCreateSlider(label: string, id: string, onchange: string, min: number
     ui.createSlider(label, id, onchange, min, max, target);
 }
 
-function uiCreateDropDown(label: string, id: string, onchange: string, target: string, items: string[]): void {
-    ui.createDropDown(label, id, onchange, target, items);
+function uiCreateDropDown(label: string, id: string, isMulti: boolean, activeValues: string[], onchange: string, target: string, items: string[]): void {
+    ui.createDropDown(label, id, isMulti, activeValues, onchange, target, items);
 }
 
 function uiCreateSelector(label: string, state: number, id: string, onchange: string, target: string, items: string[]): void {

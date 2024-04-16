@@ -9,12 +9,12 @@
 
 namespace ui {
     // void DropDownCallback(std::string item, bool newItemState, std::vector<std::string> list)
-    typedef callback_holder<void, std::string, bool, std::vector<std::string>> dropdown_callback;
+    typedef callback_holder<std::vector<std::string>, std::string, bool, std::vector<std::string>> dropdown_callback;
 
     class Dropdown : public Component {
     public:
-        Dropdown(const std::string& label, const std::vector<std::string>& values, const dropdown_callback& callbackHolder, const std::string& target = "") :
-            m_label(label), m_values(values), m_callbackHolder(callbackHolder) {
+        Dropdown(const std::string& label, bool isMulti, const std::vector<std::string>& activeValues, const std::vector<std::string>& values, const dropdown_callback& callbackHolder, const std::string& target = "") :
+            m_label(label), m_isMulti(isMulti), m_activeValues(activeValues), m_values(values), m_callbackHolder(callbackHolder) {
             m_target = target;
         }
 
@@ -26,6 +26,8 @@ namespace ui {
 
     private:
         std::string m_label;
+        bool m_isMulti;
+        std::vector<std::string> m_activeValues;
         std::vector<std::string> m_values;
         dropdown_callback m_callbackHolder;
     };
