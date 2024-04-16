@@ -1,3 +1,54 @@
+namespace colors {
+    // same as the css
+    const primaryColor = '#98add9';
+    const accentColor = '#af7dbf';
+
+    function interpolateColor(color1: string, color2: string, factor: number) {
+        if (factor === 0) return color1;
+        if (factor === 1) return color2;
+
+        const c1 = parseColor(color1);
+        const c2 = parseColor(color2);
+
+        const r = Math.round(lerp(c1.r, c2.r, factor));
+        const g = Math.round(lerp(c1.g, c2.g, factor));
+        const b = Math.round(lerp(c1.b, c2.b, factor));
+
+        return rgbToHex(r, g, b);
+    }
+
+    function parseColor(color: string) {
+        const hex = color.substring(1);
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        return { r, g, b };
+    }
+
+    function lerp(value1: number, value2: number, factor: number) {
+        return value1 * (1 - factor) + value2 * factor;
+    }
+
+    function rgbToHex(r: number, g: number, b: number) {
+        const componentToHex = (c: number) => {
+            const hex = c.toString(16);
+            return hex.length === 1 ? "0" + hex : hex;
+        };
+        return `#${componentToHex(r)}${componentToHex(g)}${componentToHex(b)}`;
+    }
+
+    export function generateGradient(steps: number) {
+        const colors = [];
+        for (let i = 0; i < steps; i++) {
+            const factor = i / (steps - 1);
+            const interpolatedColor = interpolateColor(primaryColor, accentColor, factor);
+            colors.push(interpolatedColor);
+        }
+        return colors;
+    }
+}; // colors
+
+
 namespace ui {
     const noTarget = (target: string) => console.error(`Error: Failed to find target "${target}"`);
 
@@ -46,8 +97,14 @@ namespace ui {
         label.id = id;
     
         const p = document.createElement("p");
+        p.className = "label";
         p.innerText = text;
         label.appendChild(p);
+        
+        const shadow = document.createElement("span");
+        shadow.className = "shadow";
+        shadow.innerText = text;
+        label.appendChild(shadow);
     
         element.appendChild(label);
     }
@@ -59,7 +116,11 @@ namespace ui {
 
         const p = document.createElement("p");
         p.innerText = text;
-        element.replaceChildren(p);
+
+        const shadow = document.createElement("span");
+        shadow.innerText = text;
+        
+        element.replaceChildren(p, shadow);
     }
     
     export function createCheckBox(label: string, state: boolean, id: string, onclick: string, target: string): void {
@@ -70,6 +131,11 @@ namespace ui {
         const checkbox = document.createElement("div");
         checkbox.className = "checkbox element";
         checkbox.id = id;
+
+        const p = document.createElement("p");
+        p.className = "label"
+        p.innerText = label;
+        checkbox.appendChild(p);
     
         const lbl = document.createElement("label");
         const input = document.createElement("input");
@@ -84,10 +150,6 @@ namespace ui {
         lbl.appendChild(span);
         checkbox.appendChild(lbl);
     
-        const p = document.createElement("p");
-        p.innerText = label;
-        checkbox.appendChild(p);
-    
         element.appendChild(checkbox);
     }
     
@@ -99,32 +161,72 @@ namespace ui {
         const slider = document.createElement("div");
         slider.className = "slider element";
         slider.id = id;
+
+        //     <p class="label">${label}</p>
+        const p = document.createElement("p");
+        p.className = "label";
+        p.innerText = label;
+        slider.appendChild(p);
+
+        //     <span class="shadow">${label}</span>
+        const shadow = document.createElement("span");
+        shadow.className = "shadow";
+        shadow.innerText = label;
+        slider.appendChild(shadow);
+
+        const div = document.createElement("div");
     
         const sldr = document.createElement("input");
         sldr.type = "range"
         sldr.min = `${min}`;
         sldr.max = `${max}`;
-    
-        sldr.oninput = (e: Event) => {
-            const newValue = parseInt((e.currentTarget as HTMLInputElement).value);
+
+        const doSliderEvents = (newValue: number) => {
             invoke(onchange, [ newValue ]);
             const span = document.getElementById(id+"sliderTick") as HTMLSpanElement;
             span.innerText = `${newValue}`;
-            span.style.left = `${(newValue - min) / (max - min) * 100}px`
+            span.style.left = `${(newValue - min) / (max - min) * 100}%`
         }
     
-        slider.appendChild(sldr);
+        sldr.oninput = () => {
+            const newValue = parseInt(sldr.value);
+            doSliderEvents(newValue);
+        }
     
+        div.appendChild(sldr);
+
+        //         <span class="decrement">-</span>
+        const decrement = document.createElement("span");
+        decrement.className = "decrement noselect";
+        decrement.innerText = "-";
+        decrement.onclick = () => {
+            const newValue = parseInt(sldr.value) - 1;
+            sldr.value = `${newValue}`;
+            doSliderEvents(parseInt(sldr.value));
+        }
+        div.appendChild(decrement);
+
+        //         <span class="increment">+</span>
+        const increment = document.createElement("span");
+        increment.className = "increment noselect";
+        increment.innerText = "+";
+        increment.onclick = () => {
+            const newValue = parseInt(sldr.value) + 1;
+            sldr.value = `${newValue}`;
+            doSliderEvents(parseInt(sldr.value));
+        }
+        div.appendChild(increment);
+
+        //         <span id=id+"sliderTick" class="sliderTick">${mid}</span>
         const span = document.createElement("span");
         span.id = id+"sliderTick";
+        span.className = "sliderTick";
         const mid = Math.round((min + max) / 2);
         span.innerText = `${mid}`;
-        span.style.left = `${(mid - min) / (max - min) * 100}px`
-        slider.appendChild(span);
-    
-        const p = document.createElement("p");
-        p.innerText = label;
-        slider.appendChild(p);
+        span.style.left = `${(mid - min) / (max - min) * 100}%`
+        div.appendChild(span);
+
+        slider.appendChild(div);
     
         element.appendChild(slider);
     }
@@ -134,10 +236,23 @@ namespace ui {
         if (!element)
             return noTarget(target);
 
+        // <div class="dropdown element" id=`${id}`>
         const dropdown = document.createElement("div");
         dropdown.className = "dropdown element"
         dropdown.id = id;
     
+        //     <p class="label">${label}</p>
+        const p = document.createElement("p");
+        p.className = "label";
+        p.innerText = label;
+        dropdown.appendChild(p);
+
+        //     <span class="shadow">${label}</span>
+        const shadow = document.createElement("span");
+        shadow.className = "shadow";
+        shadow.innerText = label;
+        dropdown.appendChild(shadow);
+
         const dropDownDiv = document.createElement("div");
     
         const disabledInput = document.createElement("input");
@@ -155,7 +270,7 @@ namespace ui {
             p.innerText = item;
             p.onclick = () => {
                 p.className = p.className == "selected" ? "" : "selected";
-    
+
                 const selectedItems: string[] = [];
                 for (const element of document.getElementById(id + "content")!.children as HTMLCollectionOf<HTMLParagraphElement>) {
                     if (element.className == "selected")
@@ -173,11 +288,6 @@ namespace ui {
         dropDownDiv.appendChild(dropdownContent);
     
         dropdown.appendChild(dropDownDiv);
-    
-    
-        const lbl = document.createElement("p");
-        lbl.innerText = label;
-        dropdown.appendChild(lbl);
      
         element.appendChild(dropdown);
     }
@@ -191,15 +301,31 @@ namespace ui {
         selector.className = "selector element"
         selector.id = id;
 
+        //     <p class="label">${label}</p>
+        const p = document.createElement("p");
+        p.className = "label";
+        p.innerText = label;
+        selector.appendChild(p);
+
+        //     <span class="shadow">${label}</span>
+        const shadow = document.createElement("span");
+        shadow.className = "shadow";
+        shadow.innerText = label;
+        selector.appendChild(shadow);
+
         const selectorContent = document.createElement("div");
         selectorContent.id = id + "content"
         selectorContent.className = "noselect"
+
+        const gradient = colors.generateGradient(items.length);
 
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
 
             const p = document.createElement("p");
             p.innerText = item;
+
+            p.style.backgroundColor = gradient[i];
 
             if (i == state)
                 p.className = "selected";
@@ -220,10 +346,6 @@ namespace ui {
         }
 
         selector.appendChild(selectorContent);
-            
-        const lbl = document.createElement("p");
-        lbl.innerText = label;
-        selector.appendChild(lbl);
 
         element.appendChild(selector);
     }
