@@ -76,7 +76,7 @@ namespace ui {
             return noTarget(target);
     
         const button = document.createElement("div");
-        button.className = "button element";
+        button.className = "button element noselect";
         button.id = id;
     
         const btn = document.createElement("button");
