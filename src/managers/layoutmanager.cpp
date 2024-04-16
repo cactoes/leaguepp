@@ -2,9 +2,11 @@
 
 #include "../interface/holder.hpp"
 #include "configmanager.hpp"
+#include "browsermanager.hpp"
 
-void layout_manager::Setup(browser::browser* handle) {
-    handle->RegisterFunction("GetMainLayout", CREATE_REGISTRATION_MEMBER(layout_manager::PushLayout));
+void layout_manager::Setup() {
+    auto browserManager = interface<browser_manager>::Get();
+    browserManager->GetHandle()->RegisterFunction("GetMainLayout", CREATE_REGISTRATION_MEMBER(layout_manager::PushLayout));
 
     m_frameMain = std::make_shared<ui::frame>("", ui::FL_HORIZONTAL, FRAME_TARGET_MAIN);
     m_frameMain->SetId("MainFrame");

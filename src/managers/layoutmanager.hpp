@@ -15,7 +15,7 @@
 
 class layout_manager {
 public:
-    void Setup(browser::browser* handle);
+    void Setup();
 
     void PushLayout(browser::browser* handle, browser::js_args_t args);
 

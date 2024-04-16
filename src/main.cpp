@@ -17,13 +17,8 @@ int main(int argc, char** argv) {
     auto browserManager = interface<browser_manager>::Get();
     browserManager->Setup();
 
-    // load user settings
     interface<config_manager>::Get()->Setup();
-
-    // create frames
-    interface<layout_manager>::Get()->Setup(browserManager->GetHandle());
-
-    // setup features
+    interface<layout_manager>::Get()->Setup();
     interface<feature_manager>::Get()->Setup();
 
     // setup league connector & try to connect
