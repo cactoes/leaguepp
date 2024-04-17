@@ -5,7 +5,8 @@
   "main": "",
   "scripts": {
     "build:debug": "tsc && node --no-deprecation view_compiler.js -c Debug",
-    "build:release": "tsc && node --no-deprecation view_compiler.js -c Release"
+    "build:release": "tsc && node --no-deprecation view_compiler.js -c Release",
+    "cloc": "cloc src view cloc src view lib\\leaguepp-connector\\src view_compiler.js corefunctions.js -exclude-dir=endpointmappers"
   },
   "keywords": [],
   "author": "",

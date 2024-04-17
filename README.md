@@ -11,7 +11,7 @@ $ node --no-deprecation view_compiler.js -c CONFIG
 
 ## building
 The build process has 2 steps
-* CMake (the C++ source code)
+* CMake (the C++ backend code)
 * HTML/CSS/JS (the frontend)
 
 ### how to build
@@ -21,5 +21,5 @@ after that run the view compiler with the same config.
 
 ## cloc
 ```bash
-$ cloc src uiframework shared view lib\leaguepp-connector\src -exclude-dir=endpointmappers
+$ npm run cloc
 ```
