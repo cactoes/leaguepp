@@ -26,7 +26,10 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame) {
     // TODO: change the selectors
     // TODO: add inputs for the bans & picks
 
-    m_config->SetVar("autoPicker::banIds", std::vector<int>{ 22, 74, 17, 103, 84 }); // 22, 74, 17, 103, 84
+    // 901 smolder
+    // 51 caitlyn
+
+    m_config->SetVar("autoPicker::banIds", std::vector<int>{ 901, 22, 74, 17, 103, 84 }); // 901, 22, 74, 17, 103, 84
     m_config->SetVar("autoPicker::pickIds", std::vector<int>{ 51 }); // 51
 
     // setup hooks
@@ -245,9 +248,9 @@ int feature::AutoPicker::MakeAction(const champselect::Session& session, action_
                 continue;
 
             const int championId = GetNextPick(options);
-            const auto& selectedChampionId = action.championId.value();
-            if (selectedChampionId != 0 && selectedChampionId != championId)
-                continue;
+            // const auto& selectedChampionId = action.championId.value();
+            // if (selectedChampionId != 0 && selectedChampionId != championId)
+            //     continue;
             
             if (championId != -1)
                 return DoAction(static_cast<int>(action.id.value()), championId, commit)
