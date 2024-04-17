@@ -8,6 +8,8 @@
 #include "../managers/browsermanager.hpp"
 #include "../managers/connectormanager.hpp"
 
+#include "endpointmappers/summaryplayerdata.hpp"
+
 #undef interface
 
 #include "../utils.hpp"
@@ -24,20 +26,29 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame) {
 
     auto label = std::make_shared<ui::Label>("disconnected", "left");
 
-    // auto connectionFrame = std::make_shared<ui::Frame>("connection", ui::FL_VERTICAL_AUTO);
-    // connectionFrame->AddComponent<ui::Label>(label);
-    // frame->AddComponent(std::move(frame));
-
     frame->AddComponent<ui::Label>(label);
 
     frame->AddComponent<ui::Button>(
         "clear tokens",
-        ui::button_callback([this, connectorManager, browserManager]() { 
-            auto result = connectorManager->MakeRequest(connector::request_type::POST, "/lol-challenges/v1/update-player-preferences/", "{\"challengeIds\": []}");
-            if (result.status == 204)
-                browserManager->CreateNotification("cleared", "the tokens have been cleared", notification_type::NONE);
-            else
-                browserManager->CreateNotification("failed to clear", "the tokens could no be cleared", notification_type::NONE);
+        ui::button_callback([this, connectorManager, browserManager]() {
+            auto playerDataResult = connectorManager->MakeRequest(connector::request_type::GET, "/lol-challenges/v1/summary-player-data/local-player");
+
+            if (playerDataResult.status == 200) {
+                auto data = playerDataResult.data.get<challenges::SummaryPlayerData>();
+
+                const auto& bannerId = data.bannerId.value();
+                const auto& titleId = data.title->itemId.value();
+
+                auto result = connectorManager->MakeRequest(connector::request_type::POST, "/lol-challenges/v1/update-player-preferences",
+                    "{\"bannerAccent\":\"" + bannerId + "\",\"challengeIds\":[],\"title\":\"" + std::to_string(titleId) + "\"}");
+
+                if (result.status == 204) {
+                    browserManager->CreateNotification("cleared", "the tokens have been cleared", notification_type::NONE);
+                    return;
+                }
+            }
+
+            browserManager->CreateNotification("failed to clear", "the tokens could no be cleared", notification_type::NONE);
         })
     );
 
@@ -77,7 +88,7 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame) {
     // );
 
     // frame->AddComponent<ui::Slider>(
-    //     "test slider", 0, 100,ui::slider_callback([this](int newValue) {})
+    //     "test slider", 0, 100,ui::slider_callback([this](int) {})
     // );
 
     connectorManager->AddConnectHandler(
