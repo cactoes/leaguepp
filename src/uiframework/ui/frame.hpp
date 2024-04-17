@@ -9,14 +9,15 @@
 namespace ui {
     class FrameImpl : public Frame {
     public:
-        FrameImpl(const std::string& name, const frame_layout& layout, const std::string& target = "") :
+        FrameImpl(const std::string& name, const frame_layout& layout, browser::Browser* handle, const std::string& target = "") :
             m_name(name), m_layout(layout) {
             m_target = target;
+            m_handle = handle;
         }
 
         component_type GetType() const override;
         void Update() override;
-        void Register(browser::Browser* handle) override;
+        void Register() override;
 
         template <typename Ty, typename... Args>
         std::enable_if_t<std::is_base_of_v<Component, Ty> | std::is_constructible_v<Ty, Args..., std::string>, std::shared_ptr<Ty>>
@@ -45,7 +46,6 @@ namespace ui {
         void AddComponent(std::shared_ptr<Component> component) override;
         
     private:
-        browser::Browser* m_handle;
         std::string m_name;
         frame_layout m_layout;
     };

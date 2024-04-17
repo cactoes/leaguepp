@@ -52,13 +52,16 @@ namespace ui {
 
         virtual component_type GetType() const = 0;
         virtual void Update() = 0;
-        virtual void Register(browser::Browser* handle) = 0;
+        virtual void Register() = 0;
 
         const void SetId(const std::string& id) { m_id = id; };
         const std::string& GetId() const { return m_id; }
 
     public:
         std::string m_target;
+
+    protected:
+        browser::Browser* m_handle;
 
     private:
         std::string m_id = RandomString<16>();

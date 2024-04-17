@@ -22,7 +22,7 @@ bool UiFrameworkImpl::Init() {
 
     m_browserHandle = browser::CreateBrowser(browserConfig, windowConfig);
     
-    m_main = std::make_shared<ui::FrameImpl>("", ui::FL_HORIZONTAL, FRAME_TARGET_MAIN);
+    m_main = std::make_shared<ui::FrameImpl>("", ui::FL_HORIZONTAL, m_browserHandle.get(), FRAME_TARGET_MAIN);
     m_main->SetId("Main");
 
     m_browserHandle->RegisterFunction("GetMainLayout", CREATE_REGISTRATION_MEMBER(UiFrameworkImpl::GetMainLayout));
@@ -53,6 +53,6 @@ std::shared_ptr<ui::Frame> UiFrameworkImpl::GetMainFrame() {
     return m_main;
 }
 
-void UiFrameworkImpl::GetMainLayout(browser::Browser* handle, browser::js_args_t) {
-    m_main->Register(handle);
+void UiFrameworkImpl::GetMainLayout(browser::Browser*, browser::js_args_t) {
+    m_main->Register();
 }

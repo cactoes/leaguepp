@@ -4,10 +4,9 @@ ui::component_type ui::CheckboxImpl::GetType() const {
     return CT_CHECKBOX;
 }
 
-void ui::CheckboxImpl::Register(browser::Browser* handle) {
-    m_handle = handle;
-    handle->CallJSFunction("uiCreateCheckBox", { m_label, m_state, GetId(), COMPONENT_CALLER_ID(HandleChange), m_target });
-    handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &CheckboxImpl::HandleChange, this);
+void ui::CheckboxImpl::Register() {
+    m_handle->CallJSFunction("uiCreateCheckBox", { m_label, m_state, GetId(), COMPONENT_CALLER_ID(HandleChange), m_target });
+    m_handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &CheckboxImpl::HandleChange, this);
 }
 
 void ui::CheckboxImpl::Update() {

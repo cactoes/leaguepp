@@ -7,19 +7,19 @@
 namespace ui {
     class CheckboxImpl : public Checkbox {
     public:
-        CheckboxImpl(const std::string& label, bool state, const checkbox_callback& callbackHolder, const std::string& target = "") :
+        CheckboxImpl(const std::string& label, bool state, const checkbox_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
             m_state(state), m_label(label), m_callbackHolder(callbackHolder) {
             m_target = target;
+            m_handle = handle;
         }
 
         component_type GetType() const override;
         void Update() override;
-        void Register(browser::Browser* handle) override;
+        void Register() override;
 
         void HandleChange(browser::Browser*, browser::js_args_t args);
 
     private:
-        browser::Browser* m_handle;
         bool m_state;
         std::string m_label;
         checkbox_callback m_callbackHolder;

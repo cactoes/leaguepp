@@ -4,9 +4,8 @@ ui::component_type ui::LabelImpl::GetType() const {
     return CT_LABEL;
 }
 
-void ui::LabelImpl::Register(browser::Browser* handle) {
-    m_handle = handle;
-    handle->CallJSFunction("uiCreateLabel", { m_text, m_pos, GetId(), m_target });
+void ui::LabelImpl::Register() {
+    m_handle->CallJSFunction("uiCreateLabel", { m_text, m_pos, GetId(), m_target });
 }
 
 void ui::LabelImpl::Update() {

@@ -4,10 +4,9 @@ ui::component_type ui::DropdownImpl::GetType() const {
     return CT_DROPDOWN;
 }
 
-void ui::DropdownImpl::Register(browser::Browser* handle) {
-    m_handle = handle;
-    handle->CallJSFunction("uiCreateDropDown", { m_label, GetId(), m_isMulti, m_activeValues, COMPONENT_CALLER_ID(HandleChange), m_target, m_values });
-    handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &DropdownImpl::HandleChange, this);
+void ui::DropdownImpl::Register() {
+    m_handle->CallJSFunction("uiCreateDropDown", { m_label, GetId(), m_isMulti, m_activeValues, COMPONENT_CALLER_ID(HandleChange), m_target, m_values });
+    m_handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &DropdownImpl::HandleChange, this);
 }
 
 void ui::DropdownImpl::Update() {

@@ -15,7 +15,7 @@ public:
 
     std::shared_ptr<ui::Frame> GetMainFrame() override;
 
-    void GetMainLayout(browser::Browser* handle, browser::js_args_t);
+    void GetMainLayout(browser::Browser*, browser::js_args_t);
 
 private:
     std::shared_ptr<ui::Frame> m_main;
