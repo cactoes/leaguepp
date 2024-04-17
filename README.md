@@ -21,5 +21,5 @@ after that run the view compiler with the same config.
 
 ## cloc
 ```bash
-$ cloc src view -exclude-dir=endpointmappers
+$ cloc src view lib\leaguepp-connector\src -exclude-dir=endpointmappers
 ```
