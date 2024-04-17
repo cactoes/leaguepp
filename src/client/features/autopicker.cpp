@@ -12,11 +12,11 @@
 #undef interface
 
 void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* frameworkApiHandle) {
+    m_frameworkApiHandle = frameworkApiHandle;
     auto connectorManager = interface<ConnectorManager>::Get();
     m_config = interface<ConfigManager>::Get()->Get(CONFIG_BASIC);
 
     // TODO: lane based bans & picks
-    // TODO: change the selectors
     // TODO: add inputs for the bans & picks
 
     // 901 smolder
@@ -49,7 +49,7 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* 
 
         const auto lobbyDataResult = connectorManager->MakeRequest(connector::request_type::GET, "/lol-lobby/v2/lobby");
         if (lobbyDataResult.status != 200) {
-            NotifyUser("error", "failed to get lobby data");
+            m_frameworkApiHandle->CreateNotification("error", "failed to get lobby data");
             return;
         }
 
@@ -210,13 +210,16 @@ void feature::AutoPicker::HandleFrame(const champselect::Session& session, const
 
     switch (GetPlayerState(session)) {
         case player_state::DECLARING:
-            (void)MakeAction(session, action_type::PICK, m_config->GetVar<std::vector<int>>("autoPicker::pickIds"), false);
+            if (MakeAction(session, action_type::PICK, m_config->GetVar<std::vector<int>>("autoPicker::pickIds"), false))
+                m_frameworkApiHandle->CreateNotification("declared", "x champion");
             break;
         case player_state::BANNING:
-            (void)MakeAction(session, action_type::BAN, m_config->GetVar<std::vector<int>>("autoPicker::banIds"), mode == BOT_AUTO);
+            if (MakeAction(session, action_type::BAN, m_config->GetVar<std::vector<int>>("autoPicker::banIds"), mode == BOT_AUTO))
+                m_frameworkApiHandle->CreateNotification("banned", "x champion");
             break;
         case player_state::PICKING:
-            (void)MakeAction(session, action_type::PICK, m_config->GetVar<std::vector<int>>("autoPicker::pickIds"), mode == BOT_AUTO);
+            if (MakeAction(session, action_type::PICK, m_config->GetVar<std::vector<int>>("autoPicker::pickIds"), mode == BOT_AUTO))
+                m_frameworkApiHandle->CreateNotification("picked", "x champion");
             break;
         case player_state::INVALID:
         case player_state::WAITING:
@@ -286,8 +289,4 @@ bool feature::AutoPicker::DoAction(int actionId, int championId, bool commit) {
     }
 
     return true;
-}
-
-void feature::AutoPicker::NotifyUser(const std::string& title, const std::string& message) {
-    // interface<BrowserManager>::Get()->CreateNotification(title, message, notification_type::NONE);
 }

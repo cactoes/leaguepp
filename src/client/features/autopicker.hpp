@@ -93,13 +93,12 @@ namespace feature {
         int GetNextPick(const std::vector<int>& list);
         bool DoAction(int actionId, int championId, bool commit);
 
-        void NotifyUser(const std::string& title, const std::string& message);
-
     private:
         const std::vector<std::string> m_modes = { "manual", "semi", "auto" };
         const std::vector<std::string> m_strictnesses = { "none", "loose", "strict" };
         lobby_info_t m_lobby_info = {};
         std::shared_ptr<Config> m_config = nullptr;
+        IUiFramework* m_frameworkApiHandle = nullptr;
     };
 }; // namespace feature
 
