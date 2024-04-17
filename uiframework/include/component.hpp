@@ -2,12 +2,17 @@
 #define __COMPONENT_HPP__
 
 #include <string>
+#include <vector>
 #include <functional>
 #include <type_traits>
 #include <random>
+#include <memory>
+#include <vector>
+#include <callbackholder.hpp>
 
-#include "../callbackholder.hpp"
-#include "../browser/browser.hpp"
+namespace browser {
+    class Browser;
+}; // namespace browser
 
 // GetId() is silent input
 #define COMPONENT_CALLER_ID(callerType) GetId() + #callerType
@@ -44,8 +49,8 @@ namespace ui {
     class Component {
     public:
         virtual component_type GetType() const = 0;
+        virtual void Update() = 0;
         virtual void Register(browser::Browser* handle) = 0;
-        virtual void Update(browser::Browser* handle) = 0;
 
         const void SetId(const std::string& id) { m_id = id; };
         const std::string& GetId() const { return m_id; }

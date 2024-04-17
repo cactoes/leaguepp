@@ -4,8 +4,7 @@
 #include <memory>
 #include <connector.hpp>
 #include <vector>
-
-#include "../callbackholder.hpp"
+#include <callbackholder.hpp>
 
 typedef callback_holder<void, std::string, nlohmann::json> client_callback;
 typedef callback_holder<void> client_connect;

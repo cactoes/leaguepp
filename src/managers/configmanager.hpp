@@ -5,8 +5,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-#include "../hash.hpp"
+#include <hash.hpp>
 
 #define CONFIG_BASIC "cfg"
 

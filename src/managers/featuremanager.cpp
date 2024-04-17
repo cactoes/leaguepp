@@ -1,27 +1,20 @@
 #include "featuremanager.hpp"
 
-#include "../interface/holder.hpp"
-#include "../ui/frame.hpp"
-
 #include "../features/lobbycontrolls.hpp"
 #include "../features/autopicker.hpp"
 #include "../features/profile.hpp"
 
-#include "layoutmanager.hpp"
+bool FeatureManager::Init(IUiFramework* frameworkApiHandle) {
+    auto frameMain = frameworkApiHandle->GetMainFrame();
+    auto targetFrame = frameMain->AddFrame("", ui::FL_VERTICAL);
 
-#undef interface
+    auto lobbyFrame = targetFrame->AddFrame("lobby", ui::FL_VERTICAL_AUTO);
+    auto autoPickerFrame = targetFrame->AddFrame("auto picker", ui::FL_VERTICAL_AUTO);
+    auto profileFrame = frameMain->AddFrame("profile", ui::FL_VERTICAL_AUTO);
 
-bool FeatureManager::Init() {
-    auto frameMain = interface<LayoutManager>::Get()->GetFrame();
-    auto targetFrame = frameMain->GetComponent<ui::Frame>("HolderFrame");
-
-    auto lobbyFrame = targetFrame->GetComponent<ui::Frame>("LobbyFrame");
-    auto autoPickerFrame = targetFrame->GetComponent<ui::Frame>("AutoPickerFrame");
-    auto profileFrame = frameMain->GetComponent<ui::Frame>("ProfileFrame");
-
-    CreateFeature<feature::LobbyControlls>(lobbyFrame);
-    CreateFeature<feature::AutoPicker>(autoPickerFrame);
-    CreateFeature<feature::Profile>(profileFrame);
+    CreateFeature<feature::LobbyControlls>(lobbyFrame, frameworkApiHandle);
+    CreateFeature<feature::AutoPicker>(autoPickerFrame, frameworkApiHandle);
+    CreateFeature<feature::Profile>(profileFrame, frameworkApiHandle);
 
     return true;
 }

@@ -2,35 +2,20 @@
 
 #include "../interface/holder.hpp"
 
-#include "../ui/frame.hpp"
-#include "../ui/label.hpp"
-
-#include "../managers/browsermanager.hpp"
 #include "../managers/connectormanager.hpp"
 
 #include "endpointmappers/summaryplayerdata.hpp"
 
 #undef interface
 
-#include "../utils.hpp"
-#include "../ui/button.hpp"
-#include "../ui/checkbox.hpp"
-#include "../ui/dropdown.hpp"
-#include "../ui/selector.hpp"
-#include "../ui/slider.hpp"
-#include "../ui/input.hpp"
-
-void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame) {
+void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* frameworkApiHandle) {
     auto connectorManager = interface<ConnectorManager>::Get();
-    auto browserManager = interface<BrowserManager>::Get();
 
-    auto label = std::make_shared<ui::Label>("disconnected", "left");
+    auto label = frame->AddLabel("disconnected", "left");
 
-    frame->AddComponent<ui::Label>(label);
-
-    frame->AddComponent<ui::Button>(
+    frame->AddButton(
         "clear tokens",
-        ui::button_callback([this, connectorManager, browserManager]() {
+        ui::button_callback([this, connectorManager, frameworkApiHandle]() {
             auto playerDataResult = connectorManager->MakeRequest(connector::request_type::GET, "/lol-challenges/v1/summary-player-data/local-player");
 
             if (playerDataResult.status == 200) {
@@ -43,12 +28,12 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame) {
                     "{\"bannerAccent\":\"" + bannerId + "\",\"challengeIds\":[],\"title\":\"" + std::to_string(titleId) + "\"}");
 
                 if (result.status == 204) {
-                    browserManager->CreateNotification("cleared", "the tokens have been cleared", notification_type::NONE);
+                    frameworkApiHandle->CreateNotification("cleared", "the tokens have been cleared");
                     return;
                 }
             }
 
-            browserManager->CreateNotification("failed to clear", "the tokens could no be cleared", notification_type::NONE);
+            frameworkApiHandle->CreateNotification("failed to clear", "the tokens could no be cleared");
         })
     );
 
@@ -92,18 +77,18 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame) {
     // );
 
     connectorManager->AddConnectHandler(
-        client_connect([this, browserManager, label]() {
+        client_connect([this, label, frameworkApiHandle]() {
             label->SetText("connected");
-            label->Update(browserManager->GetHandle());
-            browserManager->CreateNotification("connected", "the client has connected to league", notification_type::SUCCESS);
+            label->Update();
+            frameworkApiHandle->CreateNotification("connected", "the client has connected to league");
         })
     );
 
     connectorManager->AddDisconnectHandler(
-        client_disconnect([this, browserManager, label]() {
+        client_disconnect([this, label, frameworkApiHandle]() {
             label->SetText("disconnected");
-            label->Update(interface<BrowserManager>::Get()->GetHandle());
-            browserManager->CreateNotification("disconnected", "the client has disconnected from league", notification_type::SUCCESS);
+            label->Update();
+            frameworkApiHandle->CreateNotification("disconnected", "the client has disconnected from league");
         })
     );
 }

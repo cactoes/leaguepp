@@ -1,24 +1,17 @@
 #include "autopicker.hpp"
 
+#include <utils.hpp>
+
 #include "../interface/holder.hpp"
 #include "../managers/configmanager.hpp"
 #include "../managers/connectormanager.hpp"
-#include "../managers/browsermanager.hpp"
-
-#include "../ui/selector.hpp"
-#include "../ui/button.hpp"
-#include "../ui/label.hpp"
-#include "../ui/checkbox.hpp"
-#include "../ui/frame.hpp"
-
-#include "../utils.hpp"
 
 #include "endpointmappers/champselectsession.hpp"
 #include "endpointmappers/lobbylobby.hpp"
 
 #undef interface
 
-void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame) {
+void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* frameworkApiHandle) {
     auto connectorManager = interface<ConnectorManager>::Get();
     m_config = interface<ConfigManager>::Get()->Get(CONFIG_BASIC);
 
@@ -65,14 +58,14 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame) {
 
     // setup ui
 
-    frame->AddComponent<ui::Checkbox>(
+    frame->AddCheckbox(
         "enabled", m_config->GetVar<bool>("autoPicker::bEnabled"),
         ui::checkbox_callback([this](bool newState) {
             return interface<ConfigManager>::Get()->TrackedSetVar(m_config, "autoPicker::bEnabled", newState);
         })
     );
 
-    frame->AddComponent<ui::Selector>(
+    frame->AddSelector(
         "mode", m_config->GetVar<int>("autoPicker::nMode"), m_modes,
         ui::selector_callback([this](std::string newMode) {
             const auto newModeIndex = (int)std::distance(m_modes.begin(), std::ranges::find(m_modes, newMode));
@@ -80,7 +73,7 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame) {
         })
     );
 
-    frame->AddComponent<ui::Selector>(
+    frame->AddSelector(
         "strictness", m_config->GetVar<int>("autoPicker::nStrictness"), m_strictnesses,
         ui::selector_callback([this](std::string newStrictness) {
             const auto newStrictnessIndex = (int)std::distance(m_strictnesses.begin(), std::ranges::find(m_strictnesses, newStrictness));
@@ -296,5 +289,5 @@ bool feature::AutoPicker::DoAction(int actionId, int championId, bool commit) {
 }
 
 void feature::AutoPicker::NotifyUser(const std::string& title, const std::string& message) {
-    interface<BrowserManager>::Get()->CreateNotification(title, message, notification_type::NONE);
+    // interface<BrowserManager>::Get()->CreateNotification(title, message, notification_type::NONE);
 }

@@ -2,19 +2,20 @@
 #define __FEATUREMANAGER_HPP__
 
 #include <map>
+#include <framework.hpp>
+#include <hash.hpp>
 
 #include "../features/feature.hpp"
-#include "../hash.hpp"
 
 class FeatureManager {
 public:
-    bool Init();
+    bool Init(IUiFramework* frameworkApiHandle);
 
     template <typename Ty>
     std::enable_if_t<std::is_base_of_v<feature::Feature, Ty>, void>
-    CreateFeature(std::shared_ptr<ui::Frame> frame) {
+    CreateFeature(std::shared_ptr<ui::Frame> parent, IUiFramework* frameworkApiHandle) {
         auto feature = std::make_unique<Ty>();
-        feature->Setup(std::move(frame));
+        feature->Setup(std::move(parent), frameworkApiHandle);
         m_features[hash::Fnv1a64Hash(feature->GetName().c_str())] = std::move(feature);
     }
 

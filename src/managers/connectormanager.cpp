@@ -3,10 +3,6 @@
 #include <connector.hpp>
 
 #include "../interface/holder.hpp"
-#include "../ui/label.hpp"
-#include "../ui/frame.hpp"
-#include "browsermanager.hpp"
-#include "layoutmanager.hpp"
 
 #undef interface
 

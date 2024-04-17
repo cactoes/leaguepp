@@ -79,7 +79,7 @@ namespace feature {
 
     class AutoPicker : public Feature {
     public:
-        void Setup(std::shared_ptr<ui::Frame> frame) override;
+        void Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* frameworkApiHandle) override;
         std::string GetName() override;
 
     private:
