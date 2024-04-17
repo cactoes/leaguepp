@@ -9,6 +9,7 @@ namespace ui {
 
     class Selector : public Component {
     public:
+        virtual ~Selector() = default;
     };
 }; // namespace ui
 

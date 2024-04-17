@@ -9,6 +9,7 @@ namespace ui {
 
     class Slider : public Component {
     public:
+        virtual ~Slider() = default;
     };
 }; // namespace ui
 

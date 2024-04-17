@@ -9,6 +9,7 @@ namespace ui {
 
     class Button : public Component {
     public:
+        virtual ~Button() = default;
     };
 }; // namespace ui
 

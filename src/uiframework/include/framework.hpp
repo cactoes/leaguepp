@@ -15,6 +15,8 @@
 
 class IUiFramework {
 public:
+    virtual ~IUiFramework() = default;
+    
     virtual bool Init() = 0;
     virtual void Shutdown() = 0;
 

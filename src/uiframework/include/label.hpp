@@ -6,6 +6,8 @@
 namespace ui {
     class Label : public Component {
     public:
+        virtual ~Label() = default;
+
         virtual void SetText(const std::string& text) = 0;
     };
 }; // namespace ui

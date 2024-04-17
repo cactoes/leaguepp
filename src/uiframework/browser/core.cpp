@@ -1,7 +1,6 @@
 #include "browser.hpp"
 
-// only so we have access to the json library ww
-#include <connector.hpp>
+#include <nlohmann/json.hpp>
 
 #include "../window/window.hpp"
 #include "typehelpers.hpp"

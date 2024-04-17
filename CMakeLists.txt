@@ -8,19 +8,20 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # ================
 # main
 # ================
-file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*)
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/client/*)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} resources.rc)
 target_link_libraries(${PROJECT_NAME} PRIVATE UIFramework)
-target_include_directories(${PROJECT_NAME} PRIVATE uiframework/include)
-target_include_directories(${PROJECT_NAME} PRIVATE shared)
+target_include_directories(${PROJECT_NAME} PRIVATE src/uiframework/include)
+target_include_directories(${PROJECT_NAME} PRIVATE src/shared)
 
 # ================
 # uiframework
 # ================
-file(GLOB_RECURSE UIFRAMEWORK_SOURCE_FILES CONFIGURE_DEPENDS uiframework/*)
+file(GLOB_RECURSE UIFRAMEWORK_SOURCE_FILES CONFIGURE_DEPENDS src/uiframework/*)
 add_library(UIFramework SHARED ${UIFRAMEWORK_SOURCE_FILES})
 target_compile_definitions(UIFramework PRIVATE UIFRAMEWORK_EXPORTS)
-target_include_directories(UIFramework PRIVATE shared)
+target_include_directories(UIFramework PRIVATE src/shared)
+target_include_directories(UIFramework PRIVATE "lib/leaguepp-connector/lib/json/single_include")
 
 # ================
 # library: WebView 2
@@ -48,7 +49,6 @@ target_link_libraries(UIFramework PRIVATE windowsapp.lib)
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL)
-target_link_libraries(UIFramework PRIVATE OpenSSL::SSL)
 
 # ================
 # library: Boost
@@ -58,17 +58,13 @@ set(Boost_USE_STATIC_LIBS TRUE)
 add_definitions("-D_WEBSOCKETPP_CPP11_STL_")
 find_package(Boost REQUIRED COMPONENTS system)
 target_include_directories(${PROJECT_NAME} PRIVATE Boost::headers)
-target_include_directories(UIFramework PRIVATE Boost::headers)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
-target_link_libraries(UIFramework PRIVATE Boost::system)
 
 # ================
 # library: league++connector
 # ================
 add_subdirectory(lib/leaguepp-connector)
 target_link_libraries(${PROJECT_NAME} PRIVATE leaguepp_connector)
-# for json
-target_link_libraries(UIFramework PRIVATE leaguepp_connector)
 
 # add the license to the build
 # add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy LICENSE $<TARGET_FILE_DIR:${PROJECT_NAME}>)

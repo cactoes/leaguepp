@@ -9,6 +9,7 @@ namespace ui {
 
     class Dropdown : public Component {
     public:
+        virtual ~Dropdown() = default;
     };
 }; // namespace ui
 

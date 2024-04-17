@@ -24,6 +24,8 @@ constexpr bool is_valid_type_v = is_valid_type<Ty>::value;
 
 class ICvar {
 public:
+    virtual ~ICvar() = default;
+
     virtual char* Data() { return nullptr; }
     virtual void SetData(char*, size_t) {}
     virtual uint64_t Size() { return 0ULL; }

@@ -9,6 +9,7 @@ namespace ui {
 
     class Input : public Component {
     public:
+        virtual ~Input() = default;
     };
 }; // namespace ui
 

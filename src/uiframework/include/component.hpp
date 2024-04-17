@@ -48,6 +48,8 @@ namespace ui {
 
     class Component {
     public:
+        virtual ~Component() = default;
+
         virtual component_type GetType() const = 0;
         virtual void Update() = 0;
         virtual void Register(browser::Browser* handle) = 0;

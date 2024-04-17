@@ -9,6 +9,7 @@ namespace ui {
 
     class Checkbox : public Component {
     public:
+        virtual ~Checkbox() = default;
     };
 }; // namespace ui
 

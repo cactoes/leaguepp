@@ -49,6 +49,8 @@ namespace ui {
 
     class Frame : public Component {
     public:
+        virtual ~Frame() = default;
+
         virtual std::shared_ptr<Button> AddButton(const std::string& label, const button_callback& callbackHolder) = 0;
         virtual std::shared_ptr<Checkbox> AddCheckbox(const std::string& label, bool state, const checkbox_callback& callbackHolder) = 0;
         virtual std::shared_ptr<Dropdown> AddDropdown(const std::string& label, bool isMulti, const std::vector<std::string>& activeValues, const std::vector<std::string>& values, const dropdown_callback& callbackHolder) = 0;
