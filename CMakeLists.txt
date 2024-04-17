@@ -54,6 +54,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
 add_subdirectory(lib/leaguepp-connector)
 target_link_libraries(${PROJECT_NAME} PRIVATE leaguepp_connector)
 
+# add the license to the build
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy LICENSE $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /D "_MBCS")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Oxs")
