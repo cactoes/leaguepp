@@ -103,7 +103,7 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* fra
     // );
 
     connectorManager->AddConnectHandler(
-        client_connect([this, label, frameworkApiHandle, connectorManager]() {
+        client_connect([this, label, frameworkApiHandle]() {
             label->SetText("connected");
             label->Update();
             frameworkApiHandle->CreateNotification("connected", "the client has connected to league");
