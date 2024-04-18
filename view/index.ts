@@ -50,6 +50,16 @@ namespace colors {
 
 const noTarget = (target: string) => console.error(`Error: Failed to find target "${target}"`);
 
+const debounce = (callback:any, wait:number) => {
+    let timeoutId: any = null;
+    return (...args: any) => {
+        window.clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(() => {
+            callback(...args);
+        }, wait);
+    };
+}
+
 function createInfoBox(info: string) {
     const infoDiv = document.createElement("div");
     infoDiv.className = "infoDiv"
@@ -198,8 +208,11 @@ function uiCreateSlider(label: string, info: string, id: string, onchange: strin
     sldr.min = `${min}`;
     sldr.max = `${max}`;
 
-    const doSliderEvents = (newValue: number) => {
-        invoke(onchange, [ newValue ]);
+    const doSliderEvents = debounce((newValue: number) => {
+        invoke(onchange, [ newValue ])
+    }, 500);
+
+    const doSliderAnimation = (newValue: number) => {
         const span = document.getElementById(id+"sliderTick") as HTMLSpanElement;
         span.innerText = `${newValue}`;
         span.style.left = `${(newValue - min) / (max - min) * 100}%`
@@ -208,6 +221,7 @@ function uiCreateSlider(label: string, info: string, id: string, onchange: strin
     sldr.oninput = () => {
         const newValue = parseInt(sldr.value);
         doSliderEvents(newValue);
+        doSliderAnimation(newValue);
     }
 
     div.appendChild(sldr);
@@ -220,6 +234,7 @@ function uiCreateSlider(label: string, info: string, id: string, onchange: strin
         const newValue = parseInt(sldr.value) - 1;
         sldr.value = `${newValue}`;
         doSliderEvents(parseInt(sldr.value));
+        doSliderAnimation(parseInt(sldr.value));
     }
     div.appendChild(decrement);
 
@@ -231,6 +246,7 @@ function uiCreateSlider(label: string, info: string, id: string, onchange: strin
         const newValue = parseInt(sldr.value) + 1;
         sldr.value = `${newValue}`;
         doSliderEvents(parseInt(sldr.value));
+        doSliderAnimation(parseInt(sldr.value));
     }
     div.appendChild(increment);
 
@@ -423,9 +439,11 @@ function uiCreateInput(label: string, info: string, id: string, value: string, o
     inputField.spellcheck = false;
     inputField.autocapitalize = "false";
     inputField.autocomplete = "off";
-    inputField.onblur = () => {
-        invoke(onchange, [ inputField.value ]);
-    }
+
+    inputField.onblur = debounce(async () => {
+        inputField.value = await invoke(onchange, [ inputField.value ]);
+    }, 250)
+
     container.appendChild(inputField);
 
     input.appendChild(container);
