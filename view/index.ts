@@ -115,9 +115,11 @@ namespace ui {
             return noTarget(id);
 
         const p = document.createElement("p");
+        p.className = "label";
         p.innerText = text;
 
         const shadow = document.createElement("span");
+        shadow.className = "shadow";
         shadow.innerText = text;
         
         element.replaceChildren(p, shadow);
