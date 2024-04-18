@@ -5,7 +5,7 @@ ui::component_type ui::CheckboxImpl::GetType() const {
 }
 
 void ui::CheckboxImpl::Register() {
-    m_handle->CallJSFunction("uiCreateCheckBox", { m_label, m_state, GetId(), COMPONENT_CALLER_ID(HandleChange), m_target });
+    m_handle->CallJSFunction("uiCreateCheckBox", { m_label, m_info, m_state, GetId(), COMPONENT_CALLER_ID(HandleChange), m_target });
     m_handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &CheckboxImpl::HandleChange, this);
 }
 

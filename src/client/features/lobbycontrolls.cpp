@@ -24,7 +24,7 @@ void feature::LobbyControlls::Setup(std::shared_ptr<ui::Frame> frame, IUiFramewo
     );
 
     frame->AddCheckbox(
-        "auto accept", cfg->GetVar<bool>("lobby::bAutoAccept"),
+        "auto accept", "", cfg->GetVar<bool>("lobby::bAutoAccept"),
         ui::checkbox_callback([this, configManager, cfg](bool state) {
             return configManager->TrackedSetVar(cfg, "lobby::bAutoAccept", state);
         })

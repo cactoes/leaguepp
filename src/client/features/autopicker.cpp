@@ -53,14 +53,14 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* 
     // setup ui
 
     frame->AddCheckbox(
-        "enabled", m_config->GetVar<bool>("autoPicker::bEnabled"),
+        "enabled", "", m_config->GetVar<bool>("autoPicker::bEnabled"),
         ui::checkbox_callback([this](bool newState) {
             return interface<ConfigManager>::Get()->TrackedSetVar(m_config, "autoPicker::bEnabled", newState);
         })
     );
 
     frame->AddCheckbox(
-        "early declare", m_config->GetVar<bool>("autoPicker::bEarlyDeclare"),
+        "early declare", "declare in planning phase", m_config->GetVar<bool>("autoPicker::bEarlyDeclare"),
         ui::checkbox_callback([this](bool newState) {
             return interface<ConfigManager>::Get()->TrackedSetVar(m_config, "autoPicker::bEarlyDeclare", newState);
         })

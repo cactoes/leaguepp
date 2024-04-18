@@ -327,6 +327,29 @@ body {
     font-size: var(--font-size-default);
 }
 
+.element > .infoDiv {
+    position: absolute;
+    z-index: 1;
+    right: 12px;
+    margin-right: var(--item-offset-left);
+    font-size: var(--font-size-default);
+    cursor: help;
+}
+
+.element > .infoDiv > p {
+    position: absolute;
+    border: 1px solid var(--trim);
+    visibility: hidden;
+    width: max-content;
+    max-width: 170px;
+    background-color: var(--background-primary);
+    padding: 4px;
+}
+
+.element > .infoDiv:hover > p {
+    visibility: visible;
+}
+
 .element:last-of-type {
     margin-bottom: 8px;
 }

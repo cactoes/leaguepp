@@ -7,8 +7,8 @@
 namespace ui {
     class CheckboxImpl : public Checkbox {
     public:
-        CheckboxImpl(const std::string& label, bool state, const checkbox_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
-            m_state(state), m_label(label), m_callbackHolder(callbackHolder) {
+        CheckboxImpl(const std::string& label, const std::string& info, bool state, const checkbox_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
+            m_state(state), m_label(label), m_info(info), m_callbackHolder(callbackHolder) {
             m_target = target;
             m_handle = handle;
         }
@@ -22,6 +22,7 @@ namespace ui {
     private:
         bool m_state;
         std::string m_label;
+        std::string m_info;
         checkbox_callback m_callbackHolder;
     };
 }; // namespace ui

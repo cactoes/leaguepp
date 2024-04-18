@@ -28,8 +28,8 @@ std::shared_ptr<ui::Button> ui::FrameImpl::AddButton(const std::string& label, c
     return AddComponent<ui::ButtonImpl>(label, callbackHolder, m_handle);
 }
 
-std::shared_ptr<ui::Checkbox> ui::FrameImpl::AddCheckbox(const std::string& label, bool state, const checkbox_callback& callbackHolder) {
-    return AddComponent<ui::CheckboxImpl>(label, state, callbackHolder, m_handle);
+std::shared_ptr<ui::Checkbox> ui::FrameImpl::AddCheckbox(const std::string& label, const std::string& info, bool state, const checkbox_callback& callbackHolder) {
+    return AddComponent<ui::CheckboxImpl>(label, info, state, callbackHolder, m_handle);
 }
 
 std::shared_ptr<ui::Dropdown> ui::FrameImpl::AddDropdown(const std::string& label, bool isMulti, const std::vector<std::string>& activeValues, const std::vector<std::string>& values, const dropdown_callback& callbackHolder) {
