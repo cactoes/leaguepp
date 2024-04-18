@@ -13,6 +13,8 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES} resources.rc)
 target_link_libraries(${PROJECT_NAME} PRIVATE UIFramework)
 target_include_directories(${PROJECT_NAME} PRIVATE src/uiframework/include)
 target_include_directories(${PROJECT_NAME} PRIVATE src/shared)
+target_include_directories(${PROJECT_NAME} PRIVATE "lib/leaguepp-connector/lib/cpp-httplib")
+target_include_directories(${PROJECT_NAME} PRIVATE "lib/leaguepp-connector/lib/json/single_include")
 
 # ================
 # uiframework
