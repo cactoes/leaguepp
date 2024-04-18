@@ -58,6 +58,13 @@ int ResourceManager::ChampionNameToId(const std::string& name) {
     return static_cast<int>(std::get<int64_t>(it->at(1)));
 }
 
+std::vector<std::string> ResourceManager::MapChampionIdsToNames(std::vector<int> ids) {
+    std::vector<std::string> mapped = {};
+    for (const auto& id : ids)
+        mapped.push_back(ChampionIdToName(id));
+    return mapped;
+}
+
 bool ResourceManager::GetLatestVersion(std::string& data) {
     if (!m_client)
         return false;

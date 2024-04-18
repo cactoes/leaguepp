@@ -22,6 +22,7 @@ public:
 
     std::string ChampionIdToName(int id);
     int ChampionNameToId(const std::string& name);
+    std::vector<std::string> MapChampionIdsToNames(std::vector<int> ids);
 
 private:
     bool GetLatestVersion(std::string& data);
