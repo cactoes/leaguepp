@@ -456,6 +456,7 @@ namespace ui {
         listInput.className = "listInput";
 
         const inputField = document.createElement("input");
+        inputField.id = id + "inputFieldId"
         inputField.type = "text";
         inputField.spellcheck = false;
         inputField.autocapitalize = "false";
@@ -464,6 +465,7 @@ namespace ui {
 
         const add = document.createElement("button");
         add.innerText = "add";
+        add.id = id+"addListItem";
         add.onclick = async () => {
             const value = inputField.value;
             const isValidItem = await invoke(validator, [ value ]);
@@ -490,16 +492,33 @@ namespace ui {
 
         const listView = document.getElementById(id + "listView") as HTMLDivElement;
 
-        listView.innerHTML = "";
-        for (const value of activeValues) {
-            const item = document.createElement("p");
-            item.innerText = value;
-            item.onclick = () => {
-                activeValues = activeValues.filter(activeValue => value != activeValue);
-                listView.removeChild(item);
-                invoke(onchange, [ activeValues ]);
+        const RenderListViewItems = () => {
+            listView.innerHTML = "";
+            for (const value of activeValues) {
+                const item = document.createElement("p");
+                item.innerText = value;
+                item.onclick = () => {
+                    activeValues = activeValues.filter(activeValue => value != activeValue);
+                    listView.removeChild(item);
+                    invoke(onchange, [ activeValues ]);
+                }
+                listView.appendChild(item);
             }
-            listView.appendChild(item);
+        }
+
+        RenderListViewItems();
+
+        const add = document.getElementById(id + "addListItem") as HTMLButtonElement;
+        const inputField = document.getElementById(id + "inputFieldId") as HTMLInputElement;
+        add.onclick = async () => {
+            const value = inputField.value;
+            const isValidItem = await invoke(validator, [ value ]);
+            if (isValidItem) {
+                const newValue = await invoke<string>(onchange, [ [ ...activeValues, value ] ]);
+                activeValues.push(newValue);
+                RenderListViewItems();
+                inputField.value = "";
+            }
         }
     }
 
