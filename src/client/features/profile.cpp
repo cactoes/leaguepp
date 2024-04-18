@@ -105,7 +105,6 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* fra
     connectorManager->AddConnectHandler(
         client_connect([this, label, frameworkApiHandle]() {
             label->SetText("connected");
-            label->Update();
             frameworkApiHandle->CreateNotification("connected", "the client has connected to league");
         })
     );
@@ -113,7 +112,6 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* fra
     connectorManager->AddDisconnectHandler(
         client_disconnect([this, label, frameworkApiHandle]() {
             label->SetText("disconnected");
-            label->Update();
             frameworkApiHandle->CreateNotification("disconnected", "the client has disconnected from league");
         })
     );

@@ -14,4 +14,5 @@ void ui::LabelImpl::Update() {
 
 void ui::LabelImpl::SetText(const std::string& text) {
     m_text = text;
+    Update();
 }
