@@ -17,7 +17,7 @@ namespace ui {
         void Update() override;
         void Register() override;
 
-        void HandleChange(browser::Browser*, browser::js_args_t args);
+        std::string HandleChange(browser::Browser*, browser::js_args_t args);
 
     private:
         std::string m_label;

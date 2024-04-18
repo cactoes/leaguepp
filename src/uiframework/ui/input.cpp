@@ -13,6 +13,7 @@ void ui::InputImpl::Update() {
 
 }
 
-void ui::InputImpl::HandleChange(browser::Browser*, browser::js_args_t args) {
+std::string ui::InputImpl::HandleChange(browser::Browser*, browser::js_args_t args) {
     m_value = m_callbackHolder.Run(args.Get<0, std::string>());
+    return m_value;
 }
