@@ -24,8 +24,7 @@ inline char* Cvar<std::vector<int>>::Data() {
 
 template <>
 inline void Cvar<std::vector<int>>::SetData(char* data, size_t size) {
-    m_value.reserve(size / sizeof(int));
-    memcpy(Data(), data, size);
+    m_value.insert(m_value.begin(), (int*)data, (int*)data + (size / sizeof(int)));
 }
 
 template <>
@@ -40,8 +39,7 @@ inline char* Cvar<std::vector<float>>::Data() {
 
 template <>
 inline void Cvar<std::vector<float>>::SetData(char* data, size_t size) {
-    m_value.reserve(size / sizeof(float));
-    memcpy(Data(), data, size);
+    m_value.insert(m_value.begin(), (float*)data, (float*)data + (size / sizeof(float)));
 }
 
 template <>
@@ -106,8 +104,13 @@ bool ConfigManager::Init() {
     cfg->AddTemplate<bool>("autoPicker::bEnabled");
     cfg->AddTemplate<int>("autoPicker::nMode");
     cfg->AddTemplate<int>("autoPicker::nStrictness");
-    cfg->AddTemplate<std::vector<int>>("autoPicker::banIds");
-    cfg->AddTemplate<std::vector<int>>("autoPicker::pickIds");
+    cfg->AddTemplate<std::string>("autoPicker::sPreferredLineBlind");
+    cfg->AddTemplate<bool>("autoPicker::bEarlyDeclare");
+
+    for (const auto& lane : std::vector<std::string>{ "top", "jungle", "middle", "bottom", "utility" }) {
+        cfg->AddTemplate<std::vector<int>>(("autoPicker::" + lane + "::banIds").c_str());
+        cfg->AddTemplate<std::vector<int>>(("autoPicker::" + lane + "::pickIds").c_str());
+    }
 
     if (!Load(cfg))
         Dump(cfg);
