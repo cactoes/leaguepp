@@ -1,6 +1,9 @@
 #ifndef __UTILS_HPP__
 #define __UTILS_HPP__
 
+#pragma warning(push)
+#pragma warning(disable:4505)
+
 #include <iostream>
 #include <string>
 #include <ranges>
@@ -28,5 +31,7 @@ static bool ParseNumber(std::string_view str, Ty& value) {
     const auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value);
     return ec == std::errc();
 }
+
+#pragma warning(pop)
 
 #endif // __UTILS_HPP__

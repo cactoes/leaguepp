@@ -1,6 +1,9 @@
 #ifndef __HASH_HPP__
 #define __HASH_HPP__
 
+#pragma warning(push)
+#pragma warning(disable:4505)
+
 #include <stdint.h>
 
 namespace hash {
@@ -33,5 +36,7 @@ namespace hash {
             HashString64Const(str + 1, (hash << 1) + static_cast<uint64_t>(*str));
     }
 }; // namespace hash
+
+#pragma warning(pop)
 
 #endif // __HASH_HPP__
