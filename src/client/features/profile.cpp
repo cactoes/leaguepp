@@ -6,8 +6,8 @@
 #include "../interface/holder.hpp"
 #include "../managers/connectormanager.hpp"
 #include "../managers/configmanager.hpp"
-#include "endpointmappers/summaryplayerdata.hpp"
-#include "endpointmappers/lolchatme.hpp"
+#include "../endpointmappers/summaryplayerdata.hpp"
+#include "../endpointmappers/lolchatme.hpp"
 
 #undef interface
 
@@ -69,11 +69,10 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* fra
                 // RANKED_FLEX_SR
                 me.lol->rankedLeagueQueue = "RANKED_SOLO_5x5";
                 me.lol->rankedLeagueTier = tier;
-
-                configManager->TrackedSetVar(cfg, "profile::sTier", tier);
                 return true;
             });
 
+            configManager->TrackedSetVar(cfg, "profile::sTier", tier);
             return list;
         })
     );
@@ -83,11 +82,10 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* fra
         ui::dropdown_callback([this, configManager, cfg](std::string division, bool, std::vector<std::string> list) {
             UpdateProfile([division, configManager, cfg](lolchat::Me& me) {
                 me.lol->rankedLeagueDivision = division;
-
-                configManager->TrackedSetVar(cfg, "profile::sDivision", division);
                 return true;
             });
 
+            configManager->TrackedSetVar(cfg, "profile::sDivision", division);
             return list;
         })
     );
