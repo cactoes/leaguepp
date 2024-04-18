@@ -16,13 +16,12 @@ int main(UNUSED int argc, UNUSED char** argv) {
 
     frameworkApiHandle->Init();
 
-    auto connectorManager = interface<ConnectorManager>::Get();
-    connectorManager->Init();
-
     interface<ResourceManager>::Get()->Init();
     interface<ConfigManager>::Get()->Init();
     interface<FeatureManager>::Get()->Init(frameworkApiHandle.get());
 
+    auto connectorManager = interface<ConnectorManager>::Get();
+    connectorManager->Init();
     frameworkApiHandle->Run();
     connectorManager->Shutdown();
 
