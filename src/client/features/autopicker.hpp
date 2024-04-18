@@ -96,9 +96,12 @@ namespace feature {
     private:
         const std::vector<std::string> m_modes = { "manual", "semi", "auto" };
         const std::vector<std::string> m_strictnesses = { "none", "loose", "strict" };
+        const std::vector<std::string> m_lanes = { "top", "jungle", "middle", "bottom", "utility" };
+        
         lobby_info_t m_lobby_info = {};
         std::shared_ptr<Config> m_config = nullptr;
         IUiFramework* m_frameworkApiHandle = nullptr;
+        std::string m_listTarget;
     };
 }; // namespace feature
 

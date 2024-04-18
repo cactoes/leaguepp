@@ -5,25 +5,19 @@
 #include "../interface/holder.hpp"
 #include "../managers/configmanager.hpp"
 #include "../managers/connectormanager.hpp"
+#include "../managers/resourcemanager.hpp"
 
-#include "endpointmappers/champselectsession.hpp"
-#include "endpointmappers/lobbylobby.hpp"
+#include "../endpointmappers/champselectsession.hpp"
+#include "../endpointmappers/lobbylobby.hpp"
 
 #undef interface
 
 void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* frameworkApiHandle) {
     m_frameworkApiHandle = frameworkApiHandle;
     auto connectorManager = interface<ConnectorManager>::Get();
-    m_config = interface<ConfigManager>::Get()->Get(CONFIG_BASIC);
-
-    // TODO: lane based bans & picks
-    // TODO: add inputs for the bans & picks
-
-    // 901 smolder
-    // 51 caitlyn
-
-    m_config->SetVar("autoPicker::banIds", std::vector<int>{ 901, 22, 74, 17, 103, 84 }); // 901, 22, 74, 17, 103, 84
-    m_config->SetVar("autoPicker::pickIds", std::vector<int>{ 51 }); // 51
+    auto resourceManger = interface<ResourceManager>::Get();
+    auto configManager = interface<ConfigManager>::Get();
+    m_config = configManager->Get(CONFIG_BASIC);
 
     // setup hooks
 
@@ -33,7 +27,7 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* 
             m_lobby_info.isInChampSelect = data.get<std::string>() == "ChampSelect";
 
             // for early declare
-            if (m_lobby_info.isInChampSelect && m_config->GetVar<bool>("autoPicker::bEnabled")) {
+            if (m_lobby_info.isInChampSelect && m_config->GetVar<bool>("autoPicker::bEnabled") && m_config->GetVar<bool>("autoPicker::bEarlyDeclare")) {
                 const auto sessionDataResult = connectorManager->MakeRequest(connector::request_type::GET, "/lol-champ-select/v1/session");
                 const auto lobbyDataResult = connectorManager->MakeRequest(connector::request_type::GET, "/lol-lobby/v2/lobby");
 
@@ -65,8 +59,15 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* 
         })
     );
 
+    frame->AddCheckbox(
+        "early declare", m_config->GetVar<bool>("autoPicker::bEarlyDeclare"),
+        ui::checkbox_callback([this](bool newState) {
+            return interface<ConfigManager>::Get()->TrackedSetVar(m_config, "autoPicker::bEarlyDeclare", newState);
+        })
+    );
+
     frame->AddSelector(
-        "mode", m_config->GetVar<int>("autoPicker::nMode"), m_modes,
+        "bot mode", m_config->GetVar<int>("autoPicker::nMode"), m_modes,
         ui::selector_callback([this](std::string newMode) {
             const auto newModeIndex = (int)std::distance(m_modes.begin(), std::ranges::find(m_modes, newMode));
             return interface<ConfigManager>::Get()->TrackedSetVar(m_config, "autoPicker::nMode", newModeIndex);
@@ -74,12 +75,79 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* 
     );
 
     frame->AddSelector(
-        "strictness", m_config->GetVar<int>("autoPicker::nStrictness"), m_strictnesses,
+        "lane strictness", m_config->GetVar<int>("autoPicker::nStrictness"), m_strictnesses,
         ui::selector_callback([this](std::string newStrictness) {
             const auto newStrictnessIndex = (int)std::distance(m_strictnesses.begin(), std::ranges::find(m_strictnesses, newStrictness));
             return interface<ConfigManager>::Get()->TrackedSetVar(m_config, "autoPicker::nStrictness", newStrictnessIndex);
         })
     );
+
+    auto ListItemValidator = [resourceManger](std::string value, std::vector<int> list) {
+        auto id = resourceManger->ChampionNameToId(value);
+        if (id == 0)
+            return false;
+
+        return std::ranges::find(list, id) == list.end();
+    };
+
+    auto RemapListAndParseIds = [resourceManger](std::vector<std::string>& list) {
+        std::vector<int> newItems = {};
+        for (auto& v : list) {
+            auto id = resourceManger->ChampionNameToId(v);
+            v = resourceManger->ChampionIdToName(id);
+            newItems.push_back(id);
+        }
+
+        return newItems;
+    };
+
+    m_listTarget = m_config->GetVar<std::string>("autoPicker::sPreferredLineBlind");
+    if (m_listTarget.empty())
+        m_listTarget = "top";
+
+    frame->AddDropdown(
+        "preferred lane (blind)", false, std::vector<std::string>{ m_config->GetVar<std::string>("autoPicker::sPreferredLineBlind") }, m_lanes,
+        ui::dropdown_callback([this, configManager](std::string item, bool, std::vector<std::string> list) {
+            configManager->TrackedSetVar(m_config, "autoPicker::sPreferredLineBlind", item);
+            return list;
+        })
+    );
+
+    frame->AddDropdown(
+        "lane", false, std::vector<std::string>{ m_listTarget }, m_lanes,
+        ui::dropdown_callback([this, frame, resourceManger](std::string item, bool, std::vector<std::string> list) {
+            m_listTarget = item;
+
+            auto& cvarBans = m_config->GetVar<std::vector<int>>(("autoPicker::" + m_listTarget + "::banIds").c_str());
+            auto& cvarPicks = m_config->GetVar<std::vector<int>>(("autoPicker::" + m_listTarget + "::pickIds").c_str());
+
+            frame->GetComponent<ui::List>("autoPickerBans")->SetActiveItems(resourceManger->MapChampionIdsToNames(cvarBans));
+            frame->GetComponent<ui::List>("autoPickerPicks")->SetActiveItems(resourceManger->MapChampionIdsToNames(cvarPicks));
+            return list;
+        })
+    );
+
+    frame->AddList(
+        "bans", resourceManger->MapChampionIdsToNames(m_config->GetVar<std::vector<int>>(("autoPicker::" + m_listTarget + "::banIds").c_str())),
+        ui::list_validator_callback([this, ListItemValidator](std::string v) {
+            return ListItemValidator(v, m_config->GetVar<std::vector<int>>(("autoPicker::" + m_listTarget + "::banIds").c_str()));
+        }),
+        ui::list_callback([this, RemapListAndParseIds, configManager](std::vector<std::string> list) {
+            configManager->TrackedSetVar(m_config, ("autoPicker::" + m_listTarget + "::banIds").c_str(), RemapListAndParseIds(list));
+            return list;
+        })
+    )->SetId("autoPickerBans");
+
+    frame->AddList(
+        "picks", resourceManger->MapChampionIdsToNames(m_config->GetVar<std::vector<int>>(("autoPicker::" + m_listTarget + "::pickIds").c_str())),
+        ui::list_validator_callback([this, ListItemValidator](std::string v) {
+            return ListItemValidator(v, m_config->GetVar<std::vector<int>>(("autoPicker::" + m_listTarget + "::pickIds").c_str()));
+        }),
+        ui::list_callback([this, RemapListAndParseIds, configManager](std::vector<std::string> list) {
+            configManager->TrackedSetVar(m_config, ("autoPicker::" + m_listTarget + "::pickIds").c_str(), RemapListAndParseIds(list));
+            return list;
+        })
+    )->SetId("autoPickerPicks");
 }
 
 std::string feature::AutoPicker::GetName() {
@@ -208,18 +276,24 @@ void feature::AutoPicker::HandleFrame(const champselect::Session& session, const
     // TODO: notif the user with the banned / picked champ name
     // NotifyUser("declared champion", "champion_name");
 
+    auto myTeamIterator = std::ranges::find_if(session.myTeam.value(), [session](const champselect::MyTeam& obj) {
+        return obj.cellId.value() == session.localPlayerCellId.value();
+    });
+
+    std::string assignedPosition = myTeamIterator->assignedPosition.value();
+
+    if (assignedPosition.empty())
+        assignedPosition = m_config->GetVar<std::string>("autoPicker::sPreferredLineBlind");
+
     switch (GetPlayerState(session)) {
         case player_state::DECLARING:
-            if (MakeAction(session, action_type::PICK, m_config->GetVar<std::vector<int>>("autoPicker::pickIds"), false))
-                m_frameworkApiHandle->CreateNotification("declared", "x champion");
+            (void)MakeAction(session, action_type::PICK, m_config->GetVar<std::vector<int>>(("autoPicker::" + assignedPosition + "::pickIds").c_str()), false);
             break;
         case player_state::BANNING:
-            if (MakeAction(session, action_type::BAN, m_config->GetVar<std::vector<int>>("autoPicker::banIds"), mode == BOT_AUTO))
-                m_frameworkApiHandle->CreateNotification("banned", "x champion");
+            (void)MakeAction(session, action_type::BAN, m_config->GetVar<std::vector<int>>(("autoPicker::" + assignedPosition + "::banIds").c_str()), mode == BOT_AUTO);
             break;
         case player_state::PICKING:
-            if (MakeAction(session, action_type::PICK, m_config->GetVar<std::vector<int>>("autoPicker::pickIds"), mode == BOT_AUTO))
-                m_frameworkApiHandle->CreateNotification("picked", "x champion");
+            (void)MakeAction(session, action_type::PICK, m_config->GetVar<std::vector<int>>(("autoPicker::" + assignedPosition + "::pickIds").c_str()), mode == BOT_AUTO);
             break;
         case player_state::INVALID:
         case player_state::WAITING:
