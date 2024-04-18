@@ -60,14 +60,14 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* 
     );
 
     frame->AddCheckbox(
-        "early declare", "declare in planning phase", m_config->GetVar<bool>("autoPicker::bEarlyDeclare"),
+        "early declare", "", m_config->GetVar<bool>("autoPicker::bEarlyDeclare"),
         ui::checkbox_callback([this](bool newState) {
             return interface<ConfigManager>::Get()->TrackedSetVar(m_config, "autoPicker::bEarlyDeclare", newState);
         })
     );
 
     frame->AddSelector(
-        "bot mode", m_config->GetVar<int>("autoPicker::nMode"), m_modes,
+        "bot mode", "", m_config->GetVar<int>("autoPicker::nMode"), m_modes,
         ui::selector_callback([this](std::string newMode) {
             const auto newModeIndex = (int)std::distance(m_modes.begin(), std::ranges::find(m_modes, newMode));
             return interface<ConfigManager>::Get()->TrackedSetVar(m_config, "autoPicker::nMode", newModeIndex);
@@ -75,7 +75,7 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* 
     );
 
     frame->AddSelector(
-        "lane strictness", m_config->GetVar<int>("autoPicker::nStrictness"), m_strictnesses,
+        "lane strictness", "none - the lane doesnt matter\\nloose - primary / secondary (if available)\\nstrict - primary", m_config->GetVar<int>("autoPicker::nStrictness"), m_strictnesses,
         ui::selector_callback([this](std::string newStrictness) {
             const auto newStrictnessIndex = (int)std::distance(m_strictnesses.begin(), std::ranges::find(m_strictnesses, newStrictness));
             return interface<ConfigManager>::Get()->TrackedSetVar(m_config, "autoPicker::nStrictness", newStrictnessIndex);
@@ -106,7 +106,8 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* 
         m_listTarget = "top";
 
     frame->AddDropdown(
-        "preferred lane (blind)", false, std::vector<std::string>{ m_config->GetVar<std::string>("autoPicker::sPreferredLineBlind") }, m_lanes,
+        "preferred lane (blind)", "the lane that gets used in blind pick modes",
+        false, std::vector<std::string>{ m_config->GetVar<std::string>("autoPicker::sPreferredLineBlind") }, m_lanes,
         ui::dropdown_callback([this, configManager](std::string item, bool, std::vector<std::string> list) {
             configManager->TrackedSetVar(m_config, "autoPicker::sPreferredLineBlind", item);
             return list;
@@ -114,7 +115,7 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* 
     );
 
     frame->AddDropdown(
-        "lane", false, std::vector<std::string>{ m_listTarget }, m_lanes,
+        "lane", "select the lane for the bans & picks input", false, std::vector<std::string>{ m_listTarget }, m_lanes,
         ui::dropdown_callback([this, frame, resourceManger](std::string item, bool, std::vector<std::string> list) {
             m_listTarget = item;
 
@@ -128,7 +129,7 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* 
     );
 
     frame->AddList(
-        "bans", resourceManger->MapChampionIdsToNames(m_config->GetVar<std::vector<int>>(("autoPicker::" + m_listTarget + "::banIds").c_str())),
+        "bans", "", resourceManger->MapChampionIdsToNames(m_config->GetVar<std::vector<int>>(("autoPicker::" + m_listTarget + "::banIds").c_str())),
         ui::list_validator_callback([this, ListItemValidator](std::string v) {
             return ListItemValidator(v, m_config->GetVar<std::vector<int>>(("autoPicker::" + m_listTarget + "::banIds").c_str()));
         }),
@@ -139,7 +140,7 @@ void feature::AutoPicker::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* 
     )->SetId("autoPickerBans");
 
     frame->AddList(
-        "picks", resourceManger->MapChampionIdsToNames(m_config->GetVar<std::vector<int>>(("autoPicker::" + m_listTarget + "::pickIds").c_str())),
+        "picks", "", resourceManger->MapChampionIdsToNames(m_config->GetVar<std::vector<int>>(("autoPicker::" + m_listTarget + "::pickIds").c_str())),
         ui::list_validator_callback([this, ListItemValidator](std::string v) {
             return ListItemValidator(v, m_config->GetVar<std::vector<int>>(("autoPicker::" + m_listTarget + "::pickIds").c_str()));
         }),

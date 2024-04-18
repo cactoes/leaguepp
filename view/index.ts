@@ -50,6 +50,18 @@ namespace colors {
 
 const noTarget = (target: string) => console.error(`Error: Failed to find target "${target}"`);
 
+function createInfoBox(info: string) {
+    const infoDiv = document.createElement("div");
+    infoDiv.className = "infoDiv"
+    infoDiv.innerText = "?"
+
+    const infoBox = document.createElement("p");
+    infoBox.innerText = info;
+    infoDiv.appendChild(infoBox);
+
+    return infoDiv;
+}
+
 function uiCreateFrame(name: string, id: string, layout: string, target: string): void {
     const element = document.getElementById(target);
     if (!element)
@@ -137,17 +149,8 @@ function uiCreateCheckBox(label: string, info: string, state: boolean, id: strin
     p.innerText = label;
     checkbox.appendChild(p);
 
-    if (info != "") {
-        const infoDiv = document.createElement("div");
-        infoDiv.className = "infoDiv"
-        infoDiv.innerText = "?"
-
-        const infoBox = document.createElement("p");
-        infoBox.innerText = info;
-        infoDiv.appendChild(infoBox);
-
-        checkbox.appendChild(infoDiv);
-    }
+    if (info != "")
+        checkbox.appendChild(createInfoBox(info));
 
     const lbl = document.createElement("label");
     const input = document.createElement("input");
@@ -164,7 +167,7 @@ function uiCreateCheckBox(label: string, info: string, state: boolean, id: strin
     element.appendChild(checkbox);
 }
 
-function uiCreateSlider(label: string, id: string, onchange: string, min: number, max: number, target: string): void {
+function uiCreateSlider(label: string, info: string, id: string, onchange: string, min: number, max: number, target: string): void {
     const element = document.getElementById(target);
     if (!element)
         return noTarget(target);
@@ -184,6 +187,9 @@ function uiCreateSlider(label: string, id: string, onchange: string, min: number
     shadow.className = "shadow";
     shadow.innerText = label;
     slider.appendChild(shadow);
+
+    if (info != "")
+        slider.appendChild(createInfoBox(info));
 
     const div = document.createElement("div");
 
@@ -242,7 +248,7 @@ function uiCreateSlider(label: string, id: string, onchange: string, min: number
     element.appendChild(slider);
 }
 
-function uiCreateDropDown(label: string, id: string, isMulti: boolean, activeValues: string[], onchange: string, target: string, items: string[]): void {
+function uiCreateDropDown(label: string, info: string, id: string, isMulti: boolean, activeValues: string[], onchange: string, target: string, items: string[]): void {
     const element = document.getElementById(target);
     if (!element)
         return noTarget(target);
@@ -264,7 +270,11 @@ function uiCreateDropDown(label: string, id: string, isMulti: boolean, activeVal
     shadow.innerText = label;
     dropdown.appendChild(shadow);
 
+    if (info != "")
+        dropdown.appendChild(createInfoBox(info));
+
     const dropDownDiv = document.createElement("div");
+    dropDownDiv.className = "wrapper"
 
     const disabledInput = document.createElement("input");
     disabledInput.type = "text";
@@ -320,7 +330,7 @@ function uiCreateDropDown(label: string, id: string, isMulti: boolean, activeVal
     element.appendChild(dropdown);
 }
 
-function uiCreateSelector(label: string, state: number, id: string, onchange: string, target: string, items: string[]): void {
+function uiCreateSelector(label: string, info: string, state: number, id: string, onchange: string, target: string, items: string[]): void {
     const element = document.getElementById(target);
     if (!element)
         return noTarget(target);
@@ -341,9 +351,12 @@ function uiCreateSelector(label: string, state: number, id: string, onchange: st
     shadow.innerText = label;
     selector.appendChild(shadow);
 
+    if (info != "")
+        selector.appendChild(createInfoBox(info));
+
     const selectorContent = document.createElement("div");
     selectorContent.id = id + "content"
-    selectorContent.className = "noselect"
+    selectorContent.className = "content noselect"
 
     const gradient = colors.generateGradient(items.length);
 
@@ -378,7 +391,7 @@ function uiCreateSelector(label: string, state: number, id: string, onchange: st
     element.appendChild(selector);
 }
 
-function uiCreateInput(label: string, id: string, value: string, onchange: string, target: string): void {
+function uiCreateInput(label: string, info: string, id: string, value: string, onchange: string, target: string): void {
     const element = document.getElementById(target);
     if (!element)
         return noTarget(target);
@@ -399,6 +412,9 @@ function uiCreateInput(label: string, id: string, value: string, onchange: strin
     shadow.innerText = label;
     input.appendChild(shadow);
 
+    if (info != "")
+        input.appendChild(createInfoBox(info));
+
     const container = document.createElement("div");
 
     const inputField = document.createElement("input");
@@ -417,7 +433,7 @@ function uiCreateInput(label: string, id: string, value: string, onchange: strin
     element.appendChild(input);
 }
 
-function uiCreateList(label: string, id: string, activeValues: string[], validator: string, onchange: string, target: string): void {
+function uiCreateList(label: string, info: string, id: string, activeValues: string[], validator: string, onchange: string, target: string): void {
     const element = document.getElementById(target);
     if (!element)
         return noTarget(target);
@@ -437,6 +453,9 @@ function uiCreateList(label: string, id: string, activeValues: string[], validat
     shadow.className = "shadow";
     shadow.innerText = label;
     list.appendChild(shadow);
+
+    if (info != "")
+        list.appendChild(createInfoBox(info));
 
     const container = document.createElement("div");
 

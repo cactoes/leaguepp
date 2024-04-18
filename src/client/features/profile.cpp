@@ -63,7 +63,7 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* fra
     // );
 
     frame->AddDropdown(
-        "tier", false, std::vector<std::string>{ cfg->GetVar<std::string>("profile::sTier") }, m_tiers,
+        "tier", "", false, std::vector<std::string>{ cfg->GetVar<std::string>("profile::sTier") }, m_tiers,
         ui::dropdown_callback([this, configManager, cfg](std::string tier, bool, std::vector<std::string> list) {
             UpdateProfile([tier, configManager, cfg](lolchat::Me& me) {
                 // RANKED_FLEX_SR
@@ -78,7 +78,7 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* fra
     );
 
     frame->AddDropdown(
-        "division", false, std::vector<std::string>{ cfg->GetVar<std::string>("profile::sDivision") }, m_divisions,
+        "division", "", false, std::vector<std::string>{ cfg->GetVar<std::string>("profile::sDivision") }, m_divisions,
         ui::dropdown_callback([this, configManager, cfg](std::string division, bool, std::vector<std::string> list) {
             UpdateProfile([division, configManager, cfg](lolchat::Me& me) {
                 me.lol->rankedLeagueDivision = division;

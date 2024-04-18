@@ -7,8 +7,8 @@
 namespace ui {
     class InputImpl : public Input {
     public:
-        InputImpl(const std::string& label, const std::string& value, const input_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
-            m_label(label), m_value(value), m_callbackHolder(callbackHolder) {
+        InputImpl(const std::string& label, const std::string& info, const std::string& value, const input_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
+            m_label(label), m_info(info), m_value(value), m_callbackHolder(callbackHolder) {
             m_target = target;
             m_handle = handle;
         }
@@ -21,6 +21,7 @@ namespace ui {
 
     private:
         std::string m_label;
+        std::string m_info;
         std::string m_value;
         input_callback m_callbackHolder;
     };

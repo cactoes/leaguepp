@@ -5,7 +5,7 @@ ui::component_type ui::InputImpl::GetType() const {
 }
 
 void ui::InputImpl::Register() {
-    m_handle->CallJSFunction("uiCreateInput", { m_label, GetId(), m_value, COMPONENT_CALLER_ID(HandleChange), m_target });
+    m_handle->CallJSFunction("uiCreateInput", { m_label, m_info, GetId(), m_value, COMPONENT_CALLER_ID(HandleChange), m_target });
     m_handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &InputImpl::HandleChange, this);
 }
 

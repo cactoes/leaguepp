@@ -9,7 +9,7 @@ void ui::ListImpl::Update() {
 }
 
 void ui::ListImpl::Register(){
-    m_handle->CallJSFunction("uiCreateList", { m_label, GetId(), m_activeValues, COMPONENT_CALLER_ID(HandleValidate), COMPONENT_CALLER_ID(HandleChange), m_target });
+    m_handle->CallJSFunction("uiCreateList", { m_label, m_info, GetId(), m_activeValues, COMPONENT_CALLER_ID(HandleValidate), COMPONENT_CALLER_ID(HandleChange), m_target });
     m_handle->RegisterFunction(COMPONENT_CALLER_ID(HandleValidate), &ListImpl::HandleValidate, this);
     m_handle->RegisterFunction(COMPONENT_CALLER_ID(HandleChange), &ListImpl::HandleChange, this);
 }

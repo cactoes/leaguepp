@@ -32,28 +32,28 @@ std::shared_ptr<ui::Checkbox> ui::FrameImpl::AddCheckbox(const std::string& labe
     return AddComponent<ui::CheckboxImpl>(label, info, state, callbackHolder, m_handle);
 }
 
-std::shared_ptr<ui::Dropdown> ui::FrameImpl::AddDropdown(const std::string& label, bool isMulti, const std::vector<std::string>& activeValues, const std::vector<std::string>& values, const dropdown_callback& callbackHolder) {
-    return AddComponent<ui::DropdownImpl>(label, isMulti, activeValues, values, callbackHolder, m_handle);
+std::shared_ptr<ui::Dropdown> ui::FrameImpl::AddDropdown(const std::string& label, const std::string& info, bool isMulti, const std::vector<std::string>& activeValues, const std::vector<std::string>& values, const dropdown_callback& callbackHolder) {
+    return AddComponent<ui::DropdownImpl>(label, info, isMulti, activeValues, values, callbackHolder, m_handle);
 }
 
-std::shared_ptr<ui::Input> ui::FrameImpl::AddInput(const std::string& label, const std::string& value, const input_callback& callbackHolder) {
-    return AddComponent<ui::InputImpl>(label, value, callbackHolder, m_handle);
+std::shared_ptr<ui::Input> ui::FrameImpl::AddInput(const std::string& label, const std::string& info, const std::string& value, const input_callback& callbackHolder) {
+    return AddComponent<ui::InputImpl>(label, info, value, callbackHolder, m_handle);
 }
 
 std::shared_ptr<ui::Label> ui::FrameImpl::AddLabel(const std::string& text, const std::string& pos) {
     return AddComponent<ui::LabelImpl>(text, pos, m_handle);
 }
 
-std::shared_ptr<ui::Selector> ui::FrameImpl::AddSelector(const std::string& label, int state, const std::vector<std::string>& values, const selector_callback& callbackHolder) {
-    return AddComponent<ui::SelectorImpl>(label, state, values, callbackHolder, m_handle);
+std::shared_ptr<ui::Selector> ui::FrameImpl::AddSelector(const std::string& label, const std::string& info, int state, const std::vector<std::string>& values, const selector_callback& callbackHolder) {
+    return AddComponent<ui::SelectorImpl>(label, info, state, values, callbackHolder, m_handle);
 }
 
-std::shared_ptr<ui::Slider> ui::FrameImpl::AddSlider(const std::string& label, int min, int max, const slider_callback& callbackHolder) {
-    return AddComponent<ui::SliderImpl>(label, min, max,callbackHolder, m_handle);
+std::shared_ptr<ui::Slider> ui::FrameImpl::AddSlider(const std::string& label, const std::string& info, int min, int max, const slider_callback& callbackHolder) {
+    return AddComponent<ui::SliderImpl>(label, info, min, max,callbackHolder, m_handle);
 }
 
-std::shared_ptr<ui::List> ui::FrameImpl::AddList(const std::string& label, const std::vector<std::string>& activeValues, const list_validator_callback& validator, const list_callback& callbackHolder) {
-    return AddComponent<ui::ListImpl>(label, activeValues, validator, callbackHolder, m_handle);
+std::shared_ptr<ui::List> ui::FrameImpl::AddList(const std::string& label, const std::string& info, const std::vector<std::string>& activeValues, const list_validator_callback& validator, const list_callback& callbackHolder) {
+    return AddComponent<ui::ListImpl>(label, info, activeValues, validator, callbackHolder, m_handle);
 }
 
 std::shared_ptr<ui::Frame> ui::FrameImpl::AddFrame(const std::string& name, const frame_layout& layout) {

@@ -54,12 +54,12 @@ namespace ui {
 
         virtual std::shared_ptr<Button> AddButton(const std::string& label, const button_callback& callbackHolder) = 0;
         virtual std::shared_ptr<Checkbox> AddCheckbox(const std::string& label, const std::string& info, bool state, const checkbox_callback& callbackHolder) = 0;
-        virtual std::shared_ptr<Dropdown> AddDropdown(const std::string& label, bool isMulti, const std::vector<std::string>& activeValues, const std::vector<std::string>& values, const dropdown_callback& callbackHolder) = 0;
-        virtual std::shared_ptr<Input> AddInput(const std::string& label, const std::string& value, const input_callback& callbackHolder) = 0;
+        virtual std::shared_ptr<Dropdown> AddDropdown(const std::string& label, const std::string& info, bool isMulti, const std::vector<std::string>& activeValues, const std::vector<std::string>& values, const dropdown_callback& callbackHolder) = 0;
+        virtual std::shared_ptr<Input> AddInput(const std::string& label, const std::string& info, const std::string& value, const input_callback& callbackHolder) = 0;
         virtual std::shared_ptr<Label> AddLabel(const std::string& text, const std::string& pos) = 0;
-        virtual std::shared_ptr<Selector> AddSelector(const std::string& label, int state, const std::vector<std::string>& values, const selector_callback& callbackHolder) = 0;
-        virtual std::shared_ptr<Slider> AddSlider(const std::string& label, int min, int max, const slider_callback& callbackHolder) = 0;
-        virtual std::shared_ptr<List> AddList(const std::string& label, const std::vector<std::string>& activeValues, const list_validator_callback& validator, const list_callback& callbackHolder) = 0;
+        virtual std::shared_ptr<Selector> AddSelector(const std::string& label, const std::string& info, int state, const std::vector<std::string>& values, const selector_callback& callbackHolder) = 0;
+        virtual std::shared_ptr<Slider> AddSlider(const std::string& label, const std::string& info, int min, int max, const slider_callback& callbackHolder) = 0;
+        virtual std::shared_ptr<List> AddList(const std::string& label, const std::string& info, const std::vector<std::string>& activeValues, const list_validator_callback& validator, const list_callback& callbackHolder) = 0;
         virtual std::shared_ptr<Frame> AddFrame(const std::string& name, const frame_layout& layout) = 0;
 
         virtual void AddComponent(std::shared_ptr<Component> component) = 0;

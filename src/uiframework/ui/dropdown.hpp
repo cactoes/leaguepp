@@ -7,8 +7,8 @@
 namespace ui {
     class DropdownImpl : public Dropdown {
     public:
-        DropdownImpl(const std::string& label, bool isMulti, const std::vector<std::string>& activeValues, const std::vector<std::string>& values, const dropdown_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
-            m_label(label), m_isMulti(isMulti), m_activeValues(activeValues), m_values(values), m_callbackHolder(callbackHolder) {
+        DropdownImpl(const std::string& label, const std::string& info, bool isMulti, const std::vector<std::string>& activeValues, const std::vector<std::string>& values, const dropdown_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
+            m_label(label), m_info(info), m_isMulti(isMulti), m_activeValues(activeValues), m_values(values), m_callbackHolder(callbackHolder) {
             m_target = target;
             m_handle = handle;
         }
@@ -21,6 +21,7 @@ namespace ui {
 
     private:
         std::string m_label;
+        std::string m_info;
         bool m_isMulti;
         std::vector<std::string> m_activeValues;
         std::vector<std::string> m_values;

@@ -7,8 +7,8 @@
 namespace ui {
     class ListImpl : public List {
     public:
-        ListImpl(const std::string& label, const std::vector<std::string>& activeValues, const list_validator_callback& validator, const list_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
-            m_label(label), m_activeValues(activeValues), m_validator(validator), m_callbackHolder(callbackHolder) {
+        ListImpl(const std::string& label, const std::string& info, const std::vector<std::string>& activeValues, const list_validator_callback& validator, const list_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
+            m_label(label), m_info(info), m_activeValues(activeValues), m_validator(validator), m_callbackHolder(callbackHolder) {
             m_target = target;
             m_handle = handle;
         }
@@ -24,6 +24,7 @@ namespace ui {
 
     private:
         std::string m_label;
+        std::string m_info;
         std::vector<std::string> m_activeValues;
         list_validator_callback m_validator;
         list_callback m_callbackHolder;

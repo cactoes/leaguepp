@@ -7,8 +7,8 @@
 namespace ui {
     class SliderImpl : public Slider {
     public:
-        SliderImpl(const std::string& label, int min, int max, const slider_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
-            m_label(label), m_min(min), m_max(max), m_callbackHolder(callbackHolder) {
+        SliderImpl(const std::string& label, const std::string& info, int min, int max, const slider_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
+            m_label(label), m_info(info), m_min(min), m_max(max), m_callbackHolder(callbackHolder) {
             m_target = target;
             m_handle = handle;
         }
@@ -21,6 +21,7 @@ namespace ui {
 
     private:
         std::string m_label;
+        std::string m_info;
         int m_min;
         int m_max;
         slider_callback m_callbackHolder;

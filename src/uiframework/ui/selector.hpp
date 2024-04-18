@@ -7,8 +7,8 @@
 namespace ui {
     class SelectorImpl : public Selector {
     public:
-        SelectorImpl(const std::string& label, int state, const std::vector<std::string>& values, const selector_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
-            m_state(state), m_label(label), m_values(values), m_callbackHolder(callbackHolder) {
+        SelectorImpl(const std::string& label, const std::string& info, int state, const std::vector<std::string>& values, const selector_callback& callbackHolder, browser::Browser* handle, const std::string& target = "") :
+            m_state(state), m_label(label), m_info(info), m_values(values), m_callbackHolder(callbackHolder) {
             m_target = target;
             m_handle = handle;
         }
@@ -22,6 +22,7 @@ namespace ui {
     private:
         int m_state;
         std::string m_label;
+        std::string m_info;
         std::vector<std::string> m_values;
         selector_callback m_callbackHolder;
     };

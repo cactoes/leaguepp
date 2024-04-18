@@ -342,8 +342,10 @@ body {
     visibility: hidden;
     width: max-content;
     max-width: 170px;
+    left: 12px;
     background-color: var(--background-primary);
     padding: 4px;
+    font-style: italic;
 }
 
 .element > .infoDiv:hover > p {
@@ -525,15 +527,16 @@ body {
     flex-direction: column;
 }
 
-.dropdown > div {
+.dropdown > .wrapper {
+    /* 12px is the element left padding */
+    width: calc(100% - var(--item-offset-left)*2 - 12px);
     position: relative;
     margin-left: var(--item-offset-left);
     margin-top: var(--item-offset-label);
 }
 
-.dropdown > div > input {
-    /* 12px is the element left padding */
-    width: calc(100% - var(--item-offset-left) - 12px);
+.dropdown > .wrapper > input {
+    width: 100%;
     background-color: var(--background-secondary);
     padding: 3px 10px;
     color: var(--text);
@@ -543,19 +546,18 @@ body {
     transition: all .15s ease;
 }
 
-.dropdown > div > .content {
+.dropdown > .wrapper > .content {
     display: none;
     position: absolute;
 
-    min-width: calc(100% - var(--item-offset-left) - 12px);
-    max-width: calc(100% - var(--item-offset-left) - 12px);
+    width: 100%;
 
     background-color: var(--background-secondary);
 
     z-index: 1;
 }
 
-.dropdown > div > .content > p {
+.dropdown > .wrapper > .content > p {
     cursor: pointer;
 
     padding: 4px 10px;
@@ -564,20 +566,20 @@ body {
     transition: all .15s ease;
 }
 
-.dropdown > div > .content > p:not(:hover):not(.selected) {
+.dropdown > .wrapper > .content > p:not(:hover):not(.selected) {
     color: var(--text) !important;
 }
 
-.dropdown > div > .content > p:hover {
+.dropdown > .wrapper > .content > p:hover {
     filter: brightness(120%);
     background-color: var(--background-primary);
 }
 
-.dropdown > div:hover > .content {
+.dropdown > .wrapper:hover > .content {
     display: block;
 }
 
-.dropdown > div:hover > input {
+.dropdown > .wrapper:hover > input {
     filter: brightness(80%);
     background-color: var(--background-primary);
 }
@@ -593,7 +595,7 @@ body {
     font-size: var(--font-size-default);
 }
 
-.selector > div {
+.selector > .content {
     /* 12px is the element left padding */
     width: calc(100% - var(--item-offset-left)*2 - 12px);
 
@@ -607,7 +609,7 @@ body {
     background-color: var(--background-secondary);
 }
 
-.selector > div > p {
+.selector > .content > p {
     background-color: var(--background-secondary);
 
     transition: all .15s ease;
@@ -623,18 +625,18 @@ body {
     text-align: center;
 }
 
-.selector > div > p:not(:hover):not(.selected) {
+.selector > .content > p:not(:hover):not(.selected) {
     background-color: var(--background-secondary) !important;
 }
 
-.selector > div > p:hover {
+.selector > .content > p:hover {
     cursor: pointer;
     background-color: var(--primary);
     color: var(--background-primary);
     filter: brightness(120%);
 }
 
-.selector > div > p.selected {
+.selector > .content > p.selected {
     background-color: var(--primary);
     color: var(--background-primary);
 }
