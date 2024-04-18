@@ -13,6 +13,11 @@ inline uint64_t Cvar<std::string>::Size() {
 }
 
 template <>
+inline void Cvar<std::string>::SetData(char* data, size_t size) {
+    m_value.assign(data, data + size);
+}
+
+template <>
 inline char* Cvar<std::vector<int>>::Data() {
     return reinterpret_cast<char*>(m_value.data());
 }
@@ -94,6 +99,9 @@ Config::data_t Config::Data() {
 bool ConfigManager::Init() {
     auto cfg = Create(CONFIG_BASIC);
     cfg->AddTemplate<bool>("lobby::bAutoAccept");
+    
+    cfg->AddTemplate<std::string>("profile::sTier");
+    cfg->AddTemplate<std::string>("profile::sDivision");
 
     cfg->AddTemplate<bool>("autoPicker::bEnabled");
     cfg->AddTemplate<int>("autoPicker::nMode");
