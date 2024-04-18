@@ -7,6 +7,7 @@
 #include "label.hpp"
 #include "selector.hpp"
 #include "slider.hpp"
+#include "list.hpp"
 
 ui::component_type ui::FrameImpl::GetType() const {
     return CT_FRAME;
@@ -49,6 +50,10 @@ std::shared_ptr<ui::Selector> ui::FrameImpl::AddSelector(const std::string& labe
 
 std::shared_ptr<ui::Slider> ui::FrameImpl::AddSlider(const std::string& label, int min, int max, const slider_callback& callbackHolder) {
     return AddComponent<ui::SliderImpl>(label, min, max,callbackHolder, m_handle);
+}
+
+std::shared_ptr<ui::List> ui::FrameImpl::AddList(const std::string& label, const std::vector<std::string>& activeValues, const list_validator_callback& validator, const list_callback& callbackHolder) {
+    return AddComponent<ui::ListImpl>(label, activeValues, validator, callbackHolder, m_handle);
 }
 
 std::shared_ptr<ui::Frame> ui::FrameImpl::AddFrame(const std::string& name, const frame_layout& layout) {

@@ -25,6 +25,22 @@
     color: var(--text);
 }
 
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--background-primary); 
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--primary); 
+}
+
+::-webkit-scrollbar-thumb:hover {
+    cursor: pointer;
+}
+
 ::selection {
     background: var(--secondary);
 }
@@ -640,4 +656,90 @@ body {
 .input > div > input:hover,
 .input > div > input:focus {
     border: 1px solid var(--accent);
+}
+
+/* =========================== */
+/* LIST STYLING */
+/* =========================== */
+
+.list {
+    display: flex;
+    flex-direction: column;
+
+    font-size: var(--font-size-default);
+}
+
+.list > div {
+    /* 12px is the element left padding */
+    width: calc(100% - var(--item-offset-left)*2 - 12px);
+
+    margin-left: var(--item-offset-left);
+    margin-top: var(--item-offset-label);
+}
+
+.list > div > .listView {
+    background-color: var(--background-secondary);
+    overflow-x: hidden;
+    overflow-y: visible;
+    min-height: 63px;
+    max-height: 63px;
+}
+
+.list > div > .listView > p {
+    background-color: var(--background-secondary);
+
+    transition: all .15s ease;
+
+    font-size: var(--font-size-default);
+
+    padding: 3px 10px;
+    color: var(--text);
+
+    width: 100%;
+
+    cursor: pointer;
+}
+
+.list > div > .listView > p:hover {
+    filter: brightness(120%);
+    background-color: var(--background-primary);
+    color: var(--accent);
+}
+
+.list > div > .listInput {
+    display: flex;
+    flex-direction: row;
+}
+
+.list > div > .listInput > input {
+    outline: none;
+    width: 80%;
+
+    border-top: 1px solid var(--background-primary);
+    border-right: 1px solid var(--background-primary);
+    background-color: var(--background-secondary);
+
+    padding: 3px 10px;
+
+    font-size: var(--font-size-default);
+
+    transition: all .15s ease;
+}
+
+.list > div > .listInput > button {
+    width: 20%;
+    height: 22px;
+
+    border-top: 1px solid var(--background-primary);
+    background-color: var(--background-secondary);
+    color: var(--text);
+
+    transition: all .15s ease;
+}
+
+.list > div > .listInput > button:hover {
+    filter: brightness(120%);
+    background-color: var(--background-primary);
+    color: var(--primary);
+    cursor: pointer;
 }

@@ -26,7 +26,8 @@ namespace ui {
         CT_SLIDER,
         CT_DROPDOWN,
         CT_SELECTOR,
-        CT_INPUT
+        CT_INPUT,
+        CT_LIST
     };
 
     template <std::int32_t I>

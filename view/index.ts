@@ -407,6 +407,102 @@ namespace ui {
         element.appendChild(input);
     }
 
+    export function createList(label: string, id: string, activeValues: string[], validator: string, onchange: string, target: string): void {
+        const element = document.getElementById(target);
+        if (!element)
+            return noTarget(target);
+    
+        const list = document.createElement("div");
+        list.className = "list element"
+        list.id = id;
+
+        //     <p class="label">${label}</p>
+        const p = document.createElement("p");
+        p.className = "label";
+        p.innerText = label;
+        list.appendChild(p);
+
+        //     <span class="shadow">${label}</span>
+        const shadow = document.createElement("span");
+        shadow.className = "shadow";
+        shadow.innerText = label;
+        list.appendChild(shadow);
+
+        const container = document.createElement("div");
+
+        const listView = document.createElement("div");
+        listView.className = "listView";
+        listView.id = id+"listView";
+
+        const RenderListViewItems = () => {
+            listView.innerHTML = "";
+            for (const value of activeValues) {
+                const item = document.createElement("p");
+                item.innerText = value;
+                item.onclick = () => {
+                    activeValues = activeValues.filter(activeValue => value != activeValue);
+                    listView.removeChild(item);
+                    invoke(onchange, [ activeValues ]);
+                }
+                listView.appendChild(item);
+            }
+        }
+
+        RenderListViewItems();
+
+        container.appendChild(listView);
+
+        const listInput = document.createElement("div");
+        listInput.className = "listInput";
+
+        const inputField = document.createElement("input");
+        inputField.type = "text";
+        inputField.spellcheck = false;
+        inputField.autocapitalize = "false";
+        inputField.autocomplete = "off";
+        listInput.appendChild(inputField);
+
+        const add = document.createElement("button");
+        add.innerText = "add";
+        add.onclick = async () => {
+            const value = inputField.value;
+            const isValidItem = await invoke(validator, [ value ]);
+            if (isValidItem) {
+                const newValue = await invoke<string>(onchange, [ [ ...activeValues, value ] ]);
+                activeValues.push(newValue);
+                RenderListViewItems();
+                inputField.value = "";
+            }
+        }
+        listInput.appendChild(add);
+
+        container.appendChild(listInput);
+
+        list.appendChild(container);
+
+        element.appendChild(list);
+    }
+
+    export function updateList(id: string, activeValues: string[], validator: string, onchange: string): void {
+        const element = document.getElementById(id) as HTMLDivElement | null;
+        if (!element)
+            return noTarget(id);
+
+        const listView = document.getElementById(id + "listView") as HTMLDivElement;
+
+        listView.innerHTML = "";
+        for (const value of activeValues) {
+            const item = document.createElement("p");
+            item.innerText = value;
+            item.onclick = () => {
+                activeValues = activeValues.filter(activeValue => value != activeValue);
+                listView.removeChild(item);
+                invoke(onchange, [ activeValues ]);
+            }
+            listView.appendChild(item);
+        }
+    }
+
     export function createNotificationBox(title: string, description: string, typeId: number, parent: HTMLDivElement): HTMLDivElement {
         const notification = document.createElement("div");
         notification.className = "notification noselect";
@@ -489,7 +585,15 @@ function uiCreateInput(label: string, id: string, value: string, onchange: strin
     ui.createInput(label, id, value, onchange, target);
 }
 
-function createNotification(title: string, description: string, typeId: number) {
+function uiCreateList(label: string, id: string, activeValues: string[], validator: string, onchange: string, target: string): void {
+    ui.createList(label, id, activeValues, validator, onchange, target);
+}
+
+function uiUpdateList(id: string, activeValues: string[], validator: string, onchange: string): void {
+    ui.updateList(id, activeValues, validator, onchange);
+}
+
+function createNotification(title: string, description: string, typeId: number): void {
     const target = document.getElementById("notification_wrapper") as HTMLDivElement;
     const box = ui.createNotificationBox(title, description, typeId, target);
     target.appendChild(box);
@@ -505,6 +609,8 @@ async function main() {
     register(uiCreateDropDown);
     register(uiCreateSelector);
     register(uiCreateInput);
+    register(uiCreateList);
+    register(uiUpdateList);
 
     register(createNotification);
 
