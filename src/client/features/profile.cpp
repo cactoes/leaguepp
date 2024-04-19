@@ -18,6 +18,14 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* fra
 
     auto label = frame->AddLabel("disconnected", "left");
 
+    frame->AddCheckbox(
+        "auto update profile", "", false,
+        ui::checkbox_callback([frameworkApiHandle](bool a) {
+            frameworkApiHandle->CreateNotification("NOT IMPLEMENTED", "");
+            return a;
+        })
+    );
+
     frame->AddButton(
         "clear tokens",
         ui::button_callback([this, connectorManager, frameworkApiHandle]() {
@@ -83,6 +91,13 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* fra
 
         return configManager->TrackedSetVar(cfg, "profile::sMastery", mastery);
     }));
+
+    frame->AddButton(
+        "update profile",
+        ui::button_callback([frameworkApiHandle]() {
+            frameworkApiHandle->CreateNotification("NOT IMPLEMENTED", "");
+        })
+    );
 
     connectorManager->AddConnectHandler(
         client_connect([this, label, frameworkApiHandle]() {
