@@ -72,6 +72,38 @@ function createInfoBox(info: string) {
     return infoDiv;
 }
 
+function uiSetActiveTab(id: string) {
+    const tablist = document.getElementById("tablist")!.children;
+
+    for (let child of tablist)
+        child.className = child.id == id+"tabLabel" ? "active" : "";
+
+    const tabcontent = document.getElementById("tabcontent")!.children;
+    for (let child of tabcontent)
+        child.className = child.id == id ? "tab active" : "tab";
+}
+
+function uiCreateTab(label: string, isActive: boolean, id: string) {
+    const tablist = document.getElementById("tablist")!;
+    const tablistlabel = document.createElement("p");
+    tablistlabel.id = id+"tabLabel";
+    tablistlabel.innerText = label;
+    if (isActive)
+        tablistlabel.className = "active";
+    tablistlabel.onclick = () => {
+        uiSetActiveTab(id);
+    }
+    tablist.appendChild(tablistlabel)
+
+    const tabcontent = document.getElementById("tabcontent")!;
+    const tab = document.createElement("div");
+    tab.id = id;
+    tab.className = "tab";
+    if (isActive)
+        tab.className += " active";
+    tabcontent.appendChild(tab);
+}
+
 function uiCreateFrame(name: string, id: string, layout: string, target: string): void {
     const element = document.getElementById(target);
     if (!element)
@@ -621,6 +653,8 @@ function createNotification(title: string, description: string, typeId: number):
 }
 
 async function main() {
+    register(uiCreateTab);
+    register(uiSetActiveTab);
     register(uiCreateFrame);
     register(uiCreateButton);
     register(uiCreateLabel);

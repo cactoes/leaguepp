@@ -155,6 +155,7 @@ body {
     height: 100%;
     background-color: var(--background-primary);
     z-index: 0;
+    flex-direction: column;
 }
 
 /* =========================== */
@@ -257,6 +258,55 @@ body {
 
 .notification > .content > .contentDescription {
     color: var(--text-secondary);
+}
+
+/* =========================== */
+/* TAB STYLING */
+/* =========================== */
+
+#tablist {
+    margin-top: 6px;
+    display: flex;
+    width: calc(100% - 12px);
+    flex-direction: row;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+#tablist > p {
+    border: 1px solid var(--trim);
+    padding: 8px 32px;
+    margin-bottom: -7px;
+    z-index: 1;
+    background-color: var(--background-primary);
+    font-size: var(--font-size-default);
+    cursor: pointer;
+    transition: all .15s ease;
+}
+
+#tablist > p:hover {
+    filter: brightness(120%);
+    color: var(--accent);
+}
+
+#tablist > p.active {
+    border-bottom: 1px solid var(--background-primary);
+}
+
+#tabcontent {
+    width: 100%;
+    height: 100%;
+}
+
+#tabcontent > .tab {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+#tabcontent > .tab.active {
+    display: flex;
 }
 
 /* =========================== */
