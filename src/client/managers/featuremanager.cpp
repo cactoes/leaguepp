@@ -5,7 +5,8 @@
 #include "../features/profile.hpp"
 
 bool FeatureManager::Init(IUiFramework* frameworkApiHandle) {
-    auto frameMain = frameworkApiHandle->GetMainFrame();
+    auto settingsTab = frameworkApiHandle->AddTab("settings", true);
+    auto frameMain = settingsTab->GetFrame();
 
     auto autoPickerFrame = frameMain->AddFrame("auto picker", ui::FL_VERTICAL_AUTO);
 
@@ -16,6 +17,8 @@ bool FeatureManager::Init(IUiFramework* frameworkApiHandle) {
     CreateFeature<feature::LobbyControlls>(lobbyFrame, frameworkApiHandle);
     CreateFeature<feature::AutoPicker>(autoPickerFrame, frameworkApiHandle);
     CreateFeature<feature::Profile>(profileFrame, frameworkApiHandle);
+
+    frameworkApiHandle->AddTab("lobby");
 
     return true;
 }
