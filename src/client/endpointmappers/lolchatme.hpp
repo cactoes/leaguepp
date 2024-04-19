@@ -51,6 +51,11 @@ namespace lolchat {
     #endif
 
     struct Lol {
+        std::optional<std::string> bannerIdSelected;
+        std::optional<std::string> challengeCrystalLevel;
+        std::optional<std::string> challengePoints;
+        std::optional<std::string> challengeTitleSelected;
+        std::optional<std::string> challengeTokensSelected;
         std::optional<std::string> championId;
         std::optional<std::string> companionId;
         std::optional<std::string> damageSkinId;
@@ -106,6 +111,11 @@ namespace lolchat {
     void to_json(json & j, const Me & x);
 
     inline void from_json(const json & j, Lol& x) {
+        x.bannerIdSelected = get_stack_optional<std::string>(j, "bannerIdSelected");
+        x.challengeCrystalLevel = get_stack_optional<std::string>(j, "challengeCrystalLevel");
+        x.challengePoints = get_stack_optional<std::string>(j, "challengePoints");
+        x.challengeTitleSelected = get_stack_optional<std::string>(j, "challengeTitleSelected");
+        x.challengeTokensSelected = get_stack_optional<std::string>(j, "challengeTokensSelected");
         x.championId = get_stack_optional<std::string>(j, "championId");
         x.companionId = get_stack_optional<std::string>(j, "companionId");
         x.damageSkinId = get_stack_optional<std::string>(j, "damageSkinId");
@@ -132,6 +142,11 @@ namespace lolchat {
 
     inline void to_json(json & j, const Lol & x) {
         j = json::object();
+        j["bannerIdSelected"] = x.bannerIdSelected;
+        j["challengeCrystalLevel"] = x.challengeCrystalLevel;
+        j["challengePoints"] = x.challengePoints;
+        j["challengeTitleSelected"] = x.challengeTitleSelected;
+        j["challengeTokensSelected"] = x.challengeTokensSelected;
         j["championId"] = x.championId;
         j["companionId"] = x.companionId;
         j["damageSkinId"] = x.damageSkinId;
