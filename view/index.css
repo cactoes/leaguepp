@@ -275,6 +275,8 @@ body {
 
 #tablist > p {
     border: 1px solid var(--trim);
+    border-right: 1px solid var(--background-primary);
+
     padding: 8px 32px;
     margin-bottom: -7px;
     z-index: 1;
@@ -282,6 +284,10 @@ body {
     font-size: var(--font-size-default);
     cursor: pointer;
     transition: all .15s ease;
+}
+
+#tablist > p:last-child {
+    border-right: 1px solid var(--trim);
 }
 
 #tablist > p:hover {
