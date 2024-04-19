@@ -19,7 +19,8 @@ namespace browser {
 
 namespace ui {
     enum component_type {
-        CT_FRAME = 0,
+        CT_TAB = 0,
+        CT_FRAME,
         CT_BUTTON,
         CT_LABEL,
         CT_CHECKBOX,
