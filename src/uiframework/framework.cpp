@@ -1,6 +1,7 @@
 #include "framework_impl.hpp"
 
 #include "ui/frame.hpp"
+#include "ui/tab.hpp"
 
 std::unique_ptr<IUiFramework> CreateFrameworkApi() {
     return std::make_unique<UiFrameworkImpl>();
@@ -22,9 +23,6 @@ bool UiFrameworkImpl::Init() {
 
     m_browserHandle = browser::CreateBrowser(browserConfig, windowConfig);
     
-    m_main = std::make_shared<ui::FrameImpl>("", ui::FL_HORIZONTAL, m_browserHandle.get(), FRAME_TARGET_MAIN);
-    m_main->SetId("Main");
-
     m_browserHandle->RegisterFunction("GetMainLayout", CREATE_REGISTRATION_MEMBER(UiFrameworkImpl::GetMainLayout));
 
     return true; 
@@ -49,10 +47,17 @@ void UiFrameworkImpl::CreateNotification(const std::string& title, const std::st
     m_browserHandle->CallJSFunction("createNotification", { title, description, 0 });
 }
 
-std::shared_ptr<ui::Frame> UiFrameworkImpl::GetMainFrame() {
-    return m_main;
+std::vector<std::shared_ptr<ui::Tab>> UiFrameworkImpl::GetTabs() {
+    return m_tabs;
+}
+
+std::shared_ptr<ui::Tab> UiFrameworkImpl::AddTab(const std::string& label, bool isActive) {
+    auto tab = std::make_shared<ui::TabImpl>(label, isActive, m_browserHandle.get(), "");
+    m_tabs.push_back(tab);
+    return tab;
 }
 
 void UiFrameworkImpl::GetMainLayout(browser::Browser*, browser::js_args_t) {
-    m_main->Register();
+    for (auto& tab : m_tabs)
+        tab->Register();
 }

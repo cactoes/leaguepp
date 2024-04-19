@@ -5,6 +5,7 @@
 #include <string>
 
 #include "frame.hpp"
+#include "tab.hpp"
 
 #ifdef UIFRAMEWORK_EXPORTS
     #define UIFRAMEWORK_API __declspec(dllexport) [[nodiscard]]
@@ -24,7 +25,8 @@ public:
 
     virtual void CreateNotification(const std::string& title, const std::string& description) = 0;
 
-    virtual std::shared_ptr<ui::Frame> GetMainFrame() = 0;
+    virtual std::vector<std::shared_ptr<ui::Tab>> GetTabs() = 0;
+    virtual std::shared_ptr<ui::Tab> AddTab(const std::string& label, bool isActive = false) = 0;
 };
 
 UIFRAMEWORK_API std::unique_ptr<IUiFramework> CreateFrameworkApi();

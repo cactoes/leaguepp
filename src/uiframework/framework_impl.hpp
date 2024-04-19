@@ -3,6 +3,7 @@
 
 #include "include/framework.hpp"
 #include "browser/browser.hpp"
+#include "include/tab.hpp"
 
 class UiFrameworkImpl : public IUiFramework {
 public:
@@ -13,12 +14,13 @@ public:
 
     void CreateNotification(const std::string& title, const std::string& description) override;
 
-    std::shared_ptr<ui::Frame> GetMainFrame() override;
+    std::vector<std::shared_ptr<ui::Tab>> GetTabs() override;
+    std::shared_ptr<ui::Tab> AddTab(const std::string& label, bool isActive = false) override;
 
     void GetMainLayout(browser::Browser*, browser::js_args_t);
 
 private:
-    std::shared_ptr<ui::Frame> m_main;
+    std::vector<std::shared_ptr<ui::Tab>> m_tabs;
     std::shared_ptr<browser::Browser> m_browserHandle;
 };
 
