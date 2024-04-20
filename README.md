@@ -1,6 +1,20 @@
 ## league++
 a league client written in c++
 
+## features
+
+### auto picker
+automatically pick / ban a champion
+
+### profile customizer
+change your rank / mastery to whatever you want & clear token
+
+### auto accept
+automatically accept a match
+
+### dodge
+dodge the match without having to close the client
+
 ## view compiler
 a simple compiler for the frontend to get it to a usable format
 
