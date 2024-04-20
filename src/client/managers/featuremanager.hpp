@@ -12,7 +12,7 @@ public:
     bool Init(IUiFramework* frameworkApiHandle);
 
     template <typename Ty>
-    std::enable_if_t<std::is_base_of_v<feature::Feature, Ty>, void>
+    std::enable_if_t<std::is_base_of_v<feature::IFeature, Ty>, void>
     CreateFeature(std::shared_ptr<ui::Frame> parent, IUiFramework* frameworkApiHandle) {
         auto feature = std::make_unique<Ty>();
         feature->Setup(std::move(parent), frameworkApiHandle);
@@ -20,7 +20,7 @@ public:
     }
 
 private:
-    std::map<uint64_t, std::unique_ptr<feature::Feature>> m_features;
+    std::map<uint64_t, std::unique_ptr<feature::IFeature>> m_features;
 };
 
 #endif // __FEATUREMANAGER_HPP__

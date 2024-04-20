@@ -77,7 +77,7 @@ namespace feature {
         bool isInChampSelect = false;
     };
 
-    class AutoPicker : public Feature {
+    class AutoPicker : public IFeature {
     public:
         void Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* frameworkApiHandle) override;
         std::string GetName() override;

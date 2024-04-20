@@ -4,7 +4,7 @@
 #include "feature.hpp"
 
 namespace feature {
-    class LobbyControlls : public Feature {
+    class LobbyControlls : public IFeature {
     public:
         void Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* frameworkApiHandle) override;
         std::string GetName() override;

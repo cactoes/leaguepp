@@ -6,7 +6,7 @@
 #include <framework.hpp>
 
 namespace feature {
-    class Feature {
+    class IFeature {
     public:
         virtual void Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* frameworkApiHandle) = 0;
         virtual std::string GetName() = 0;

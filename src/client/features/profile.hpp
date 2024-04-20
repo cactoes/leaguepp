@@ -10,7 +10,7 @@ namespace lolchat {
 }; // namespace lolchat
 
 namespace feature {
-    class Profile : public Feature {
+    class Profile : public IFeature {
     public:
         void Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* frameworkApiHandle) override;
         std::string GetName() override;
