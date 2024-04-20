@@ -101,6 +101,7 @@ bool ConfigManager::Init() {
     cfg->AddTemplate<std::string>("profile::sTier");
     cfg->AddTemplate<std::string>("profile::sDivision");
     cfg->AddTemplate<std::string>("profile::sMastery");
+    cfg->AddTemplate<std::string>("profile::bAutoSet");
 
     cfg->AddTemplate<bool>("autoPicker::bEnabled");
     cfg->AddTemplate<int>("autoPicker::nMode");

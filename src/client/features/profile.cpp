@@ -20,8 +20,8 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* fra
 
     frame->AddCheckbox(
         "auto update profile", "", false,
-        ui::checkbox_callback([frameworkApiHandle](bool a) {
-            frameworkApiHandle->CreateNotification("NOT IMPLEMENTED", "");
+        ui::checkbox_callback([this, configManager, cfg](bool a) {
+            configManager->TrackedSetVar(cfg, "profile::bAutoSet", a);
             return a;
         })
     );
@@ -94,8 +94,29 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* fra
 
     frame->AddButton(
         "update profile",
-        ui::button_callback([frameworkApiHandle]() {
-            frameworkApiHandle->CreateNotification("NOT IMPLEMENTED", "");
+        ui::button_callback([this, cfg]() {
+            UpdateProfile([cfg](lolchat::Me& me) {
+                me.lol->rankedLeagueQueue = "RANKED_SOLO_5x5";
+                me.lol->rankedLeagueTier = cfg->GetVar<std::string>("profile::sTier");
+                me.lol->rankedLeagueDivision = cfg->GetVar<std::string>("profile::sDivision");
+                me.lol->masteryScore = cfg->GetVar<std::string>("profile::sMastery");
+                return true;
+            });
+        })
+    );
+
+    connectorManager->AddEventListener(
+        "/lol-chat/v1/me", client_callback([this, cfg](std::string, nlohmann::json) {
+            if (!cfg->GetVar<bool>("profile::bAutoSet"))
+                return;
+
+            UpdateProfile([cfg](lolchat::Me& me) {
+                me.lol->rankedLeagueQueue = "RANKED_SOLO_5x5";
+                me.lol->rankedLeagueTier = cfg->GetVar<std::string>("profile::sTier");
+                me.lol->rankedLeagueDivision = cfg->GetVar<std::string>("profile::sDivision");
+                me.lol->masteryScore = cfg->GetVar<std::string>("profile::sMastery");
+                return true;
+            });
         })
     );
 
