@@ -50,6 +50,46 @@ namespace colors {
 
 const noTarget = (target: string) => console.error(`Error: Failed to find target "${target}"`);
 
+namespace uiComponents {
+    export function createLabel(label: string) {
+        const p = document.createElement("p");
+        p.className = "label"
+        p.innerText = label;
+        return p;
+    }
+
+    export function createShadowLabel(label: string) {
+        const shadow = document.createElement("span");
+        shadow.className = "shadow";
+        shadow.innerText = label;
+        return shadow;
+    }
+
+    export function createFullLabel(label: string) {
+        return [ uiComponents.createLabel(label), uiComponents.createShadowLabel(label) ];
+    }
+
+    interface tag_props_t {
+        className?: string
+        innerText?: string
+        id?: string
+        onclick?: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null;
+        [key: string]: any
+    }
+
+    export function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, props: tag_props_t, childNodes?: HTMLElement[]): HTMLElementTagNameMap[K] {
+        const element = document.createElement(tagName);
+        for (const prop of Object.keys(props))
+            (element as any)[prop] = (props as any)[prop];
+
+        if (childNodes)
+            for (const child of childNodes)
+                element.appendChild(child);
+            
+        return element;
+    }
+}; // namespace uiComponents
+
 const debounce = (callback:any, wait:number) => {
     let timeoutId: any = null;
     return (...args: any) => {
@@ -61,15 +101,10 @@ const debounce = (callback:any, wait:number) => {
 }
 
 function createInfoBox(info: string) {
-    const infoDiv = document.createElement("div");
-    infoDiv.className = "infoDiv"
-    infoDiv.innerText = "?"
-
-    const infoBox = document.createElement("p");
-    infoBox.innerText = info;
-    infoDiv.appendChild(infoBox);
-
-    return infoDiv;
+    return uiComponents.createElement(
+        "div", { className: "infoDiv", innerText: "?" },
+        [ uiComponents.createElement("p", { innerText: info }) ]
+    );
 }
 
 function uiSetActiveTab(id: string) {
@@ -85,23 +120,19 @@ function uiSetActiveTab(id: string) {
 
 function uiCreateTab(label: string, isActive: boolean, id: string) {
     const tablist = document.getElementById("tablist")!;
-    const tablistlabel = document.createElement("p");
-    tablistlabel.id = id+"tabLabel";
-    tablistlabel.innerText = label;
-    if (isActive)
-        tablistlabel.className = "active";
-    tablistlabel.onclick = () => {
-        uiSetActiveTab(id);
-    }
-    tablist.appendChild(tablistlabel)
+    tablist.appendChild(uiComponents.createElement(
+        "p", {
+            id: id + "tabLabel",
+            innerText: label,
+            className: isActive ? "active" : "",
+            onclick: () => {
+                uiSetActiveTab(id);
+            }
+        }
+    ));
 
     const tabcontent = document.getElementById("tabcontent")!;
-    const tab = document.createElement("div");
-    tab.id = id;
-    tab.className = "tab";
-    if (isActive)
-        tab.className += " active";
-    tabcontent.appendChild(tab);
+    tabcontent.appendChild(uiComponents.createElement("div", { id, className: isActive ? "tab active" : "tab" }));
 }
 
 function uiCreateFrame(name: string, id: string, layout: string, target: string): void {
@@ -109,15 +140,10 @@ function uiCreateFrame(name: string, id: string, layout: string, target: string)
     if (!element)
         return noTarget(target);
 
-    const frame = document.createElement("div");
-    frame.id = id;
-    frame.className = "frame " + layout;
+    const frame = uiComponents.createElement("div", { id, className: "frame " + layout });
 
-    if (name.length != 0) {
-        const span = document.createElement("span");
-        span.innerText = name;
-        frame.appendChild(span);
-    }
+    if (name.length != 0)
+        frame.appendChild(uiComponents.createElement("span", { innerText: name }));
 
     element.appendChild(frame);
 }
@@ -127,16 +153,10 @@ function uiCreateButton(label: string, id: string, onclick: string, target: stri
     if (!element)
         return noTarget(target);
 
-    const button = document.createElement("div");
-    button.className = "button element noselect";
-    button.id = id;
-
-    const btn = document.createElement("button");
-    btn.innerText = label;
-    btn.onclick = () => { invoke(onclick, []); }
-    button.appendChild(btn);
-
-    element.appendChild(button);
+    element.appendChild(uiComponents.createElement(
+        "div", { id, className: "button element noselect" },
+        [ uiComponents.createElement("button", { innerText: label, onclick: () => { invoke(onclick, []); } }) ]
+    ));
 }
 
 function uiCreateLabel(text: string, pos: string, id: string, target: string): void {
@@ -144,21 +164,10 @@ function uiCreateLabel(text: string, pos: string, id: string, target: string): v
     if (!element)
         return noTarget(target);
 
-    const label = document.createElement("div");
-    label.className = "label element " + pos;
-    label.id = id;
-
-    const p = document.createElement("p");
-    p.className = "label";
-    p.innerText = text;
-    label.appendChild(p);
-    
-    const shadow = document.createElement("span");
-    shadow.className = "shadow";
-    shadow.innerText = text;
-    label.appendChild(shadow);
-
-    element.appendChild(label);
+    element.appendChild(uiComponents.createElement(
+        "div", { id, className: "label element " + pos },
+        [ ...uiComponents.createFullLabel(text) ]
+    ));
 }
 
 function uiUpdateLabel(text: string, id: string): void {
@@ -166,15 +175,7 @@ function uiUpdateLabel(text: string, id: string): void {
     if (!element)
         return noTarget(id);
 
-    const p = document.createElement("p");
-    p.className = "label";
-    p.innerText = text;
-
-    const shadow = document.createElement("span");
-    shadow.className = "shadow";
-    shadow.innerText = text;
-    
-    element.replaceChildren(p, shadow);
+    element.replaceChildren(...uiComponents.createFullLabel(text));
 }
 
 function uiCreateCheckBox(label: string, info: string, state: boolean, id: string, onclick: string, target: string): void {
@@ -182,29 +183,17 @@ function uiCreateCheckBox(label: string, info: string, state: boolean, id: strin
     if (!element)
         return noTarget(target);
 
-    const checkbox = document.createElement("div");
-    checkbox.className = "checkbox element";
-    checkbox.id = id;
-
-    const p = document.createElement("p");
-    p.className = "label"
-    p.innerText = label;
-    checkbox.appendChild(p);
+    const checkbox = uiComponents.createElement("div", { className: "checkbox element", id }, [ uiComponents.createLabel(label) ]);
 
     if (info != "")
         checkbox.appendChild(createInfoBox(info));
 
-    const lbl = document.createElement("label");
-    const input = document.createElement("input");
-    input.type = "checkbox";
-    input.checked = state;
-    input.onclick = () => {
-        invoke(onclick, [ input.checked ])
-    }
-    lbl.appendChild(input);
-    const span = document.createElement("span");
-    lbl.appendChild(span);
-    checkbox.appendChild(lbl);
+    const input = uiComponents.createElement("input", { type: "checkbox", checked: state, onclick: () => { invoke(onclick, [ input.checked ]) } });
+
+    checkbox.appendChild(uiComponents.createElement(
+        "label", {},
+        [ input,  uiComponents.createElement("span", {}) ]
+    ));
 
     element.appendChild(checkbox);
 }
@@ -214,84 +203,57 @@ function uiCreateSlider(label: string, info: string, id: string, onchange: strin
     if (!element)
         return noTarget(target);
 
-    const slider = document.createElement("div");
-    slider.className = "slider element";
-    slider.id = id;
-
-    //     <p class="label">${label}</p>
-    const p = document.createElement("p");
-    p.className = "label";
-    p.innerText = label;
-    slider.appendChild(p);
-
-    //     <span class="shadow">${label}</span>
-    const shadow = document.createElement("span");
-    shadow.className = "shadow";
-    shadow.innerText = label;
-    slider.appendChild(shadow);
+    const slider = uiComponents.createElement(
+        "div", {
+            id, className: "slider element"
+        },
+        [ ...uiComponents.createFullLabel(label) ]
+    );
 
     if (info != "")
         slider.appendChild(createInfoBox(info));
 
-    const div = document.createElement("div");
+    const mid = Math.round((min + max) / 2);
+    const span = uiComponents.createElement(
+        "span", {
+            id: id+"sliderTick",
+            className: "sliderTick",
+            innerText: `${mid}`,
+        }
+    );
+    span.style.left = `${(mid - min) / (max - min) * 100}%`
 
-    const sldr = document.createElement("input");
-    sldr.type = "range"
-    sldr.min = `${min}`;
-    sldr.max = `${max}`;
+    const doSliderEvents = debounce((newValue: number) => { invoke(onchange, [ newValue ]) }, 500);
+    const handleSliderUpdate = (newValue: number) => {
+        doSliderEvents(newValue);
+        
+        sldr.value = `${newValue}`;
 
-    const doSliderEvents = debounce((newValue: number) => {
-        invoke(onchange, [ newValue ])
-    }, 500);
-
-    const doSliderAnimation = (newValue: number) => {
-        const span = document.getElementById(id+"sliderTick") as HTMLSpanElement;
         span.innerText = `${newValue}`;
         span.style.left = `${(newValue - min) / (max - min) * 100}%`
     }
 
-    sldr.oninput = () => {
-        const newValue = parseInt(sldr.value);
-        doSliderEvents(newValue);
-        doSliderAnimation(newValue);
-    }
+    const sldr = uiComponents.createElement("input", { type: "range", min: `${min}`, max: `${max}`, oninput: () => { handleSliderUpdate(parseInt(sldr.value)); } });
 
-    div.appendChild(sldr);
-
-    //         <span class="decrement">-</span>
-    const decrement = document.createElement("span");
-    decrement.className = "decrement noselect";
-    decrement.innerText = "-";
-    decrement.onclick = () => {
-        const newValue = parseInt(sldr.value) - 1;
-        sldr.value = `${newValue}`;
-        doSliderEvents(parseInt(sldr.value));
-        doSliderAnimation(parseInt(sldr.value));
-    }
-    div.appendChild(decrement);
-
-    //         <span class="increment">+</span>
-    const increment = document.createElement("span");
-    increment.className = "increment noselect";
-    increment.innerText = "+";
-    increment.onclick = () => {
-        const newValue = parseInt(sldr.value) + 1;
-        sldr.value = `${newValue}`;
-        doSliderEvents(parseInt(sldr.value));
-        doSliderAnimation(parseInt(sldr.value));
-    }
-    div.appendChild(increment);
-
-    //         <span id=id+"sliderTick" class="sliderTick">${mid}</span>
-    const span = document.createElement("span");
-    span.id = id+"sliderTick";
-    span.className = "sliderTick";
-    const mid = Math.round((min + max) / 2);
-    span.innerText = `${mid}`;
-    span.style.left = `${(mid - min) / (max - min) * 100}%`
-    div.appendChild(span);
-
-    slider.appendChild(div);
+    slider.appendChild(uiComponents.createElement("div", {},
+        [
+            uiComponents.createElement(
+                "span", {
+                    innerText: "-",
+                    className: "decrement noselect",
+                    onclick: () => { handleSliderUpdate(parseInt(sldr.value) - 1); }
+                }
+            ),
+            uiComponents.createElement(
+                "span", {
+                    innerText: "+",
+                    className: "increment noselect",
+                    onclick: () => { handleSliderUpdate(parseInt(sldr.value) + 1); }
+                }
+            ),
+            sldr, span 
+        ]
+    ));
 
     element.appendChild(slider);
 }
@@ -302,37 +264,18 @@ function uiCreateDropDown(label: string, info: string, id: string, isMulti: bool
         return noTarget(target);
 
     // <div class="dropdown element" id=`${id}`>
-    const dropdown = document.createElement("div");
-    dropdown.className = "dropdown element"
-    dropdown.id = id;
-
-    //     <p class="label">${label}</p>
-    const p = document.createElement("p");
-    p.className = "label";
-    p.innerText = label;
-    dropdown.appendChild(p);
-
-    //     <span class="shadow">${label}</span>
-    const shadow = document.createElement("span");
-    shadow.className = "shadow";
-    shadow.innerText = label;
-    dropdown.appendChild(shadow);
+    const dropdown = uiComponents.createElement(
+        "div", {
+            id, className: "dropdown element"
+        },
+        [ ...uiComponents.createFullLabel(label) ]
+    );
 
     if (info != "")
         dropdown.appendChild(createInfoBox(info));
 
-    const dropDownDiv = document.createElement("div");
-    dropDownDiv.className = "wrapper"
-
-    const disabledInput = document.createElement("input");
-    disabledInput.type = "text";
-    disabledInput.id = id + "input";
-    disabledInput.disabled = true;
-    dropDownDiv.appendChild(disabledInput);
-
-    const dropdownContent = document.createElement("div");
-    dropdownContent.className = "content noselect";
-    dropdownContent.id = id + "content";
+    const disabledInput = uiComponents.createElement("input", { id: id + "input", type: "text", disabled: true });
+    const dropdownContent = uiComponents.createElement("div", { id: id + "content", className: "content noselect" });
 
     const updateInput = () => {
         const selectedItems: string[] = [];
@@ -341,7 +284,6 @@ function uiCreateDropDown(label: string, info: string, id: string, isMulti: bool
                 selectedItems.push(element.innerText);
 
         disabledInput.value = selectedItems.join(", ");
-
         return selectedItems;
     }
 
@@ -349,31 +291,28 @@ function uiCreateDropDown(label: string, info: string, id: string, isMulti: bool
 
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
-
-        const p = document.createElement("p");
-        p.innerText = item;
+        const p = uiComponents.createElement(
+            "p", {
+                innerText: item,
+                className: activeValues.includes(item) ? "selected" : "",
+                onclick: () => {
+                    if (!isMulti)
+                        for (const element of dropdownContent.children as HTMLCollectionOf<HTMLParagraphElement>)
+                            element.className = "";
+        
+                    p.className = p.className == "selected" ? "" : "selected";
+                    const selectedItems = updateInput();
+                    invoke(onchange, [ p.innerText, p.className == "selected", selectedItems ]);
+                }
+            }
+        );
         p.style.color = gradient[i];
-
-        if (activeValues.includes(item))
-            p.className = "selected";
-
-        p.onclick = () => {
-            if (!isMulti)
-                for (const element of dropdownContent.children as HTMLCollectionOf<HTMLParagraphElement>)
-                    element.className = "";
-
-            p.className = p.className == "selected" ? "" : "selected";
-            const selectedItems = updateInput();
-            invoke(onchange, [ p.innerText, p.className == "selected", selectedItems ]);
-        }
         dropdownContent.appendChild(p);
     }
 
     updateInput();
 
-    dropDownDiv.appendChild(dropdownContent);
-
-    dropdown.appendChild(dropDownDiv);
+    dropdown.appendChild(uiComponents.createElement("div", { className: "wrapper" }, [ disabledInput, dropdownContent ]));
  
     element.appendChild(dropdown);
 }
@@ -383,54 +322,41 @@ function uiCreateSelector(label: string, info: string, state: number, id: string
     if (!element)
         return noTarget(target);
 
-    const selector = document.createElement("div");
-    selector.className = "selector element"
-    selector.id = id;
-
-    //     <p class="label">${label}</p>
-    const p = document.createElement("p");
-    p.className = "label";
-    p.innerText = label;
-    selector.appendChild(p);
-
-    //     <span class="shadow">${label}</span>
-    const shadow = document.createElement("span");
-    shadow.className = "shadow";
-    shadow.innerText = label;
-    selector.appendChild(shadow);
+    const selector = uiComponents.createElement(
+        "div", {
+            id, className: "selector element"
+        },
+        [ ...uiComponents.createFullLabel(label) ]
+    );
 
     if (info != "")
         selector.appendChild(createInfoBox(info));
 
-    const selectorContent = document.createElement("div");
-    selectorContent.id = id + "content"
-    selectorContent.className = "content noselect"
+    const selectorContent = uiComponents.createElement("div", { id: id + "content", className: "content noselect" });
 
     const gradient = colors.generateGradient(items.length);
 
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
-
-        const p = document.createElement("p");
-        p.innerText = item;
-
+        const p = uiComponents.createElement(
+            "p", {
+                innerText: item,
+                className: i == state ? "selected" : "",
+                onclick: () => {
+                    if (p.className == "selected")
+                        return;
+        
+                    for (const element of document.getElementById(id + "content")!.children as HTMLCollectionOf<HTMLParagraphElement>)
+                        element.className = "";
+        
+                    p.className = "selected";
+                    
+                    // state that gets returned is ignored
+                    invoke(onchange, [ p.innerText ]);
+                }
+            }
+        );
         p.style.backgroundColor = gradient[i];
-
-        if (i == state)
-            p.className = "selected";
-
-        p.onclick = () => {
-            if (p.className == "selected")
-                return;
-
-            for (const element of document.getElementById(id + "content")!.children as HTMLCollectionOf<HTMLParagraphElement>)
-                element.className = "";
-
-            p.className = "selected";
-            
-            // state that gets returned is ignored
-            invoke(onchange, [ p.innerText ]);
-        }
         selectorContent.appendChild(p);
     }
 
@@ -444,37 +370,28 @@ function uiCreateInput(label: string, info: string, id: string, value: string, o
     if (!element)
         return noTarget(target);
 
-    const input = document.createElement("div");
-    input.className = "input element"
-    input.id = id;
-
-    //     <p class="label">${label}</p>
-    const p = document.createElement("p");
-    p.className = "label";
-    p.innerText = label;
-    input.appendChild(p);
-
-    //     <span class="shadow">${label}</span>
-    const shadow = document.createElement("span");
-    shadow.className = "shadow";
-    shadow.innerText = label;
-    input.appendChild(shadow);
+    const input = uiComponents.createElement(
+        "div", {
+            id, className: "input element"
+        },
+        [ ...uiComponents.createFullLabel(label) ]
+    );
 
     if (info != "")
         input.appendChild(createInfoBox(info));
 
-    const container = document.createElement("div");
+    const container = uiComponents.createElement("div", {});
 
-    const inputField = document.createElement("input");
-    inputField.type = "text";
-    inputField.value = value;
-    inputField.spellcheck = false;
-    inputField.autocapitalize = "false";
-    inputField.autocomplete = "off";
-
-    inputField.onblur = debounce(async () => {
-        inputField.value = await invoke(onchange, [ inputField.value ]);
-    }, 250)
+    const inputField = uiComponents.createElement(
+        "input", {
+            type: "text",
+            value: value,
+            spellcheck: false,
+            autocapitalize: "false",
+            autocomplete: "off",
+            onblur: debounce(async () => { inputField.value = await invoke(onchange, [ inputField.value ]); }, 250)
+        }
+    );
 
     container.appendChild(inputField);
 
@@ -488,41 +405,33 @@ function uiCreateList(label: string, info: string, id: string, activeValues: str
     if (!element)
         return noTarget(target);
 
-    const list = document.createElement("div");
-    list.className = "list element"
-    list.id = id;
-
-    //     <p class="label">${label}</p>
-    const p = document.createElement("p");
-    p.className = "label";
-    p.innerText = label;
-    list.appendChild(p);
-
-    //     <span class="shadow">${label}</span>
-    const shadow = document.createElement("span");
-    shadow.className = "shadow";
-    shadow.innerText = label;
-    list.appendChild(shadow);
+    const list = uiComponents.createElement(
+        "div", {
+            id, className: "list element"
+        },
+        [ ...uiComponents.createFullLabel(label) ]
+    );
 
     if (info != "")
         list.appendChild(createInfoBox(info));
 
-    const container = document.createElement("div");
+    const container = uiComponents.createElement("div", {});
 
-    const listView = document.createElement("div");
-    listView.className = "listView";
-    listView.id = id+"listView";
+    const listView = uiComponents.createElement("div", { id: id + "listView", className: "listView" });
 
     const RenderListViewItems = () => {
         listView.innerHTML = "";
         for (const value of activeValues) {
-            const item = document.createElement("p");
-            item.innerText = value;
-            item.onclick = () => {
-                activeValues = activeValues.filter(activeValue => value != activeValue);
-                listView.removeChild(item);
-                invoke(onchange, [ activeValues ]);
-            }
+            const item = uiComponents.createElement(
+                "p", {
+                    innerText: value,
+                    onclick: () => {
+                        activeValues = activeValues.filter(activeValue => value != activeValue);
+                        listView.removeChild(item);
+                        invoke(onchange, [ activeValues ]);
+                    }
+                }
+            );
             listView.appendChild(item);
         }
     }
@@ -531,36 +440,36 @@ function uiCreateList(label: string, info: string, id: string, activeValues: str
 
     container.appendChild(listView);
 
-    const listInput = document.createElement("div");
-    listInput.className = "listInput";
-
-    const inputField = document.createElement("input");
-    inputField.id = id + "inputFieldId"
-    inputField.type = "text";
-    inputField.spellcheck = false;
-    inputField.autocapitalize = "false";
-    inputField.autocomplete = "off";
-    listInput.appendChild(inputField);
-
-    const add = document.createElement("button");
-    add.innerText = "add";
-    add.id = id+"addListItem";
-    add.onclick = async () => {
-        const value = inputField.value;
-        const isValidItem = await invoke(validator, [ value ]);
-        if (isValidItem) {
-            const newValue = await invoke<string>(onchange, [ [ ...activeValues, value ] ]);
-            activeValues.push(newValue);
-            RenderListViewItems();
-            inputField.value = "";
+    const listInput = uiComponents.createElement("div", { className: "listInput" });
+    const inputField = uiComponents.createElement(
+        "input", {
+            id: id + "inputFieldId",
+            type: "text",
+            spellcheck: false,
+            autocapitalize: "false",
+            autocomplete: "off"
         }
-    }
-    listInput.appendChild(add);
+    );
+    listInput.appendChild(inputField);
+    listInput.appendChild(uiComponents.createElement(
+        "button", {
+            id: id + "addListItem",
+            innerText: "add",
+            onclick: async () => {
+                const value = inputField.value;
+                const isValidItem = await invoke(validator, [ value ]);
+                if (isValidItem) {
+                    const newValue = await invoke<string>(onchange, [ [ ...activeValues, value ] ]);
+                    activeValues.push(newValue);
+                    RenderListViewItems();
+                    inputField.value = "";
+                }
+            }
+        }
+    ));
 
     container.appendChild(listInput);
-
     list.appendChild(container);
-
     element.appendChild(list);
 }
 
@@ -574,13 +483,16 @@ function uiUpdateList(id: string, activeValues: string[], validator: string, onc
     const RenderListViewItems = () => {
         listView.innerHTML = "";
         for (const value of activeValues) {
-            const item = document.createElement("p");
-            item.innerText = value;
-            item.onclick = () => {
-                activeValues = activeValues.filter(activeValue => value != activeValue);
-                listView.removeChild(item);
-                invoke(onchange, [ activeValues ]);
-            }
+            const item = uiComponents.createElement(
+                "p", {
+                    innerText: value,
+                    onclick: () => {
+                        activeValues = activeValues.filter(activeValue => value != activeValue);
+                        listView.removeChild(item);
+                        invoke(onchange, [ activeValues ]);
+                    }
+                }
+            );
             listView.appendChild(item);
         }
     }
@@ -602,24 +514,6 @@ function uiUpdateList(id: string, activeValues: string[], validator: string, onc
 }
 
 function uiCreateNotificationBox(title: string, description: string, typeId: number, parent: HTMLDivElement): HTMLDivElement {
-    const notification = document.createElement("div");
-    notification.className = "notification noselect";
-
-    const content = document.createElement("div");
-    content.className = "content";
-
-    const contentTitle = document.createElement("p");
-    contentTitle.className = "contentTitle";
-    contentTitle.innerText = title;
-    content.appendChild(contentTitle);
-
-    const contentDescription = document.createElement("p");
-    contentDescription.className = "contentDescription";
-    contentDescription.innerText = description;
-    content.appendChild(contentDescription);
-
-    notification.appendChild(content);
-
     let isRemoving = false;
 
     const clearThisElement = () => {
@@ -633,15 +527,27 @@ function uiCreateNotificationBox(title: string, description: string, typeId: num
 
     let timeout = setTimeout(clearThisElement, 4700);
 
-    notification.onclick = () => {
-        clearTimeout(timeout);
-        clearThisElement();
-    }
-
-    const statusBar = document.createElement("div");
-    statusBar.className = "statusbar";
-    statusBar.appendChild(document.createElement("div"));
-    notification.appendChild(statusBar);
+    const notification = uiComponents.createElement(
+        "div", {
+            className: "notification noselect",
+            onclick: () => {
+                clearTimeout(timeout);
+                clearThisElement();
+            }
+        },
+        [
+            uiComponents.createElement(
+                "div", {
+                    className: "content"
+                },
+                [
+                    uiComponents.createElement("p", { className: "contentTitle", innerText: title }),
+                    uiComponents.createElement("p", { className: "contentDescription", innerText: description })
+                ]
+            ),
+            uiComponents.createElement("div", { className: "statusbar" }, [ uiComponents.createElement("div", {}) ])
+        ]
+    );
 
     return notification;
 }
