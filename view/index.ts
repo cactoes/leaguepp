@@ -441,6 +441,18 @@ function uiCreateList(label: string, info: string, id: string, activeValues: str
     container.appendChild(listView);
 
     const listInput = uiComponents.createElement("div", { className: "listInput" });
+    listInput.onkeydown = async (ev: KeyboardEvent) => {
+        if (ev.key == "Enter") {
+            const value = inputField.value;
+            const isValidItem = await invoke(validator, [ value ]);
+            if (isValidItem) {
+                const newValue = await invoke<string>(onchange, [ [ ...activeValues, value ] ]);
+                activeValues.push(newValue);
+                RenderListViewItems();
+                inputField.value = "";
+            }
+        }
+    }
     const inputField = uiComponents.createElement(
         "input", {
             id: id + "inputFieldId",
