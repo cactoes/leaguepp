@@ -19,7 +19,7 @@ void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* fra
     auto label = frame->AddLabel("disconnected", "left");
 
     frame->AddCheckbox(
-        "auto update profile", "", false,
+        "auto update profile", "", cfg->GetVar<bool>("profile::bAutoSet"),
         ui::checkbox_callback([this, configManager, cfg](bool a) {
             configManager->TrackedSetVar(cfg, "profile::bAutoSet", a);
             return a;
