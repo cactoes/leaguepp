@@ -79,3 +79,24 @@ if(MSVC)
 else()
     message(FATAL_ERROR "Unsupported compiler")
 endif()
+
+# ================
+# WiX
+# ================
+install(TARGETS ${PROJECT_NAME} DESTINATION .)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/build/Release/UIFramework.dll" DESTINATION .)
+install(FILES "LICENSE" DESTINATION .)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/Release/view" DESTINATION .)
+
+set(CPACK_GENERATOR "WIX")
+set(CPACK_PACKAGE_NAME "league++")
+set(CPACK_PACKAGE_VENDOR "NERV")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "league++ client")
+set(CPACK_PACKAGE_VERSION "1.0.0")
+set(CPACK_WIX_UPGRADE_GUID "F9857995-5C72-42AF-BC0F-641B565E5DB1")
+
+set(CPACK_WIX_LICENSE_RTF "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.rtf")
+set(CPACK_WIX_PRODUCT_ICON "${CMAKE_CURRENT_SOURCE_DIR}/disc_icon_2.ico")
+set(CPACK_PACKAGE_EXECUTABLES "${PROJECT_NAME}" "league++")
+
+include(CPack)
