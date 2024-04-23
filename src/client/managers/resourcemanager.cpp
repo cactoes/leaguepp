@@ -59,10 +59,7 @@ int ResourceManager::ChampionNameToId(const std::string& name) {
 }
 
 std::vector<std::string> ResourceManager::MapChampionIdsToNames(std::vector<int> ids) {
-    std::vector<std::string> mapped = {};
-    for (const auto& id : ids)
-        mapped.push_back(ChampionIdToName(id));
-    return mapped;
+    return ConvertAToB<std::string, int>(ids, [this](int id) { return ChampionIdToName(id); });
 }
 
 bool ResourceManager::GetLatestVersion(std::string& data) {

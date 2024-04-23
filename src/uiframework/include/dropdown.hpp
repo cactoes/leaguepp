@@ -3,6 +3,9 @@
 
 #include "component.hpp"
 
+#define MULTI true
+#define SINGLE false
+
 namespace ui {
     // std::vector<std::string> DropDownCallback(std::string item, bool newItemState, std::vector<std::string> list)
     typedef callback_holder<std::vector<std::string>, std::string, bool, std::vector<std::string>> dropdown_callback;

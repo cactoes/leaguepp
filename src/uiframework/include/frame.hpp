@@ -14,6 +14,8 @@
 
 #define FRAME_TARGET_MAIN "main"
 
+#define NO_HINT ""
+
 namespace ui {
     struct frame_layout {
         enum values {

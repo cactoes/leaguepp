@@ -7,6 +7,8 @@
 #include <vector>
 #include <hash.hpp>
 
+#include "../interface/holder.hpp"
+
 #define CONFIG_BASIC "cfg"
 
 template<typename Ty>
@@ -19,7 +21,7 @@ struct is_valid_type : std::disjunction<
     std::is_same<Ty, std::vector<float>>
 > {};
 
-template<typename Ty>
+template <typename Ty>
 constexpr bool is_valid_type_v = is_valid_type<Ty>::value;
 
 class ICvar {
@@ -46,8 +48,8 @@ public:
         return *this;
     }
 
-    Cvar<Ty>* operator->() {
-        return this;
+    Ty* operator->() {
+        return &m_value;
     }
 
     operator Ty() {
@@ -146,6 +148,28 @@ public:
 
 private:
     std::map<std::string, config_handle> m_configs = {};
+};
+
+template <typename Ty>
+class CVarHandle {
+public:
+    CVarHandle() = default;
+
+    CVarHandle(config_handle handle, const std::string& name)
+        : m_handle(handle), m_name(name) {}
+
+    Ty Get() {
+        return m_handle->GetVar<Ty>(m_name.c_str());
+    }
+
+    Ty Set(Ty value) {
+        return interface<ConfigManager>::Get()
+            ->TrackedSetVar(m_handle, m_name.c_str(), value);
+    }
+
+private:
+    std::string m_name;
+    config_handle m_handle;
 };
 
 #endif // __CONFIGMANAGER_HPP__

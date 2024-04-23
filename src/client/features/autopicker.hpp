@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "feature.hpp"
+#include "../managers/configmanager.hpp"
 
 namespace champselect {
     struct Session;
@@ -13,10 +14,6 @@ namespace champselect {
 namespace lobby {
     struct Lobby;
 }; // namespace lobby
-
-class Config;
-
-// ref madoka
 
 namespace feature {
     // https://static.developer.riotgames.com/docs/lol/queues.json
@@ -93,15 +90,28 @@ namespace feature {
         int GetNextPick(const std::vector<int>& list);
         bool DoAction(int actionId, int championId, bool commit);
 
+        bool OnSetEnabled(bool state);
+        bool OnSetEarlyDeclare(bool state);
+        int OnBotModeUpdate(std::string mode);
+        int OnBotStrictnessUpdate(std::string strictness);
+        std::vector<std::string> OnPrefferdLaneUpdate(std::string item, bool, std::vector<std::string> list);
+
     private:
         const std::vector<std::string> m_modes = { "manual", "semi", "auto" };
         const std::vector<std::string> m_strictnesses = { "none", "loose", "strict" };
-        const std::vector<std::string> m_lanes = { "top", "jungle", "middle", "bottom", "utility" };
+
+        struct {
+            CVarHandle<std::vector<int>> autoPickerActiveLanePicks;
+            CVarHandle<std::vector<int>> autoPickerActiveLaneBans;
+            CVarHandle<std::string> autoPickerPreferredLineBlind;
+            CVarHandle<bool> autoPickerEnabled;
+            CVarHandle<bool> autoPickerEarlyDeclare;
+            CVarHandle<int> autoPickerMode;
+            CVarHandle<int> autoPickerStrictness;
+        } m_cfg;
         
         lobby_info_t m_lobby_info = {};
-        std::shared_ptr<Config> m_config = nullptr;
         IUiFramework* m_frameworkApiHandle = nullptr;
-        std::string m_listTarget;
     };
 }; // namespace feature
 

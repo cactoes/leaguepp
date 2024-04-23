@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "feature.hpp"
+#include "../managers/configmanager.hpp"
 
 namespace lolchat {
     struct Me;
@@ -16,12 +17,24 @@ namespace feature {
         std::string GetName() override;
 
     private:
-        bool IsValidItem(const std::vector<std::string>& list, const std::string& value) const;
         bool UpdateProfile(std::function<bool(lolchat::Me& me)> setter);
 
+        std::vector<std::string> OnTierUpdate(std::string tier, bool, std::vector<std::string> list);
+        std::vector<std::string> OnDivisionUpdate(std::string division, bool, std::vector<std::string> list);
+        std::string OnMasteryScoreInput(std::string input);
+        void OnClickUpdateProfile();
+        bool OnSetAutoUpdateProfile(bool state);
+        void OnClickClearTokens();
+
     private:
-        const std::vector<std::string> m_divisions = { "I", "II", "III", "IV" };
-        const std::vector<std::string> m_tiers = { "iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger" };
+        struct {
+            CVarHandle<std::string> profileTier;
+            CVarHandle<std::string> profileDivision;
+            CVarHandle<std::string> profileMastery;
+            CVarHandle<bool> profileAutoSet;
+        } m_cfg;
+
+        IUiFramework* m_frameworkApiHandle;
     };
 }; // namespace feature
 

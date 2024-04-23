@@ -9,140 +9,64 @@
 #include "../endpointmappers/summaryplayerdata.hpp"
 #include "../endpointmappers/lolchatme.hpp"
 
+#include "../clientinterfacer.hpp"
+
 #undef interface
 
 void feature::Profile::Setup(std::shared_ptr<ui::Frame> frame, IUiFramework* frameworkApiHandle) {
+    m_frameworkApiHandle = frameworkApiHandle;
+
+    auto cfg = interface<ConfigManager>::Get()->Get(CONFIG_BASIC);
+    m_cfg.profileTier = CVarHandle<std::string>(cfg, "profile::sTier");
+    m_cfg.profileDivision = CVarHandle<std::string>(cfg, "profile::sDivision");
+    m_cfg.profileMastery = CVarHandle<std::string>(cfg, "profile::sMastery");
+    m_cfg.profileAutoSet = CVarHandle<bool>(cfg, "profile::bAutoSet");
+
+    frame->AddCheckbox("auto update profile", NO_HINT, m_cfg.profileAutoSet.Get(),
+        ui::checkbox_callback(&Profile::OnSetAutoUpdateProfile, this));
+
+    frame->AddDropdown("tier", NO_HINT, SINGLE, std::vector<std::string>{ m_cfg.profileTier.Get() }, clientinterfacer::tiers,
+        ui::dropdown_callback(&Profile::OnTierUpdate, this));
+
+    frame->AddDropdown("division", NO_HINT, SINGLE, std::vector<std::string>{ m_cfg.profileDivision.Get() }, clientinterfacer::divisions,
+        ui::dropdown_callback(&Profile::OnDivisionUpdate, this));
+
+    frame->AddInput("mastery score", NO_HINT, m_cfg.profileMastery.Get(),
+        ui::input_callback(&Profile::OnMasteryScoreInput, this));
+
+    frame->AddButton("update profile", ui::button_callback(&Profile::OnClickUpdateProfile, this));
+
+    frame->AddButton("clear tokens", ui::button_callback(&Profile::OnClickClearTokens, this));
+
+    // auto label = frame->AddLabel("disconnected", "left");
+
     auto connectorManager = interface<ConnectorManager>::Get();
-    auto configManager = interface<ConfigManager>::Get();
-    auto cfg = configManager->Get(CONFIG_BASIC);
 
-    auto label = frame->AddLabel("disconnected", "left");
-
-    frame->AddCheckbox(
-        "auto update profile", "", cfg->GetVar<bool>("profile::bAutoSet"),
-        ui::checkbox_callback([this, configManager, cfg](bool a) {
-            configManager->TrackedSetVar(cfg, "profile::bAutoSet", a);
-            return a;
+    connectorManager->AddEventListener("/lol-chat/v1/me",
+        client_callback([this](std::string, nlohmann::json) {
+            // qq
+            if (m_cfg.profileAutoSet.Get())
+                OnClickUpdateProfile();
         })
     );
 
-    frame->AddButton(
-        "clear tokens",
-        ui::button_callback([this, connectorManager, frameworkApiHandle]() {
-            auto playerDataResult = connectorManager->MakeRequest(connector::request_type::GET, "/lol-challenges/v1/summary-player-data/local-player");
+    // connectorManager->AddConnectHandler(
+    //     client_connect([this, label, frameworkApiHandle]() {
+    //         label->SetText("connected");
+    //         frameworkApiHandle->CreateNotification("connected", "the client has connected to league");
+    //     })
+    // );
 
-            if (playerDataResult.status == 200) {
-                auto data = playerDataResult.data.get<challenges::SummaryPlayerData>();
-
-                const auto& bannerId = data.bannerId.value();
-                const auto& titleId = data.title->itemId.value();
-
-                auto result = connectorManager->MakeRequest(connector::request_type::POST, "/lol-challenges/v1/update-player-preferences",
-                    "{\"bannerAccent\":\"" + bannerId + "\",\"challengeIds\":[],\"title\":\"" + std::to_string(titleId) + "\"}");
-
-                if (result.status == 204) {
-                    frameworkApiHandle->CreateNotification("cleared", "the tokens have been cleared");
-                    return;
-                }
-            }
-
-            frameworkApiHandle->CreateNotification("failed to clear", "the tokens could no be cleared");
-        })
-    );
-
-    frame->AddDropdown(
-        "tier", "", false, std::vector<std::string>{ cfg->GetVar<std::string>("profile::sTier") }, m_tiers,
-        ui::dropdown_callback([this, configManager, cfg](std::string tier, bool, std::vector<std::string> list) {
-            UpdateProfile([tier, configManager, cfg](lolchat::Me& me) {
-                // RANKED_FLEX_SR
-                me.lol->rankedLeagueQueue = "RANKED_SOLO_5x5";
-                me.lol->rankedLeagueTier = tier;
-                return true;
-            });
-
-            configManager->TrackedSetVar(cfg, "profile::sTier", tier);
-            return list;
-        })
-    );
-
-    frame->AddDropdown(
-        "division", "", false, std::vector<std::string>{ cfg->GetVar<std::string>("profile::sDivision") }, m_divisions,
-        ui::dropdown_callback([this, configManager, cfg](std::string division, bool, std::vector<std::string> list) {
-            UpdateProfile([division, configManager, cfg](lolchat::Me& me) {
-                me.lol->rankedLeagueDivision = division;
-                return true;
-            });
-
-            configManager->TrackedSetVar(cfg, "profile::sDivision", division);
-            return list;
-        })
-    );
-
-    frame->AddInput("mastery score", "", cfg->GetVar<std::string>("profile::sMastery"), ui::input_callback([this, configManager, cfg](std::string input) {
-        uint64_t masteryScore = 0;
-        ParseNumber(input, masteryScore);
-
-        auto mastery = std::to_string(masteryScore);
-
-        UpdateProfile([mastery](lolchat::Me& me) {
-            me.lol->masteryScore = mastery;
-            return true;
-        });
-
-        return configManager->TrackedSetVar(cfg, "profile::sMastery", mastery);
-    }));
-
-    frame->AddButton(
-        "update profile",
-        ui::button_callback([this, cfg]() {
-            UpdateProfile([cfg](lolchat::Me& me) {
-                me.lol->rankedLeagueQueue = "RANKED_SOLO_5x5";
-                me.lol->rankedLeagueTier = cfg->GetVar<std::string>("profile::sTier");
-                me.lol->rankedLeagueDivision = cfg->GetVar<std::string>("profile::sDivision");
-                me.lol->masteryScore = cfg->GetVar<std::string>("profile::sMastery");
-                return true;
-            });
-        })
-    );
-
-    connectorManager->AddEventListener(
-        "/lol-chat/v1/me", client_callback([this, cfg](std::string, nlohmann::json) {
-            if (!cfg->GetVar<bool>("profile::bAutoSet"))
-                return;
-
-            UpdateProfile([cfg](lolchat::Me& me) {
-                me.lol->rankedLeagueQueue = "RANKED_SOLO_5x5";
-                me.lol->rankedLeagueTier = cfg->GetVar<std::string>("profile::sTier");
-                me.lol->rankedLeagueDivision = cfg->GetVar<std::string>("profile::sDivision");
-                me.lol->masteryScore = cfg->GetVar<std::string>("profile::sMastery");
-                return true;
-            });
-        })
-    );
-
-    connectorManager->AddConnectHandler(
-        client_connect([this, label, frameworkApiHandle]() {
-            label->SetText("connected");
-            frameworkApiHandle->CreateNotification("connected", "the client has connected to league");
-        })
-    );
-
-    connectorManager->AddDisconnectHandler(
-        client_disconnect([this, label, frameworkApiHandle]() {
-            label->SetText("disconnected");
-            frameworkApiHandle->CreateNotification("disconnected", "the client has disconnected from league");
-        })
-    );
+    // connectorManager->AddDisconnectHandler(
+    //     client_disconnect([this, label, frameworkApiHandle]() {
+    //         label->SetText("disconnected");
+    //         frameworkApiHandle->CreateNotification("disconnected", "the client has disconnected from league");
+    //     })
+    // );
 }
 
 std::string feature::Profile::GetName() {
     return "profile";
-}
-
-bool feature::Profile::IsValidItem(const std::vector<std::string>& list, const std::string& value) const {
-    return std::ranges::any_of(list, [&](const auto& m_value) {
-        return m_value == value;
-    });
 }
 
 bool feature::Profile::UpdateProfile(std::function<bool(lolchat::Me& me)> setter) {
@@ -160,4 +84,71 @@ bool feature::Profile::UpdateProfile(std::function<bool(lolchat::Me& me)> setter
 
     auto updateResult = connectorManager->MakeRequest(connector::request_type::PUT, "/lol-chat/v1/me", nlohmann::json(data).dump());
     return updateResult.status == 201;
+}
+
+std::vector<std::string> feature::Profile::OnTierUpdate(std::string tier, bool, std::vector<std::string> list) {
+    UpdateProfile([tier](lolchat::Me& me) {
+        me.lol->rankedLeagueQueue = clientinterfacer::queues::rankedSolo;
+        me.lol->rankedLeagueTier = tier;
+        return true;
+    });
+
+    m_cfg.profileTier.Set(tier);
+    return list;
+}
+std::vector<std::string> feature::Profile::OnDivisionUpdate(std::string division, bool, std::vector<std::string> list) {
+    UpdateProfile([division](lolchat::Me& me) {
+        me.lol->rankedLeagueQueue = clientinterfacer::queues::rankedSolo;
+        me.lol->rankedLeagueDivision = division;
+        return true;
+    });
+
+    m_cfg.profileDivision.Set(division);
+    return list;
+}
+
+std::string feature::Profile::OnMasteryScoreInput(std::string input) {
+    uint64_t masteryScore = 0;
+    ParseNumber(input, masteryScore);
+
+    auto mastery = std::to_string(masteryScore);
+
+    UpdateProfile([mastery](lolchat::Me& me) {
+        me.lol->masteryScore = mastery;
+        return true;
+    });
+
+    return m_cfg.profileMastery.Set(mastery);
+}
+
+void feature::Profile::OnClickUpdateProfile() {
+    auto result = UpdateProfile([this](lolchat::Me& me) {
+        me.lol->rankedLeagueQueue = clientinterfacer::queues::rankedSolo;
+        me.lol->rankedLeagueTier = m_cfg.profileTier.Get();
+        me.lol->rankedLeagueDivision = m_cfg.profileDivision.Get();
+        me.lol->masteryScore = m_cfg.profileMastery.Get();
+        return true;
+    });
+
+    if (!result)
+        m_frameworkApiHandle->CreateNotification("failed to update", "the profile could not be updated");
+}
+
+bool feature::Profile::OnSetAutoUpdateProfile(bool state) {
+    return m_cfg.profileAutoSet.Set(state);
+}
+
+void feature::Profile::OnClickClearTokens() {
+    auto playerData = CIGetRequest<challenges::SummaryPlayerData>("/lol-challenges/v1/summary-player-data/local-player");
+    if (playerData.has_value()) {
+        const auto& bannerId = playerData->bannerId.value();
+        const auto& titleId = playerData->title->itemId.value();
+
+        if (CIPostRequest("/lol-challenges/v1/update-player-preferences", "{\"bannerAccent\":\"" + bannerId + "\",\"challengeIds\":[],\"title\":\"" + std::to_string(titleId) + "\"}")) {
+            m_frameworkApiHandle->CreateNotification("cleared", "the tokens have been cleared");
+            return;
+        }
+    }
+
+    m_frameworkApiHandle->CreateNotification("failed to clear", "the tokens could no be cleared");
 }
