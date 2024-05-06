@@ -18,10 +18,12 @@ namespace ui {
         void Register() override;
 
         void SetText(const std::string& text) override;
+        void SetColor(const std::string& hex) override;
 
     private:
         std::string m_text;
         std::string m_pos;
+        std::string m_color;
     };
 }; // namespace ui
 

@@ -30,6 +30,7 @@ void ProxyManager::Shutdown() {
 
 void ProxyManager::UpdateLabel(bool state) {
     m_label->SetText(state ? "currently spoofing state" : "inactive");
+    m_label->SetColor(state ? "9ecf8f" : "d17b7b");
 }
 
 void ProxyManager::SetupUi(IUiFramework* frameworkApiHandle) {

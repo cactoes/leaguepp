@@ -170,12 +170,17 @@ function uiCreateLabel(text: string, pos: string, id: string, target: string): v
     ));
 }
 
-function uiUpdateLabel(text: string, id: string): void {
+function uiUpdateLabel(text: string, color: string, id: string): void {
     const element = document.getElementById(id) as HTMLDivElement | null;
     if (!element)
         return noTarget(id);
 
-    element.replaceChildren(...uiComponents.createFullLabel(text));
+    const labels = uiComponents.createFullLabel(text);
+    
+    if (color.length != 0)
+        labels[0].style.color = `#${color}`;
+
+    element.replaceChildren(...labels);
 }
 
 function uiCreateCheckBox(label: string, info: string, state: boolean, id: string, onclick: string, target: string): void {

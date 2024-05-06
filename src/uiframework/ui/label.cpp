@@ -9,10 +9,15 @@ void ui::LabelImpl::Register() {
 }
 
 void ui::LabelImpl::Update() {
-    m_handle->CallJSFunction("uiUpdateLabel", { m_text, GetId() });
+    m_handle->CallJSFunction("uiUpdateLabel", { m_text, m_color, GetId() });
 }
 
 void ui::LabelImpl::SetText(const std::string& text) {
     m_text = text;
+    Update();
+}
+
+void ui::LabelImpl::SetColor(const std::string& hex) {
+    m_color = hex;
     Update();
 }

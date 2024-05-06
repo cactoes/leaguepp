@@ -9,6 +9,7 @@ namespace ui {
         virtual ~Label() = default;
 
         virtual void SetText(const std::string& text) = 0;
+        virtual void SetColor(const std::string& hex) = 0;
     };
 }; // namespace ui
 
