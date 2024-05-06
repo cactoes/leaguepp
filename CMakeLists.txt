@@ -14,7 +14,21 @@ target_link_libraries(${PROJECT_NAME} PRIVATE UIFramework)
 target_include_directories(${PROJECT_NAME} PRIVATE src/uiframework/include)
 target_include_directories(${PROJECT_NAME} PRIVATE src/shared)
 target_include_directories(${PROJECT_NAME} PRIVATE "lib/leaguepp-connector/lib/cpp-httplib")
+target_include_directories(${PROJECT_NAME} PRIVATE "lib/leaguepp-connector/lib/websocketpp")
 target_include_directories(${PROJECT_NAME} PRIVATE "lib/leaguepp-connector/lib/json/single_include")
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    "$<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/src/chatproxy/target/debug/ChatProxyClient.dll.lib>"
+    "$<$<CONFIG:Release>:${CMAKE_CURRENT_SOURCE_DIR}/src/chatproxy/target/release/ChatProxyClient.dll.lib>"
+)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/src/chatproxy/target/debug/ChatProxyClient.dll>"
+        "$<$<CONFIG:Release>:${CMAKE_CURRENT_SOURCE_DIR}/src/chatproxy/target/release/ChatProxyClient.dll>"
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>
+)
+
+add_custom_target(CopyDLLs ALL DEPENDS ${PROJECT_NAME})
 
 # ================
 # uiframework
@@ -85,6 +99,7 @@ endif()
 # ================
 install(TARGETS ${PROJECT_NAME} DESTINATION .)
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/build/Release/UIFramework.dll" DESTINATION .)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/build/Release/ChatProxyClient.dll" DESTINATION .)
 install(FILES "LICENSE" DESTINATION .)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/Release/view" DESTINATION .)
 

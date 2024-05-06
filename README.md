@@ -29,9 +29,16 @@ The build process has 2 steps
 * HTML/CSS/JS (the frontend)
 
 ### how to build
-build the C++ first in either Debug / Release. this will create the base files for the 2nd step
+1. first build the rust project
+```bash
+# (powershell)
+$ cd src/chatproxy
+$ cargo build; cargo build --release
+```
 
-after that run the view compiler with the same config.
+2. build the C++ project using CMake. (this will create the base files for the view compiler)
+
+3. run the view compiler with the same config.
 
 ## cloc
 ```bash
