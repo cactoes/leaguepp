@@ -15,12 +15,15 @@ public:
     bool Init(IUiFramework* frameworkApiHandle);
     void Shutdown();
 
+    void UpdateLabel(bool state);
+
 private:
-    void SetupUi(std::shared_ptr<ui::Frame> frame);
+    void SetupUi(IUiFramework* frameworkApiHandle);
 
 private:
     std::unique_ptr<proxy::ConfigProxy> m_configProxy = nullptr;
     std::unique_ptr<proxy::ChatProxy> m_chatProxy = nullptr;
+    std::shared_ptr<ui::Label> m_label = nullptr;
 };
 
 #endif // __PROXYMANAGER_HPP__
