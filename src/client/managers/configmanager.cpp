@@ -96,6 +96,9 @@ Config::data_t Config::Data() {
 
 bool ConfigManager::Init() {
     auto cfg = Create(CONFIG_BASIC);
+
+    cfg->AddTemplate<bool>("proxy::appearOffline");
+
     cfg->AddTemplate<bool>("lobby::bAutoAccept");
     cfg->AddTemplate<bool>("lobby::bAutoDodge");
     cfg->AddTemplate<std::vector<int>>("lobby::autoDodgeLanes");
