@@ -1,6 +1,9 @@
 #ifndef __CLIENTINTERFACER_HPP__
 #define __CLIENTINTERFACER_HPP__
 
+#pragma warning(push)
+#pragma warning(disable:4505)
+
 #include <string>
 #include <utils.hpp>
 
@@ -60,5 +63,7 @@ namespace clientinterfacer {
         return result.status == 200;
     }
 }; // namespace clientinterfacer
+
+#pragma warning(pop)
 
 #endif // __CLIENTINTERFACER_HPP__
