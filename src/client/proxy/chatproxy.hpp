@@ -12,6 +12,8 @@ namespace proxy {
         void Stop();
         void SetProxyState(bool useProxy);
 
+        static void OnCallback(bool state);
+
     private:
         bool m_useProxy;
         int m_chatPort;
