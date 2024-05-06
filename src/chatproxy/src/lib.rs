@@ -12,7 +12,7 @@ static USE_PROXY: AtomicBool = AtomicBool::new(true);
 const PFX_FILE_DATA: &[u8] = include_bytes!("../server.pfx");
 
 #[no_mangle]
-extern "system" fn ChatProxyStartServer(remote: *const u8, remotePort: u32, localPort: u32) -> bool {
+extern "system" fn ChatProxyStartServer(remote: *const u8, remotePort: u32, localPort: u32, fp: extern "C" fn(bool)) -> bool {
     if KEEP_ALIVE.load(Ordering::Relaxed) { 
         return false;
     }
@@ -34,7 +34,8 @@ extern "system" fn ChatProxyStartServer(remote: *const u8, remotePort: u32, loca
             async_std::task::spawn(async move {
                 let mut client_stream = acceptor.accept(stream).await.unwrap();
                 let mut target_stream = create_connection(remote_string, remotePort).await;
-                handle_client(&mut client_stream, &mut target_stream).await.unwrap();
+                handle_client(&mut client_stream, &mut target_stream, fp).await.unwrap();
+                fp(false);
             });
         }
     });
@@ -65,7 +66,7 @@ async fn create_connection(url: &str, port: u32) -> TlsStream<TcpStream> {
         .unwrap();
 }
 
-async fn handle_client(client_stream: &mut TlsStream<TcpStream>, target_stream: &mut TlsStream<TcpStream>) -> async_std::io::Result<()> {
+async fn handle_client(client_stream: &mut TlsStream<TcpStream>, target_stream: &mut TlsStream<TcpStream>, fp: extern "C" fn(bool)) -> async_std::io::Result<()> {
     let mut client_buffer = [0; 1024 * 8];
     let mut target_buffer = [0; 1024 * 8];
     
@@ -82,6 +83,8 @@ async fn handle_client(client_stream: &mut TlsStream<TcpStream>, target_stream: 
             futures::future::Either::Left((Ok(bytes_read), _)) => {
                 let data = &client_buffer[..bytes_read];
 
+                fp(USE_PROXY.load(Ordering::Relaxed));
+                
                 if USE_PROXY.load(Ordering::Relaxed) {
                     let data_string = String::from_utf8_lossy(data);
                     let data_string = data_string.replace("chat", "offline");
