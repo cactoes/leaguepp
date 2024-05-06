@@ -73,10 +73,8 @@ namespace data {
 
     enum class Tag : int { ASSASSIN, FIGHTER, MAGE, MARKSMAN, SUPPORT, TANK };
 
-    enum class Version : int { THE_1481 };
-
     struct Datum {
-        std::optional<Version> version;
+        std::optional<std::string> version;
         std::optional<std::string> id;
         std::optional<std::string> key;
         std::optional<std::string> name;
@@ -92,7 +90,7 @@ namespace data {
     struct Champion {
         std::optional<Type> type;
         std::optional<std::string> format;
-        std::optional<Version> version;
+        std::optional<std::string> version;
         std::optional<std::map<std::string, Datum>> data;
     };
 }
@@ -118,9 +116,6 @@ namespace data {
 
     void from_json(const json & j, Tag & x);
     void to_json(json & j, const Tag & x);
-
-    void from_json(const json & j, Version & x);
-    void to_json(json & j, const Version & x);
 
     inline void from_json(const json & j, Image& x) {
         x.full = get_stack_optional<std::string>(j, "full");
@@ -159,7 +154,7 @@ namespace data {
     }
 
     inline void from_json(const json & j, Datum& x) {
-        x.version = get_stack_optional<Version>(j, "version");
+        x.version = get_stack_optional<std::string>(j, "version");
         x.id = get_stack_optional<std::string>(j, "id");
         x.key = get_stack_optional<std::string>(j, "key");
         x.name = get_stack_optional<std::string>(j, "name");
@@ -190,7 +185,7 @@ namespace data {
     inline void from_json(const json & j, Champion& x) {
         x.type = get_stack_optional<Type>(j, "type");
         x.format = get_stack_optional<std::string>(j, "format");
-        x.version = get_stack_optional<Version>(j, "version");
+        x.version = get_stack_optional<std::string>(j, "version");
         x.data = get_stack_optional<std::map<std::string, Datum>>(j, "data");
     }
 
@@ -254,18 +249,6 @@ namespace data {
             case Tag::MARKSMAN: j = "Marksman"; break;
             case Tag::SUPPORT: j = "Support"; break;
             case Tag::TANK: j = "Tank"; break;
-            default: throw std::runtime_error("This should not happen");
-        }
-    }
-
-    inline void from_json(const json & j, Version & x) {
-        if (j == "14.8.1") x = Version::THE_1481;
-        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
-    }
-
-    inline void to_json(json & j, const Version & x) {
-        switch (x) {
-            case Version::THE_1481: j = "14.8.1"; break;
             default: throw std::runtime_error("This should not happen");
         }
     }
