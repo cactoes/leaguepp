@@ -18,7 +18,7 @@ bool FeatureManager::Init(IUiFramework* frameworkApiHandle) {
     CreateFeature<feature::AutoPicker>(autoPickerFrame, frameworkApiHandle);
     CreateFeature<feature::Profile>(profileFrame, frameworkApiHandle);
 
-    frameworkApiHandle->AddTab("lobby");
+    // frameworkApiHandle->AddTab("lobby");
 
     return true;
 }
