@@ -77,7 +77,7 @@ void ProxyManager::SetupUi(IUiFramework* frameworkApiHandle) {
             HINSTANCE instance = ShellExecuteA(
                 NULL, "open",
                 (path + "\\\\RiotClientServices.exe").c_str(),
-                ("--client-config-url=\"" + std::to_string(PROXY_PORT_CONFIG) + "\" --launch-product=league_of_legends --launch-patchline=live").c_str(),
+                ("--client-config-url=\"http://127.0.0.1:" + std::to_string(PROXY_PORT_CONFIG) + "\" --launch-product=league_of_legends --launch-patchline=live").c_str(),
                 NULL, SW_SHOWDEFAULT
             );
 
