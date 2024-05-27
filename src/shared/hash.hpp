@@ -1,13 +1,10 @@
 #ifndef __HASH_HPP__
 #define __HASH_HPP__
 
-#pragma warning(push)
-#pragma warning(disable:4505)
-
 #include <stdint.h>
 
 namespace hash {
-    static uint64_t Fnv1a64HashUnsafe(const char* str, uint64_t hash = 14695981039346656037ULL)  {
+    inline uint64_t Fnv1a64HashUnsafe(const char* str, uint64_t hash = 14695981039346656037ULL)  {
         while (*str != '\0') {
             hash ^= static_cast<uint64_t>(*str);
             hash *= 1099511628211ULL;
@@ -16,7 +13,7 @@ namespace hash {
         return hash;
     }
 
-    static uint64_t Fnv1a64Hash(const char* str, uint64_t hash = 14695981039346656037ULL) {
+    inline uint64_t Fnv1a64Hash(const char* str, uint64_t hash = 14695981039346656037ULL) {
         int i = 0;
         while (str[i] != '\0') {
             hash ^= static_cast<uint64_t>(str[i]);
@@ -36,7 +33,5 @@ namespace hash {
             HashString64Const(str + 1, (hash << 1) + static_cast<uint64_t>(*str));
     }
 }; // namespace hash
-
-#pragma warning(pop)
 
 #endif // __HASH_HPP__

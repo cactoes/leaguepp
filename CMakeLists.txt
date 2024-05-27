@@ -48,15 +48,6 @@ target_include_directories(UIFramework PRIVATE ${WEBVIEW_LIBRARY}/WIL/include/)
 target_link_libraries(UIFramework PRIVATE ${WEBVIEW_LIBRARY}/WebView2/x64/WebView2LoaderStatic.lib)
 target_link_libraries(UIFramework PRIVATE Version.lib)
 target_link_libraries(UIFramework PRIVATE windowsapp.lib)
-# if (NOT WEB_VIEW_STATIC)
-#     set(WEBVIEW_DLL ${WINDOWS_EXTERNAL}/WebView2/x64/WebView2Loader.dll.lib)
-#     set(WEBVIEW_DLL ${WINDOWS_EXTERNAL}/WebView2/x64/WebView2Loader.dll)
-#     add_custom_command(
-#         TARGET ${PROJECT_NAME} POST_BUILD
-#         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${WEBVIEW_DLL} $<TARGET_FILE_DIR:${PROJECT_NAME}>
-#         COMMENT "Copying WebView2Loader.dll"
-#     )
-# endif()
 
 # ================
 # library: OpenSSL (v3)

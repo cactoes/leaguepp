@@ -6,20 +6,20 @@
 template <typename RTy, typename... Args>
 class callback_holder {
 public:
-    typedef RTy(*basic_t)(Args...);
+    typedef RTy(*fnBasic)(Args...);
 
-    typedef std::function<RTy(Args...)> lambda_t;
+    typedef std::function<RTy(Args...)> fnLambda;
 
     template <typename C>
     using class_t = RTy(C::*)(Args...);
 
     callback_holder() = default;
 
-    explicit callback_holder(basic_t callback) {
+    explicit callback_holder(fnBasic callback) {
         m_callback = callback;
     }
 
-    explicit callback_holder(lambda_t callback) {
+    explicit callback_holder(fnLambda callback) {
         m_callback = callback;
     }
 
