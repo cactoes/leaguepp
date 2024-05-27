@@ -57,7 +57,7 @@ void ProxyManager::SetupUi(IUiFramework* frameworkApiHandle) {
         ui::input_callback([this, cfg](std::string input) {
             // format to only "\\"
             input = std::regex_replace(input, std::regex { "\\\\+|\\/+" }, "\\\\");
-            // remove traling slashes
+            // remove trailing slashes
             input = std::regex_replace(input, std::regex { "(\\\\+|\\/+)$" }, "");
 
             return interface<ConfigManager>::Get()->TrackedSetVar(cfg,

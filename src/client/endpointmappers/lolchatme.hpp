@@ -65,7 +65,7 @@ namespace lolchat {
         std::optional<std::string> level;
         std::optional<std::string> mapId;
         std::optional<std::string> mapSkinId;
-        std::optional<std::string> masteryScore;
+        std::optional<std::string> legendaryMasteryScore;
         std::optional<std::string> puuid;
         std::optional<std::string> rankedLeagueDivision;
         std::optional<std::string> rankedLeagueQueue;
@@ -125,7 +125,7 @@ namespace lolchat {
         x.level = get_stack_optional<std::string>(j, "level");
         x.mapId = get_stack_optional<std::string>(j, "mapId");
         x.mapSkinId = get_stack_optional<std::string>(j, "mapSkinId");
-        x.masteryScore = get_stack_optional<std::string>(j, "masteryScore");
+        x.legendaryMasteryScore = get_stack_optional<std::string>(j, "legendaryMasteryScore");
         x.puuid = get_stack_optional<std::string>(j, "puuid");
         x.rankedLeagueDivision = get_stack_optional<std::string>(j, "rankedLeagueDivision");
         x.rankedLeagueQueue = get_stack_optional<std::string>(j, "rankedLeagueQueue");
@@ -156,7 +156,7 @@ namespace lolchat {
         j["level"] = x.level;
         j["mapId"] = x.mapId;
         j["mapSkinId"] = x.mapSkinId;
-        j["masteryScore"] = x.masteryScore;
+        j["legendaryMasteryScore"] = x.legendaryMasteryScore;
         j["puuid"] = x.puuid;
         j["rankedLeagueDivision"] = x.rankedLeagueDivision;
         j["rankedLeagueQueue"] = x.rankedLeagueQueue;

@@ -114,7 +114,7 @@ std::string feature::Profile::OnMasteryScoreInput(std::string input) {
     auto mastery = std::to_string(masteryScore);
 
     UpdateProfile([mastery](lolchat::Me& me) {
-        me.lol->masteryScore = mastery;
+        me.lol->legendaryMasteryScore = mastery;
         return true;
     });
 
@@ -126,7 +126,7 @@ void feature::Profile::OnClickUpdateProfile() {
         me.lol->rankedLeagueQueue = clientinterfacer::queues::rankedSolo;
         me.lol->rankedLeagueTier = m_cfg.profileTier.Get();
         me.lol->rankedLeagueDivision = m_cfg.profileDivision.Get();
-        me.lol->masteryScore = m_cfg.profileMastery.Get();
+        me.lol->legendaryMasteryScore = m_cfg.profileMastery.Get();
         return true;
     });
 
