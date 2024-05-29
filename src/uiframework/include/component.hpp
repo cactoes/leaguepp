@@ -1,73 +1,43 @@
+#pragma once
+
 #ifndef __COMPONENT_HPP__
 #define __COMPONENT_HPP__
 
 #include <string>
-#include <vector>
-#include <functional>
-#include <type_traits>
-#include <random>
 #include <memory>
-#include <vector>
-#include <callbackholder.hpp>
+#include <random.hpp>
+#include <callback.hpp>
 
-namespace browser {
-    class Browser;
-}; // namespace browser
+// ~~ the component base
 
-// GetId() is silent input
+// (internal) shorthand for creating unique ids
 #define COMPONENT_CALLER_ID(callerType) GetId() + #callerType
 
-namespace ui {
-    enum component_type {
-        CT_TAB = 0,
-        CT_FRAME,
-        CT_BUTTON,
-        CT_LABEL,
-        CT_CHECKBOX,
-        CT_SLIDER,
-        CT_DROPDOWN,
-        CT_SELECTOR,
-        CT_INPUT,
-        CT_LIST
-    };
+// struct to contain dimensional data
+struct VECTOR2I {
+    int x, y;
+};
 
-    template <std::int32_t I>
-    std::string RandomString() {
-        const std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(0, (int)charset.length() - 1);
-
-        std::string randomString;
-        randomString.reserve(I);
-
-        for (int i = 0; i < I; ++i)
-            randomString += charset[dis(gen)];
-
-        return randomString;
-    }
-
-    class Component {
+namespace component {
+    class IComponent {
     public:
-        virtual ~Component() = default;
+        virtual ~IComponent(void) = default;
 
-        virtual component_type GetType() const = 0;
-        virtual void Update() = 0;
-        virtual void Register() = 0;
+        virtual void Update(void) = 0;
+        virtual void Render(void) = 0;
 
-        const void SetId(const std::string& id) { m_id = id; };
-        const std::string& GetId() const { return m_id; }
+        void SetId(const std::string& id) { m_id = id; }
+        const std::string& GetId(void) const { return m_id; }
 
-    public:
-        std::string m_target;
+        void SetTarget(const std::string& target) { m_target = target; }
 
     protected:
-        browser::Browser* m_handle;
+        std::string m_name;
+        std::string m_target;
 
     private:
-        std::string m_id = RandomString<16>();
+        std::string m_id = random::UUID();
     };
-}; // namespace ui
+}; // namespace component
 
 #endif // __COMPONENT_HPP__
