@@ -3,3 +3,11 @@ declare async function invoke<Ty>(functionName: string,
     
 declare function register<Ty extends (string | number | boolean | (string | number | boolean)[])[]>(
     callback: (...args: Ty) => void): void;
+
+interface ICreateFunctions {
+    [key: string]: Function | undefined
+}
+
+interface IUpdateFunctions {
+    [key: string]: Function | undefined
+}

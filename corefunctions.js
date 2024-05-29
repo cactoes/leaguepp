@@ -68,6 +68,11 @@ function register(func) {
     __function_data__.registerdFunctions[func.name] = func;
 }
 
+function __core_set_title__(name) {
+    if (document.getElementById("title"))
+        document.getElementById("title").innerText = name;
+}
+
 // old
 // const auto jsCppInvoker = L"let __result_map__=new Map;window.__result__handler__=function(_,e){let l=__result_map__.get(_);l&&(l.resolve(e),__result_map__.delete(_))};async function invoke(e,_){return new Promise(((r,s)=>{__result_map__.get(e)||(__result_map__.set(e,{resolve:r,reject:s}),window.chrome.webview.postMessage({__name__:e,__args__:_}))}))};function register(_){window.__invokables__[_.name]=_}window.__invokables__={};window.__call__=(_,...n)=>{null!=window.__invokables__[_]?window.__invokables__[_](...n):console.error(`Function ${_} not registered`)};";
 // const auto jsDragScript = L"let __MX__,__MY__,__dragging__=!1;document.addEventListener(\"mousedown\",(_=>{(2==_.which||\"drag\"==getComputedStyle(_.target,null).getPropertyValue(\"--webkit-app-region\"))&&(__dragging__=!0,__MX__=_.clientX,__MY__=_.clientY);})),document.addEventListener(\"mousemove\",(_=>{if(__dragging__){const e=_.clientX-__MX__,n=_.clientY-__MY__;invoke(\"MoveWindow\",[e,n])}})),document.addEventListener(\"mouseup\",(()=>{__dragging__=!1}));";

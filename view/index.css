@@ -8,20 +8,22 @@
     font-family: 'MS Sans Serif';
     /* font-family: 'Segoe UI'; */
 
-    --text: #ebebeb;
-    --text-secondary: #b3b3b3;
-    --background-primary: #141414;
-    --background-secondary: #010101;
-    --trim: #292929;
+    --text: #141414;
+    --text-secondary: #161616;
+    --background-primary: #D4D0C7;
+    --background-secondary: #242423;
+    --trim: #f0ede8;
+
     --primary: #98add9;
     --secondary: #4f6187;
-    --accent: #af7dbf;
+    --accent: #bc95c9;
 
     --font-size-default: 13px;
 
     --item-offset-left: 28px;
     --item-offset-label: 4px;
 
+    outline: none;
     color: var(--text);
 }
 
@@ -64,28 +66,35 @@
 }
 
 body {
+    overflow: hidden;
+
     display: flex;
     flex-direction: column;
     width: 100vw;
     height: 100vh;
 
-    border: 2px solid var(--background-primary);
+    border-left: 2px solid var(--trim);
+    border-top: 2px solid var(--trim);
+    border-right: 2px solid var(--background-secondary);
+    border-bottom: 2px solid var(--background-secondary);
+    background-color: var(--background-primary);
 }
 
 /* =========================== */
-/* TITLEBAR STYLING */
+/* TITLEBAR STYLING            */
 /* =========================== */
 
 #titlebar {
     width: 100%;
     height: 26px;
-    background-color: var(--background-secondary);
 
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 
-    border-bottom: 2px solid var(--background-primary);
+    border-bottom: 2px solid var(--trim);
+
+    background-image: linear-gradient(90deg, var(--accent), var(--primary));
 
     z-index: 2;
 }
@@ -100,6 +109,7 @@ body {
 
 #titlebar > .info > .text > p {
     font-size: 14px;
+    color: var(--trim);
 }
 
 #titlebar > .info > .icon {
@@ -120,199 +130,73 @@ body {
     height: 100%;
 }
 
-#titlebar > .buttons > .button {
-    border-top: 1px solid var(--trim);
-    border-left: 1px solid var(--trim);
-    
-    height: 19px;
-    width: 19px;
+#titlebar > .buttons > button {
+    position: relative;
     margin-right: 2px;
+    height: 18px;
+    width: 20px;
+
     background-color: var(--background-primary);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+
+    transition: all .15s ease;
+    font-size: var(--font-size-default);
+    
+    border-left: 2px solid var(--trim);
+    border-top: 2px solid var(--trim);
+    border-right: 2px solid var(--background-secondary);
+    border-bottom: 2px solid var(--background-secondary);
 }
 
-#titlebar > .buttons > .button:hover > img {
-    transition: all .15s ease;
-    filter: invert(39%) sepia(55%) saturate(611%) hue-rotate(206deg) brightness(83%) contrast(90%);
+#titlebar > .buttons > button > img {
+    width: 100%;
+    height: 100%;
 }
 
-#titlebar > .buttons > .button > img {
-    width: 16px;
-    height: 16px;
-    transition: all .15s ease;
-    filter: invert(0%) sepia(100%) saturate(100%) hue-rotate(0deg) brightness(80%) contrast(100%);
+#titlebar > .buttons > button:hover {
+    cursor: pointer;
+}
+
+#titlebar > .buttons > button:active {
+    padding-left: 1px;
+    padding-top: 1px;
+    border-right: 2px solid var(--trim);
+    border-bottom: 2px solid var(--trim);
+    border-left: 2px solid var(--background-secondary);
+    border-top: 2px solid var(--background-secondary);
+}
+
+#titlebar > .buttons > button:not(:active):focus-visible:after {
+    content: "";
+    border: 1px dotted var(--background-secondary);
+    border-radius: 3px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 /* =========================== */
-/* MAIN BODY STYLING */
+/* MAIN BODY STYLING           */
 /* =========================== */
 
 #main {
-    display: flex;
-    width: 100%;
-    height: 100%;
+    width: calc(100% - 2px);
+    flex-grow: 1;
     background-color: var(--background-primary);
-    z-index: 0;
-    flex-direction: column;
 }
 
 /* =========================== */
-/* NOTIFICATION STYLING */
+/* ELEMENT STYLING */
 /* =========================== */
 
-#notification_wrapper {
-    display: flex;
-    flex-direction: column-reverse;
-    justify-content: flex-start;
-
-    position: absolute;
-    width: 35vw;
-    /* 26px for the titlebar */
-    height: calc(100vh - 26px);
-    padding: 14px;
-
-    bottom: 0;
-    right: 0;
-    z-index: 1;
-
-    pointer-events: none;
-}
-
-.notification {
-    pointer-events: auto;
-    cursor: pointer;
-
-    width: 100%;
-
-    background-color: var(--background-primary);
-    border: 1px solid var(--trim);
-
-    padding: 8px;
-
-    position: relative;
-
-    opacity: 1;
-    transition: all .2s ease;
-}
-
-.notification:not(:first-child) {
+.frame.v > .element:not(:last-child) {
     margin-bottom: 8px;
 }
 
-.notification:hover {
-    filter: brightness(110%);
-    transform: translateX(-2px) translateY(-5px);
-}
-
-.notification.fade {
-    opacity: 1;
-    animation: fadeOut .3s linear forwards;
-}
-
-@keyframes fadeOut {
-    0% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-    }
-}
-
-.notification > .statusbar {
-    position: absolute;
-    bottom: 8px;
-    /* 16px is the padding */
-    width: calc(100% - 16px);
-    height: 6px;
-    background-color: var(--background-secondary);
-}
-
-.notification > .statusbar > div {
-    animation: progress 5s linear forwards;
-    background-color: var(--accent);
-    height: 100%;
-    width: 100%;
-}
-
-@keyframes progress {
-    0% {
-        width: calc(100% - 16px);
-    }
-
-    100% {
-        width: 1%;
-    }
-}
-
-.notification > .content {
-    display: flex;
-    flex-direction: column;
-    font-size: var(--font-size-default);
-
-    /* 6px for statusbar 8px for padding */
-    margin-bottom: calc(6px + 8px);
-}
-
-.notification > .content > .contentDescription {
-    color: var(--text-secondary);
-}
-
-/* =========================== */
-/* TAB STYLING */
-/* =========================== */
-
-#tablist {
-    margin-top: 6px;
-    display: flex;
-    width: calc(100% - 12px);
-    flex-direction: row;
-    margin-left: 6px;
-    margin-right: 6px;
-}
-
-#tablist > p {
-    border: 1px solid var(--trim);
-    border-right: 1px solid var(--background-primary);
-
-    padding: 8px 32px;
-    margin-bottom: -7px;
-    z-index: 1;
-    background-color: var(--background-primary);
-    font-size: var(--font-size-default);
-    cursor: pointer;
-    transition: all .15s ease;
-}
-
-#tablist > p:last-child {
-    border-right: 1px solid var(--trim);
-}
-
-#tablist > p:hover {
-    filter: brightness(120%);
-    color: var(--accent);
-}
-
-#tablist > p.active {
-    border-bottom: 1px solid var(--background-primary);
-}
-
-#tabcontent {
-    width: 100%;
-    height: 100%;
-}
-
-#tabcontent > .tab {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: none;
-}
-
-#tabcontent > .tab.active {
-    display: flex;
+.frame.h > .element:not(:last-child) {
+    margin-right: 8px;
 }
 
 /* =========================== */
@@ -320,16 +204,20 @@ body {
 /* =========================== */
 
 .frame {
+    width: 100%;
+    height: 100%;
+    padding: 3px;
+    display: flex;
+    position: relative;
+}
+
+.frame.border {
     border: 1px solid var(--trim);
+    padding: 6px;
+    margin: 6px;
 
     width: calc(100% - 12px);
     height: calc(100% - 12px);
-
-    padding: 6px;
-    margin: 6px;
-    display: flex;
-    
-    position: relative;
 }
 
 .frame > span {
@@ -341,486 +229,105 @@ body {
     border-right: 4px solid var(--background-primary);
 }
 
-.frame.horizontal {
+.frame.h {
     flex-direction: row;
 }
 
-.frame.vertical {
+.frame.v {
     flex-direction: column;
 }
 
-.frame.vertical-auto {
+.frame.va {
     height: auto;
     flex-direction: column;
 }
 
-.frame.horizontal-auto {
+.frame.ha {
     width: auto;
     flex-direction: row;
 }
 
+.frame.ah {
+    align-items: center;
+}
+
+.frame.av {
+    justify-content: center;
+}
+
+.frame.ac {
+    align-items: center;
+    justify-content: center;
+}
+
 /* =========================== */
-/* ELEMENT STYLING */
+/* BUTTON STYLING              */
 /* =========================== */
 
-.element {
+.button {
+    border: 1.5px solid var(--background-secondary);
     position: relative;
-    margin-top: 8px;
-    margin-left: 12px;
 }
-
-.element > .shadow {
-    /* label text doesnt select properly without this */
-    z-index: -1;
-    opacity: 0;
-    margin-left: var(--item-offset-left);
-    font-size: var(--font-size-default);
-}
-
-.element > .label {
-    position: absolute;
-    margin-left: var(--item-offset-left);
-    font-size: var(--font-size-default);
-}
-
-.element > .infoDiv {
-    position: absolute;
-    z-index: 1;
-    right: 12px;
-    margin-right: var(--item-offset-left);
-    font-size: var(--font-size-default);
-    cursor: help;
-}
-
-.element > .infoDiv > p {
-    position: absolute;
-    border: 1px solid var(--trim);
-    visibility: hidden;
-    width: max-content;
-    max-width: 170px;
-    left: 12px;
-    background-color: var(--background-primary);
-    padding: 4px;
-    font-style: italic;
-}
-
-.element > .infoDiv:hover > p {
-    visibility: visible;
-}
-
-.element:last-of-type {
-    margin-bottom: 8px;
-}
-
-/* =========================== */
-/* BUTTON STYLING */
-/* =========================== */
 
 .button > button {
     padding: 4px 16px;
 
-    background-color: var(--primary);
-    color: var(--background-primary);
+    background-color: var(--background-primary);
 
     transition: all .15s ease;
     font-size: var(--font-size-default);
+    
+    border-left: 2px solid var(--trim);
+    border-top: 2px solid var(--trim);
+    border-right: 2px solid var(--background-secondary);
+    border-bottom: 2px solid var(--background-secondary);
 
-    margin-left: var(--item-offset-left);
-    margin-top: var(--item-offset-label);
+    outline: none;
 }
 
 .button > button:hover {
     cursor: pointer;
-    filter: brightness(120%);
+}
+
+.button > button:active {
+    padding-left: 17px;
+    padding-top: 5px;
+    border-right: 2px solid var(--trim);
+    border-bottom: 2px solid var(--trim);
+    border-left: 2px solid var(--background-secondary);
+    border-top: 2px solid var(--background-secondary);
+}
+
+.button > button:not(:active):focus-visible:after {
+    content: "";
+    border: 1px dotted var(--background-secondary);
+    border-radius: 3px;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    padding: 4px 16px;
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
+    box-sizing: border-box;
 }
 
 /* =========================== */
-/* LABEL STYLING */
+/* LABEL STYLING               */
 /* =========================== */
 
 .label {
-    display: flex;
-    align-items: center;
-}
-
-.label.center {
-    text-align: center;
-}
-
-.label.left {
-    text-align: left;
-}
-
-.label.right {
-    text-align: right;
+    font-size: 14px;
 }
 
 /* =========================== */
-/* CHECKBOX STYLING */
+/* IMAGE STYLING               */
 /* =========================== */
 
-.checkbox {
-    display: flex;
-    align-items: center;
-}
-
-.checkbox > label {
-    display: inline-block;
+.image {
     position: relative;
-    cursor: pointer;
 }
 
-.checkbox > label > span {
-    width: 18px;
-    height: 18px;
-    background-color: var(--background-secondary);
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.checkbox > label > span::after {
-    content: "";
-    display: block;
-    width: 12px;
-    height: 12px;
-    opacity: 0;
-    margin-top: 3px;
-    margin-left: 3px;
-    background-color: var(--background-secondary);
-    transition: all .15s ease;
-}
-
-.checkbox > label:hover > span::after {
-    transition: all .15s ease;
-    opacity: 1;
-    background-color: var(--primary);
-    filter: brightness(120%);
-}
-
-.checkbox > label input[type="checkbox"]:checked + span::after {
-    transition: all .15s ease;
-    opacity: 1;
-    background-color: var(--primary);
-}
-
-/* =========================== */
-/* SLIDER STYLING */
-/* =========================== */
-
-.slider {
-    display: flex;
-    flex-direction: column;
-
-    /* exta margin for the value text */
-    /* margin-bottom: 10px; */
-}
-
-.slider > div {
-    display: flex;
-    /* 12px is the element left padding */
-    width: calc(100% - var(--item-offset-left) * 2 - 12px);
-    position: relative;
-    margin-bottom: var(--font-size-default);
-    margin-top: var(--item-offset-label);
-    margin-left: var(--item-offset-left);
-}
-
-.slider > div > .decrement {
-    position: absolute;
-    left: -23px;
-    top: -7px;
-    cursor: pointer;
-    font-size: 17px;
-}
-
-.slider > div > .increment {
-    position: absolute;
-    right: -23px;
-    top: -6px;
-    cursor: pointer;
-    font-size: 17px;
-}
-
-.slider > div > input {
-    appearance: none;
+.image > img {
     width: 100%;
-    height: 8px;
-    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
-    outline: none;
-    overflow: hidden;
-    cursor: pointer;
-}
-
-.slider > div > input:hover {
-    filter: brightness(120%);
-}
-
-.slider > div > .sliderTick {
-    font-size: var(--font-size-default);
-    position: absolute;
-    top: 8px;
-    left: 0px;
-}
-
-.slider > div > input::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 1px;
-    height: 16px;
-    background: rgba(0,0,0,0);
-    cursor: pointer;
-    box-shadow: 400px 0 0 400px var(--background-secondary);
-}
-
-/* =========================== */
-/* DROPDOWN STYLING */
-/* =========================== */
-
-.dropdown {
-    font-size: var(--font-size-default);
-
-    display: flex;
-    flex-direction: column;
-}
-
-.dropdown > .wrapper {
-    /* 12px is the element left padding */
-    width: calc(100% - var(--item-offset-left)*2 - 12px);
-    position: relative;
-    margin-left: var(--item-offset-left);
-    margin-top: var(--item-offset-label);
-}
-
-.dropdown > .wrapper > input {
-    width: 100%;
-    background-color: var(--background-secondary);
-    padding: 3px 10px;
-    color: var(--text);
-    text-overflow: ellipsis;
-    overflow: hidden;
-    font-size: var(--font-size-default);
-    transition: all .15s ease;
-}
-
-.dropdown > .wrapper > .content {
-    display: none;
-    position: absolute;
-
-    width: 100%;
-
-    background-color: var(--background-secondary);
-
-    z-index: 1;
-}
-
-.dropdown > .wrapper > .content > p {
-    cursor: pointer;
-
-    padding: 4px 10px;
-    font-size: var(--font-size-default);
-
-    transition: all .15s ease;
-}
-
-.dropdown > .wrapper > .content > p:not(:hover):not(.selected) {
-    color: var(--text) !important;
-}
-
-.dropdown > .wrapper > .content > p:hover {
-    filter: brightness(120%);
-    background-color: var(--background-primary);
-}
-
-.dropdown > .wrapper:hover > .content {
-    display: block;
-}
-
-.dropdown > .wrapper:hover > input {
-    filter: brightness(80%);
-    background-color: var(--background-primary);
-}
-
-/* =========================== */
-/* SELECTOR STYLING */
-/* =========================== */
-
-.selector {
-    display: flex;
-    flex-direction: column;
-
-    font-size: var(--font-size-default);
-}
-
-.selector > .content {
-    /* 12px is the element left padding */
-    width: calc(100% - var(--item-offset-left)*2 - 12px);
-
-    margin-left: var(--item-offset-left);
-    margin-top: var(--item-offset-label);
-
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-
-    background-color: var(--background-secondary);
-}
-
-.selector > .content > p {
-    background-color: var(--background-secondary);
-
-    transition: all .15s ease;
-
     height: 100%;
-
-    font-size: var(--font-size-default);
-
-    padding: 3px 10px;
-    color: var(--text);
-
-    width: 100%;
-    text-align: center;
-}
-
-.selector > .content > p:not(:hover):not(.selected) {
-    background-color: var(--background-secondary) !important;
-}
-
-.selector > .content > p:hover {
-    cursor: pointer;
-    background-color: var(--primary);
-    color: var(--background-primary);
-    filter: brightness(120%);
-}
-
-.selector > .content > p.selected {
-    background-color: var(--primary);
-    color: var(--background-primary);
-}
-
-/* =========================== */
-/* INPUT STYLING */
-/* =========================== */
-
-.input {
-    display: flex;
-    flex-direction: column;
-
-    font-size: var(--font-size-default);
-}
-
-.input > div {
-    /* 12px is the element left padding */
-    width: calc(100% - var(--item-offset-left)*2 - 12px);
-
-    margin-left: var(--item-offset-left);
-    margin-top: var(--item-offset-label);
-}
-
-.input > div > input {
-    outline: none;
-    width: 100%;
-
-    border: 1px solid var(--background-primary);
-    background-color: var(--background-secondary);
-
-    padding: 3px 10px;
-
-    font-size: var(--font-size-default);
-
-    transition: all .15s ease;
-}
-
-.input > div > input:hover {
-    filter: brightness(120%);
-}
-
-.input > div > input:hover,
-.input > div > input:focus {
-    border: 1px solid var(--accent);
-}
-
-/* =========================== */
-/* LIST STYLING */
-/* =========================== */
-
-.list {
-    display: flex;
-    flex-direction: column;
-
-    font-size: var(--font-size-default);
-}
-
-.list > div {
-    /* 12px is the element left padding */
-    width: calc(100% - var(--item-offset-left)*2 - 12px);
-
-    margin-left: var(--item-offset-left);
-    margin-top: var(--item-offset-label);
-}
-
-.list > div > .listView {
-    background-color: var(--background-secondary);
-    overflow-x: hidden;
-    overflow-y: visible;
-    min-height: 63px;
-    max-height: 63px;
-}
-
-.list > div > .listView > p {
-    background-color: var(--background-secondary);
-
-    transition: all .15s ease;
-
-    font-size: var(--font-size-default);
-
-    padding: 3px 10px;
-    color: var(--text);
-
-    width: 100%;
-
-    cursor: pointer;
-}
-
-.list > div > .listView > p:hover {
-    filter: brightness(120%);
-    background-color: var(--background-primary);
-    color: var(--accent);
-}
-
-.list > div > .listInput {
-    display: flex;
-    flex-direction: row;
-}
-
-.list > div > .listInput > input {
-    outline: none;
-    width: 80%;
-
-    border-top: 1px solid var(--background-primary);
-    border-right: 1px solid var(--background-primary);
-    background-color: var(--background-secondary);
-
-    padding: 3px 10px;
-
-    font-size: var(--font-size-default);
-
-    transition: all .15s ease;
-}
-
-.list > div > .listInput > button {
-    width: 20%;
-    height: 22px;
-
-    border-top: 1px solid var(--background-primary);
-    background-color: var(--background-secondary);
-    color: var(--text);
-
-    transition: all .15s ease;
-}
-
-.list > div > .listInput > button:hover {
-    filter: brightness(120%);
-    background-color: var(--background-primary);
-    color: var(--primary);
-    cursor: pointer;
 }

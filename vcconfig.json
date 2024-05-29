@@ -18,6 +18,7 @@
         "copy": [
             "media",
             ".js",
+            ".ts",
             ".css",
             ".html"
         ],

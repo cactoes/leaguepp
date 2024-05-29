@@ -11,25 +11,22 @@
     <div id="titlebar" class="drag">
         <div class="info nodrag">
             <div class="icon drag noselect"><img src="media/disc_icon_2.png"></div>
-            <div class="text"><p>league++</p></div>
+            <div class="text"><p id="title"></p></div>
         </div>
 
         <div class="buttons nodrag noselect">
-            <div class="button" id="minimize">
-                <img src="media/minimize_icon.png">
-            </div>
-            <div class="button" id="resize">
-                <img src="media/resize_icon.png">
-            </div>
-            <div class="button" id="close">
-                <img src="media/close_icon.png">
-            </div>
+            <button class="buttonWindowEvent" id="minimize">
+                <img src="media/minimize_icon_dark.png">
+            </button>
+            <!-- <div class="button" id="resize">
+                <img src="media/resize_icon_dark.png">
+            </div> -->
+            <button class="buttonWindowEvent" id="close">
+                <img src="media/close_icon_dark.png">
+            </button>
         </div>
     </div>
-    <div id="notification_wrapper"></div>
-    <div id="main">
-        <div id="tablist" class="noselect"></div>
-        <div id="tabcontent"></div>
-    </div>
+    <!-- <div id="notification_wrapper"></div> -->
+    <div id="main"></div>
 </body>
 </html>
