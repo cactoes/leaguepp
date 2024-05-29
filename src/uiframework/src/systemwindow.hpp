@@ -20,6 +20,7 @@ public:
     }
 
     std::shared_ptr<component::IFrame> GetWindowFrame(void) override;
+    void CloseWindow(void) override;
 
 private:
     Browser m_browser;
