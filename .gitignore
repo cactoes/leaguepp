@@ -2,3 +2,5 @@ build/
 node_modules/
 .vscode/
 .vs/
+old_src/
+*.old.*
