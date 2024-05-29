@@ -4,7 +4,7 @@ project(league++)
 # ~~ gui interface
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*)
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${APP_RESOURCES_DIR}/resources.rc)
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${APP_RESOURCES_DIR}/resources.gui.rc)
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${SERVICE_INCLUDE}
