@@ -123,6 +123,8 @@ public:
 
     void EmptyEventBus(void);
 
+    const Window& GetWindow() const { return m_window; }
+
 private:
     void MoveWindow(Browser*, JSArgs args);
     bool HandleWindowEvent(Browser*, JSArgs args);

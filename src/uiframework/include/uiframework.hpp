@@ -37,12 +37,22 @@ class ISystemWindow {
 public:
     virtual ~ISystemWindow(void) = default;
     virtual std::shared_ptr<component::IFrame> GetWindowFrame(void) = 0;
+    virtual void CloseWindow(void) = 0;
 };
 
 // call at the end of everything to start polling window events
 void SystemPollWindowEvents(void);
 
 // create a new window based on the config
-std::unique_ptr<ISystemWindow> CreateSystemWindow(const WINDOW_CONFIG& wc, const BROWSER_CONFIG& bc, const component::LAYOUT& layout, const component::ALIGN& align = component::ALIGN::NONE);
+std::shared_ptr<ISystemWindow> CreateSystemWindow(const WINDOW_CONFIG& wc, const BROWSER_CONFIG& bc, const component::LAYOUT& layout, const component::ALIGN& align = component::ALIGN::NONE);
+
+enum class message_box_type {
+    MB_ERROR = 0,
+    MB_WARN,
+    MB_INFO
+};
+
+// create a new message box window
+std::shared_ptr<ISystemWindow> CreateMessageBox(const std::string& title, const std::string& message, message_box_type type);
 
 #endif // __UIFRAMEWORK_HPP__

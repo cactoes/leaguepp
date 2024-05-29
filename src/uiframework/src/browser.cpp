@@ -163,14 +163,20 @@ void Browser::CallJSFunction(const std::string& name, const std::vector<std::any
 }
 
 LRESULT Browser::OnWindowMessage(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+    static int windowCount = 0;
     const auto handle = reinterpret_cast<Browser*>(GetWindowLongPtr(wnd, GWLP_USERDATA));
 
     switch (msg) {
+        case WM_CREATE:
+            windowCount++;
+            return FALSE;
         case WM_CLOSE:
             DestroyWindow(wnd);
             return FALSE;
         case WM_DESTROY:
-            PostQuitMessage(0);
+            windowCount--;
+            if (windowCount <= 0)
+                PostQuitMessage(0);
             return FALSE;
         case WM_SIZE: {
             RECT bounds;

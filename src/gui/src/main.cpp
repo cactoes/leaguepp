@@ -5,35 +5,9 @@
 #include <Windows.h>
 
 int main(int, char**) {
-    WINDOW_CONFIG config{};
-    config.flags = { WINDOW_FLAG_SHOW, WINDOW_FLAG_HIDE_TITLE_BAR };
-    config.size = { 200, 150 };
-    config.name = "critical error";
-    config.icon = 1;
-
-    BROWSER_CONFIG bwConfig{};
-    bwConfig.flags = { BROWSER_WINDOW_FLAG_DEV_TOOLS };
-
-    auto systemWindow = CreateSystemWindow(config, bwConfig, component::LAYOUT::VERTICAL);
-    auto frameMain = systemWindow->GetWindowFrame();
-
-    auto parent = frameMain->AddFrame("", false, component::LAYOUT::HORIZONTAL);
-
-    parent
-        ->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO, component::ALIGN::HORIZONTAL)
-        ->AddImage("media/error_icon.png", { 50, 50 });
-
-    parent
-        ->AddFrame("", false, component::LAYOUT::VERTICAL, component::ALIGN::CENTER)
-        ->AddLabel("Error message");
-
-    auto b = frameMain->AddFrame("", false, component::LAYOUT::HORIZONTAL, component::ALIGN::CENTER);
-    b->AddButton("ok", []() {
-        std::cout << "clicked\n";
-    });
-    // b->AddButton("OK", []() {
-    //     std::cout << "clicked\n";
-    // });
+    auto message_box = CreateMessageBox("error", "error message", message_box_type::MB_ERROR);
+    auto message_box1 = CreateMessageBox("warn", "warn message", message_box_type::MB_WARN);
+    auto message_box2 = CreateMessageBox("info", "info message", message_box_type::MB_INFO);
 
     SystemPollWindowEvents();
 
