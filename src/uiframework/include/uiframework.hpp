@@ -24,7 +24,7 @@ struct WINDOW_CONFIG {
     BitField<unsigned long> flags = {};
 };
 
-#define BROWSER_WINDOW_FLAG_DEV_TOOLS 0ul
+#define BROWSER_FLAG_DEV_TOOLS 0ul
 
 struct BROWSER_CONFIG {
     BitField<unsigned long> flags = {};
