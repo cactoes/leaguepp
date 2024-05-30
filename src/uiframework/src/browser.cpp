@@ -1,6 +1,7 @@
 #include "browser.hpp"
 
 #include <nlohmann/json.hpp>
+
 #include "helpers.hpp"
 
 #define WM_HANDLE_BROWSER_EVENTS (WM_USER + 0x0001)
@@ -15,10 +16,10 @@ Browser::Browser(const Window& window, const BROWSER_CONFIG& config) : m_window(
     options->put_AdditionalBrowserArguments(L"--disable-web-security");
 
     CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, options.Get(),
-        Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>([this, &config](HRESULT, ICoreWebView2Environment* environment) -> HRESULT {
+        Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>([this, config](HRESULT, ICoreWebView2Environment* environment) -> HRESULT {
             return environment->CreateCoreWebView2Controller(m_window.GetWindowHandle(),
             Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
-                [this, &config](HRESULT, ICoreWebView2Controller* controller) -> HRESULT {
+                [this, config](HRESULT, ICoreWebView2Controller* controller) -> HRESULT {
                     if (controller != nullptr) {
                         m_webViewController = controller;
                         m_webViewController->get_CoreWebView2(&m_webView2);
@@ -28,7 +29,7 @@ Browser::Browser(const Window& window, const BROWSER_CONFIG& config) : m_window(
                     m_webView2->get_Settings(&comptrSettings);
                     comptrSettings->put_IsScriptEnabled(TRUE);
                     comptrSettings->put_IsWebMessageEnabled(TRUE);
-                    comptrSettings->put_AreDevToolsEnabled(config.flags.Has<BROWSER_WINDOW_FLAG_DEV_TOOLS>());
+                    comptrSettings->put_AreDevToolsEnabled(config.flags.Has<BROWSER_FLAG_DEV_TOOLS>());
 
                     wil::com_ptr<ICoreWebView2_13> comptrWebView2_13;
                     wil::com_ptr<ICoreWebView2Profile> comptrWebView2Profile;
