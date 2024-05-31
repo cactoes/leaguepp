@@ -78,6 +78,11 @@ public:
     std::vector<JSValue> AsArray() {
         return std::any_cast<std::vector<JSValue>>(m_value);
     }
+
+    template <typename Ty, typename = std::enable_if_t<is_valid_type_v<Ty>>>
+    operator Ty() {
+        return As<Ty>();
+    }
     
 private:
     std::any m_value;
