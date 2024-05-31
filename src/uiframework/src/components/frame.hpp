@@ -7,6 +7,7 @@
 #include "components/label.hpp"
 #include "components/button.hpp"
 #include "components/image.hpp"
+#include "components/folder_selector.hpp"
 #include "browser.hpp"
 
 namespace component {
@@ -55,6 +56,10 @@ namespace component {
 
         std::shared_ptr<IImage> AddImage(const std::string& name, const VECTOR2I& size) override {
             return AddComponent<Image>(name, size);
+        }
+
+        std::shared_ptr<IFolderSelector> AddFolderSelector(const std::string& name) override {
+            return AddComponent<FolderSelector>(name);
         }
 
     private:

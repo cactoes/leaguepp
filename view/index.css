@@ -157,8 +157,6 @@ body {
 }
 
 #titlebar > .buttons > button:active {
-    padding-left: 1px;
-    padding-top: 1px;
     border-right: 2px solid var(--trim);
     border-bottom: 2px solid var(--trim);
     border-left: 2px solid var(--background-secondary);
@@ -368,8 +366,6 @@ body {
 }
 
 .button > button:active {
-    padding-left: 17px;
-    padding-top: 5px;
     border-right: 2px solid var(--trim);
     border-bottom: 2px solid var(--trim);
     border-left: 2px solid var(--background-secondary);

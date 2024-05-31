@@ -1,5 +1,9 @@
 #include "browser.hpp"
 
+#define WIN32_LEAN_AND_MEAN
+
+#include <windows.h>
+#include <shlobj.h>
 #include <nlohmann/json.hpp>
 
 #include "helpers.hpp"
@@ -11,6 +15,7 @@ Browser::Browser(const Window& window, const BROWSER_CONFIG& config) : m_window(
     
     RegisterFunction("MoveWindow", &Browser::MoveWindow, this);
     RegisterFunction("HandleWindowEvent", &Browser::HandleWindowEvent, this);
+    RegisterFunction("OpenFolderSelector", &Browser::OpenFolderSelector, this);
 
     ComPtr<CoreWebView2EnvironmentOptions> options = Make<CoreWebView2EnvironmentOptions>();
     options->put_AdditionalBrowserArguments(L"--disable-web-security");
@@ -248,6 +253,42 @@ bool Browser::HandleWindowEvent(Browser*, JSArgs args) {
     }
 
     return false;
+}
+
+// https://stackoverflow.com/questions/12034943/win32-select-directory-dialog-from-c-c
+
+static int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg, LPARAM lParam, LPARAM lpData) {
+    if (uMsg == BFFM_INITIALIZED)
+        SendMessageA(hwnd, BFFM_SETSELECTION, TRUE, lpData);
+
+    return 0;
+}
+
+std::string Browser::OpenFolderSelector(Browser *, JSArgs args) {
+    char  path[MAX_PATH];
+    const char* path_param = args.at(0).As<std::string>().c_str();
+
+    BROWSEINFOA bi = { 0 };
+    bi.lpszTitle = "Select folder";
+    bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+    bi.lpfn = BrowseCallbackProc;
+    bi.lParam = (LPARAM)path_param;
+
+    LPITEMIDLIST pidl = SHBrowseForFolderA(&bi);
+
+    if (pidl != 0) {
+        SHGetPathFromIDListA(pidl, path);
+
+        IMalloc* imalloc = 0;
+        if (SUCCEEDED(SHGetMalloc(&imalloc))) {
+            imalloc->Free(pidl);
+            imalloc->Release();
+        }
+
+        return path;
+    }
+
+    return "";
 }
 
 void Browser::OnDomContentLoaded() {

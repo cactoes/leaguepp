@@ -128,6 +128,7 @@ public:
 private:
     void MoveWindow(Browser*, JSArgs args);
     bool HandleWindowEvent(Browser*, JSArgs args);
+    std::string OpenFolderSelector(Browser*, JSArgs);
     void OnDomContentLoaded();
 
 private:

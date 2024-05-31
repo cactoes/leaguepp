@@ -21,7 +21,8 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE ${WEBVIEW_LIBRARY}/WebView2/x64/WebView2LoaderStatic.lib
     PRIVATE Version.lib
-    PRIVATE windowsapp.lib)
+    PRIVATE windowsapp.lib
+    PRIVATE shlwapi.lib)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}

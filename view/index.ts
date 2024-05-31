@@ -74,6 +74,23 @@ const createFunctions: ICreateFunctions = {
         button.style.height = `${height}px`;
 
         element.appendChild(button);
+    },
+    folderSelector: (name: string, id: string, target: string, cpath: string, callback: string) => {
+        const element = getTargetElement(target);
+       
+        const button = createElement("div", { id, className: "folderSelector element" });
+
+        const display = createElement("input", { value: cpath, spellcheck: false, autocapitalize: "false", autocomplete: "off", disabled: true });
+        button.appendChild(display);
+
+        const openSelector = createElement("button", { innerText: "open" });
+        openSelector.onclick = async () => {
+            display.value = await invoke<string>("OpenFolderSelector", [ display.value ]);
+            invoke(callback, [ display.value ]);
+        }
+
+        button.appendChild(openSelector);
+        element.appendChild(button);
     }
 };
 
