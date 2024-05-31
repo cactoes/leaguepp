@@ -6,7 +6,13 @@ project(uninstaller)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE shlwapi.lib)
+target_include_directories(${PROJECT_NAME}
+    PRIVATE ${UIFRAMEWORK_INCLUDE}
+    PRIVATE ${SHARED_HEADERS})
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE shlwapi.lib
+    PRIVATE ${UIFRAMEWORK_LIB})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
