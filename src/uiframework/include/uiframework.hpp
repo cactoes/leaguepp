@@ -33,11 +33,16 @@ struct BROWSER_CONFIG {
 // ~~ ISystemWindow base class
 //    holds & manages all window & browser data
 
+typedef CallbackContainer<void> FnOnContextMenuItemClicked;
+
 class ISystemWindow {
 public:
     virtual ~ISystemWindow(void) = default;
     virtual std::shared_ptr<component::IFrame> GetWindowFrame(void) = 0;
     virtual void CloseWindow(void) = 0;
+    virtual void AddContextMenuItem(const std::string& group, const std::string& name, const FnOnContextMenuItemClicked& callback) = 0;
+    virtual void CreateContextMenuGroup(const std::string& name) = 0;
+    virtual void EnableContextMenu(bool state) = 0;
 };
 
 // call at the end of everything to start polling window events
