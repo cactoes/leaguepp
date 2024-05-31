@@ -8,6 +8,7 @@
 #include "browser.hpp"
 
 #include <map>
+#include <random.hpp>
 
 class SystemWindow : public ISystemWindow {
 public:
@@ -31,6 +32,10 @@ public:
     void AddContextMenuItem(const std::string& group, const std::string& name, const FnOnContextMenuItemClicked& callback) override;
     void CreateContextMenuGroup(const std::string& name) override;
     void EnableContextMenu(bool state) override;
+
+public:
+    inline static std::map<std::string, std::shared_ptr<ISystemWindow>> s_windows = {};
+    const std::string m_id = random::UUID();
 
 private:
     Browser m_browser;

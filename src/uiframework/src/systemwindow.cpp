@@ -23,6 +23,7 @@ std::shared_ptr<component::IFrame> SystemWindow::GetWindowFrame(void) {
 
 void SystemWindow::CloseWindow(void) {
     DestroyWindow(m_browser.GetWindow().GetWindowHandle());
+    SystemWindow::s_windows.erase(m_id);
 }
 
 void SystemWindow::AddContextMenuItem(const std::string& group, const std::string& name, const FnOnContextMenuItemClicked& callback) {
