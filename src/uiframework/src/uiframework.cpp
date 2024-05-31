@@ -12,7 +12,9 @@ void SystemPollWindowEvents(void) {
 }
 
 std::shared_ptr<ISystemWindow> CreateSystemWindow(const WINDOW_CONFIG& wc, const BROWSER_CONFIG& bc, const component::LAYOUT& layout, const component::ALIGN& align) {
-    return std::make_shared<SystemWindow>(Window::Create(wc), bc, layout, align);
+    auto ptr = std::make_shared<SystemWindow>(Window::Create(wc), bc, layout, align);
+    SystemWindow::s_windows[ptr->m_id] = ptr;
+    return ptr;
 }
 
 std::shared_ptr<ISystemWindow> CreateMessageBox(const std::string& title, int iconId, const std::string& iconName, const std::string& message, message_box_type type) {
@@ -30,7 +32,7 @@ std::shared_ptr<ISystemWindow> CreateMessageBox(const std::string& title, int ic
     auto frameMain = systemWindow->GetWindowFrame();
 
     auto parent = frameMain->AddFrame("", false, component::LAYOUT::HORIZONTAL);
-    auto iconFrame = parent->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO, component::ALIGN::HORIZONTAL);
+    auto iconFrame = parent->AddFrame("", false, component::LAYOUT::VERTICAL_AUTO, component::ALIGN::HORIZONTAL);
 
     switch (type) {
         case message_box_type::MB_ERROR:
@@ -46,13 +48,14 @@ std::shared_ptr<ISystemWindow> CreateMessageBox(const std::string& title, int ic
             break;
     }
 
-    parent
-        ->AddFrame("", false, component::LAYOUT::VERTICAL, component::ALIGN::CENTER)
-        ->AddLabel(message);
+    auto msgFrame = parent->AddFrame("", false, component::LAYOUT::HORIZONTAL, component::ALIGN::CENTER);
+    msgFrame->AddFrame("", false, component::LAYOUT::VERTICAL_AUTO);
+    msgFrame->AddFrame("", false, component::LAYOUT::VERTICAL_AUTO);
+    msgFrame->AddLabel(message);
 
     frameMain
         ->AddFrame("", false, component::LAYOUT::HORIZONTAL, component::ALIGN::CENTER)
-        ->AddButton("ok", [&]() {
+        ->AddButton("ok", [systemWindow]() {
             systemWindow->CloseWindow();
         });
 
