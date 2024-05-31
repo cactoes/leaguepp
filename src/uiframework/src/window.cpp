@@ -3,7 +3,7 @@
 #include "browser.hpp"
 
 Window Window::Create(const WINDOW_CONFIG& config) {
-    const HICON hIcon = config.icon >= 0 ? LoadIconA(GetModuleHandleA(nullptr), MAKEINTRESOURCEA(config.icon))
+    const HICON hIcon = config.iconId >= 0 ? LoadIconA(GetModuleHandleA(nullptr), MAKEINTRESOURCEA(config.iconId))
         : LoadIconA(GetModuleHandleA(nullptr), IDI_APPLICATION);
 
     const std::string wndclassName = config.name + " WindowClass";
@@ -46,5 +46,5 @@ Window Window::Create(const WINDOW_CONFIG& config) {
 
     UpdateWindow(windowHandle);
 
-    return Window(windowHandle, config.name);
+    return Window(windowHandle, config.name, config.iconName);
 }

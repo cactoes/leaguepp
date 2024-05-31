@@ -15,12 +15,13 @@ std::shared_ptr<ISystemWindow> CreateSystemWindow(const WINDOW_CONFIG& wc, const
     return std::make_shared<SystemWindow>(Window::Create(wc), bc, layout, align);
 }
 
-std::shared_ptr<ISystemWindow> CreateMessageBox(const std::string& title, const std::string& message, message_box_type type) {
+std::shared_ptr<ISystemWindow> CreateMessageBox(const std::string& title, int iconId, const std::string& iconName, const std::string& message, message_box_type type) {
     WINDOW_CONFIG config{};
     config.flags = { WINDOW_FLAG_SHOW, WINDOW_FLAG_HIDE_TITLE_BAR };
     config.size = { 200, 150 };
     config.name = title;
-    config.icon = 1;
+    config.iconId = iconId;
+    config.iconName = iconName;
 
     BROWSER_CONFIG bwConfig{};
 
@@ -33,13 +34,13 @@ std::shared_ptr<ISystemWindow> CreateMessageBox(const std::string& title, const 
 
     switch (type) {
         case message_box_type::MB_ERROR:
-            iconFrame->AddImage("media/error_icon.png", { 50, 50 });
+            iconFrame->AddImage("error_icon.png", { 50, 50 });
             break;
         case message_box_type::MB_WARN:
-            iconFrame->AddImage("media/warn_icon.png", { 50, 50 });
+            iconFrame->AddImage("warn_icon.png", { 50, 50 });
             break;
         case message_box_type::MB_INFO:
-            iconFrame->AddImage("media/info_icon.png", { 50, 50 });
+            iconFrame->AddImage("info_icon.png", { 50, 50 });
             break;
         default:
             break;

@@ -19,7 +19,8 @@
 struct WINDOW_CONFIG {
     VECTOR2I size = { 700, 600 };
     VECTOR2I pos = { 0, 0 };
-    int icon = -1;
+    int iconId = -1;
+    std::string iconName = "";
     std::string name = "window";
     BitField<unsigned long> flags = {};
 };
@@ -58,6 +59,6 @@ enum class message_box_type {
 };
 
 // create a new message box window
-std::shared_ptr<ISystemWindow> CreateMessageBox(const std::string& title, const std::string& message, message_box_type type);
+std::shared_ptr<ISystemWindow> CreateMessageBox(const std::string& title, int iconId, const std::string& iconName, const std::string& message, message_box_type type);
 
 #endif // __UIFRAMEWORK_HPP__
