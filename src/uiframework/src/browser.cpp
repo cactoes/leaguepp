@@ -198,7 +198,7 @@ LRESULT Browser::OnWindowMessage(HWND wnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 void Browser::EmptyEventBus(void) {
     EventManager::EVENT evt{};
-    while (m_eventManager.Get(evt)) {
+    while (m_eventManager.Get(evt) && m_webView2) {
         std::string script = "__core_call_js__(\"" + evt.name + "\",";
 
         for (const auto& arg : evt.args)
