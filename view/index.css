@@ -337,8 +337,8 @@ body {
 /* =========================== */
 
 .button {
-    border: 1.5px solid var(--background-secondary);
     position: relative;
+    display: inline-block;
 }
 
 .button:not(:last-child) {
@@ -404,4 +404,47 @@ body {
 .image > img {
     width: 100%;
     height: 100%;
+}
+
+/* =========================== */
+/* FOLDER SELECTOR STYLING     */
+/* TODO: fix the style         */
+/* =========================== */
+
+.folderSelector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.folderSelector > p {
+    font-size: var(--font-size-default);
+}
+
+.folderSelector > div {
+    border-right: 2px solid var(--trim);
+    border-bottom: 2px solid var(--trim);
+    border-left: 2px solid var(--background-secondary);
+    border-top: 2px solid var(--background-secondary);
+}
+
+.folderSelector > div > input {
+    padding: 4px 6px;
+
+    transition: all .15s ease;
+    font-size: var(--font-size-default);
+    
+    background-color: var(--trim);
+
+    outline: none;
+    cursor: text;
+}
+
+.folderSelector > div > .button {
+    border: none;
+}
+
+.folderSelector > div > .button > button {
+    padding: 2px 14px;
 }

@@ -78,10 +78,18 @@ const createFunctions: ICreateFunctions = {
     folderSelector: (name: string, id: string, target: string, cpath: string, callback: string) => {
         const element = getTargetElement(target);
        
-        const button = createElement("div", { id, className: "folderSelector element" });
+        const button = createElement("div", { id, className: "folderSelector element" }, [
+            createElement("p", { innerText: name })
+        ]);
 
+        
+        const container = createElement("div", { className: "container" })
+        
         const display = createElement("input", { value: cpath, spellcheck: false, autocapitalize: "false", autocomplete: "off", disabled: true });
-        button.appendChild(display);
+        container.appendChild(display);
+
+        // steal button styling
+        const wrapper = createElement("div", { className: "button" })
 
         const openSelector = createElement("button", { innerText: "open" });
         openSelector.onclick = async () => {
@@ -89,7 +97,9 @@ const createFunctions: ICreateFunctions = {
             invoke(callback, [ display.value ]);
         }
 
-        button.appendChild(openSelector);
+        wrapper.appendChild(openSelector);
+        container.appendChild(wrapper);
+        button.appendChild(container);
         element.appendChild(button);
     }
 };
