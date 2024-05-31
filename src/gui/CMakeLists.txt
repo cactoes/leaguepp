@@ -3,6 +3,8 @@ project(league++)
 
 # ~~ gui interface
 
+set(LEAGUEPP_GUI ${PROJECT_NAME} PARENT_SCOPE)
+
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${APP_RESOURCES_DIR}/resources.gui.rc)
 
