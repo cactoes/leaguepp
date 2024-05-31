@@ -68,7 +68,7 @@ const createFunctions: ICreateFunctions = {
         const element = getTargetElement(target);
 
         const button = createElement("div", { id, className: "image element" },
-            [ createElement("img", { src: name }) ]);
+            [ createElement("img", { src: `media/${name}` }) ]);
 
         button.style.width = `${width}px`;
         button.style.height = `${height}px`;
