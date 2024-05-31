@@ -16,7 +16,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:CONSOLE")
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE $<$<CONFIG:Debug>:${UIFRAMEWORK_LIB_DBG}> $<$<CONFIG:Release>:${UIFRAMEWORK_LIB_REL}>
+    PRIVATE ${UIFRAMEWORK_LIB}
     PRIVATE ${DEPENDENCY_DIR}/webview/WebView2/x64/WebView2LoaderStatic.lib
     PRIVATE Version.lib
     PRIVATE windowsapp.lib)
