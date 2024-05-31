@@ -8,8 +8,7 @@
     "build:release": "tsc && node --no-deprecation view_compiler.js -c Release",
     "pack:debug": "node --no-deprecation installer_linker.js -c Debug",
     "pack:release": "node --no-deprecation installer_linker.js -c Release",
-    "cloc_tmp": "cloc src view lib\\leaguepp-connector\\src view_compiler.js corefunctions.js -exclude-dir=\"endpointmappers,target\"",
-    "cloc": "cloc src view lib\\leaguepp-connector\\src view_compiler.js corefunctions.js"
+    "cloc": "cloc src view lib\\leaguepp-connector\\src installer_linker.js view_compiler.js corefunctions.js -exclude-dir=\"endpointmappers,target\""
   },
   "keywords": [],
   "author": "",
