@@ -23,9 +23,9 @@ std::shared_ptr<ISystemWindow> CreateMessageBox(const std::string& title, const 
     config.icon = 1;
 
     BROWSER_CONFIG bwConfig{};
-    // bwConfig.flags = { BROWSER_WINDOW_FLAG_DEV_TOOLS };
 
     auto systemWindow = CreateSystemWindow(config, bwConfig, component::LAYOUT::VERTICAL);
+    systemWindow->EnableContextMenu(false);
     auto frameMain = systemWindow->GetWindowFrame();
 
     auto parent = frameMain->AddFrame("", false, component::LAYOUT::HORIZONTAL);
