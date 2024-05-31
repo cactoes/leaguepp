@@ -11,15 +11,12 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE ${UIFRAMEWORK_INCLUDE}
     PRIVATE ${SHARED_HEADERS})
 
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE ${UIFRAMEWORK_LIB})
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:CONSOLE")
-
-target_link_libraries(${PROJECT_NAME}
-    PRIVATE ${UIFRAMEWORK_LIB}
-    PRIVATE ${DEPENDENCY_DIR}/webview/WebView2/x64/WebView2LoaderStatic.lib
-    PRIVATE Version.lib
-    PRIVATE windowsapp.lib)
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /D "_MBCS")
