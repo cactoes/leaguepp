@@ -70,13 +70,13 @@ inline std::string AnyToMappedString(std::any value) {
 
     if (value.type() == typeid(std::string)) {
         auto str = std::any_cast<std::string>(value);
-        str = ReplaceAll(str, "\"", "\\\"");
+        str = ReplaceAll(str, "\\", "\\\\");
         return "\"" + str + "\"";
     }
 
     if (value.type() == typeid(const char*)) {
         std::string str = std::any_cast<const char*>(value);
-        str = ReplaceAll(str, "\"", "\\\"");
+        str = ReplaceAll(str, "\\", "\\\\");
         return "\"" + str + "\"";
     }
 
