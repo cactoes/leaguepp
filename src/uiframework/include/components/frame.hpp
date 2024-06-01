@@ -11,6 +11,7 @@
 #include "button.hpp"
 #include "image.hpp"
 #include "folder_selector.hpp"
+#include "checkbox.hpp"
 
 // ~~ frame class
 
@@ -84,6 +85,7 @@ namespace component {
         virtual std::shared_ptr<IButton> AddButton(const std::string& name, const FnButtonCallback& callback) = 0;
         virtual std::shared_ptr<IImage> AddImage(const std::string& name, const VECTOR2I& size) = 0;
         virtual std::shared_ptr<IFolderSelector> AddFolderSelector(const std::string& name) = 0;
+        virtual std::shared_ptr<ICheckbox> AddCheckbox(const std::string& name, bool state) = 0;
 
     protected:
         std::vector<std::shared_ptr<IComponent>> m_components = {};

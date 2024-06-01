@@ -81,7 +81,6 @@ const createFunctions: ICreateFunctions = {
         const button = createElement("div", { id, className: "folderSelector element" }, [
             createElement("p", { innerText: name })
         ]);
-
         
         const container = createElement("div", { className: "container" })
         
@@ -101,6 +100,19 @@ const createFunctions: ICreateFunctions = {
         container.appendChild(wrapper);
         button.appendChild(container);
         element.appendChild(button);
+    },
+    checkbox: (name: string, id: string, target: string, state: boolean, callback: string) => {
+        const element = getTargetElement(target);   
+
+        const checkbox = createElement("div", { id, className: "checkbox element" });
+
+        const input = createElement("input", { type: "checkbox", checked: state, onclick: () => invoke(callback, [ input.checked ]) });
+        checkbox.appendChild(createElement("label", {}, [ input,  createElement("span", {}) ]));
+
+        const label = createElement("p", { innerText: name });
+        checkbox.appendChild(label);
+        
+        element.appendChild(checkbox);
     }
 };
 

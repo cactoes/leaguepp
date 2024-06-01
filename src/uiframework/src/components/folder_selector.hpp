@@ -23,7 +23,7 @@ namespace component {
         }
 
         void OnSetPath(Browser*, JSArgs args) {
-            m_path = args.at(0).As<std::string>();
+            m_path = args.at(0);
         }
 
         const std::string& GetPath(void) const override {
