@@ -4,6 +4,7 @@
 
 #include <windows.h>
 #include <shlobj.h>
+#include <Shlwapi.h>
 #include <nlohmann/json.hpp>
 
 #include "helpers.hpp"
@@ -20,7 +21,11 @@ Browser::Browser(const Window& window, const BROWSER_CONFIG& config) : m_window(
     ComPtr<CoreWebView2EnvironmentOptions> options = Make<CoreWebView2EnvironmentOptions>();
     options->put_AdditionalBrowserArguments(L"--disable-web-security");
 
-    CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, options.Get(),
+    wchar_t tempPath[MAX_PATH];
+    GetTempPathW(MAX_PATH, tempPath);
+    PathAppendW(tempPath, StringToWideString("league++.cache\\"+m_window.GetTitle()+".WebView2Cache").c_str());
+
+    CreateCoreWebView2EnvironmentWithOptions(nullptr, tempPath, options.Get(),
         Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>([this, config](HRESULT, ICoreWebView2Environment* environment) -> HRESULT {
             return environment->CreateCoreWebView2Controller(m_window.GetWindowHandle(),
             Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
