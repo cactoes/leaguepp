@@ -23,6 +23,10 @@ Browser::Browser(const Window& window, const BROWSER_CONFIG& config) : m_window(
 
     wchar_t tempPath[MAX_PATH];
     GetTempPathW(MAX_PATH, tempPath);
+
+    // create a the folder incase it doesnt exist
+    CreateDirectoryW((std::wstring(tempPath) + L"league++.cache").c_str(), nullptr);
+
     PathAppendW(tempPath, StringToWideString("league++.cache\\"+m_window.GetTitle()+".WebView2Cache").c_str());
 
     CreateCoreWebView2EnvironmentWithOptions(nullptr, tempPath, options.Get(),
