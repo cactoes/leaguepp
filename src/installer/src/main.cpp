@@ -1,239 +1,212 @@
-#include <iostream>
-#include <Windows.h>
-#include <ShlObj.h>
-#include <Shlwapi.h>
-
-#include <uiframework.hpp>
-
-// HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszPathLink, LPCSTR lpszDesc) { 
-//     HRESULT hres; 
-//     IShellLink* psl; 
-
-//     hres = CoInitialize(nullptr);
-//     if (!SUCCEEDED(hres))
-//         return hres;
- 
-//     // Get a pointer to the IShellLink interface. It is assumed that CoInitialize
-//     // has already been called.
-//     hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl); 
-//     if (SUCCEEDED(hres)) { 
-//         IPersistFile* ppf; 
- 
-//         // Set the path to the shortcut target and add the description. 
-//         psl->SetPath(lpszPathObj); 
-//         psl->SetDescription(lpszDesc); 
- 
-//         // Query IShellLink for the IPersistFile interface, used for saving the 
-//         // shortcut in persistent storage. 
-//         hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf); 
- 
-//         if (SUCCEEDED(hres)) { 
-//             WCHAR wsz[MAX_PATH]; 
- 
-//             // Ensure that the string is Unicode. 
-//             MultiByteToWideChar(CP_ACP, 0, lpszPathLink, -1, wsz, MAX_PATH); 
-            
-//             // Add code here to check return value from MultiByteWideChar 
-//             // for success.
- 
-//             // Save the link by calling IPersistFile::Save. 
-//             hres = ppf->Save(wsz, TRUE); 
-//             ppf->Release(); 
-//         } 
-//         psl->Release(); 
-//     } 
-
-//     CoUninitialize();
-
-//     return hres;
-// }
-
-#include <shellapi.h>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-
-// bool ExtractResource(LPCSTR resourceName, LPCSTR outputPath) {
-//     // Find the resource
-//     HRSRC hResource = FindResourceA(NULL, resourceName, "ZIPFILE");
-//     if (!hResource) return false;
-
-//     // Load the resource
-//     HGLOBAL hLoadedResource = LoadResource(NULL, hResource);
-//     if (!hLoadedResource) return false;
-
-//     // Lock the resource to get a pointer to the data
-//     LPVOID pLockedResource = LockResource(hLoadedResource);
-//     if (!pLockedResource) return false;
-
-//     // Get the size of the resource
-//     DWORD resourceSize = SizeofResource(NULL, hResource);
-//     if (!resourceSize) return false;
-
-//     std::cout << resourceSize << "\n";
-
-//     // Write the resource to the output file
-//     std::ofstream outFile(outputPath, std::ios::binary);
-//     outFile.write((const char*)pLockedResource, resourceSize);
-//     outFile.close();
-
-//     return true;
-// }
-
-// std::filesystem::path GetTempFolderPath() {
-//     char tempPath[MAX_PATH];
-//     DWORD result = GetTempPathA(MAX_PATH, tempPath);
-
-//     return std::filesystem::path(tempPath) / "league++.cache";
-// }
-
 #include <windows.h>
 #include <string>
-#include <shlobj.h>
-#include <iostream>
-#include <sstream>
+#include <ShlObj.h>
+#include <Shlwapi.h>
+#include <format>
+#include <uiframework.hpp>
 
-// https://stackoverflow.com/questions/12034943/win32-select-directory-dialog-from-c-c
+// from official docs
+HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszPathLink, LPCSTR lpszDesc, LPCSTR lpszWorkingDir) { 
+    HRESULT hres; 
+    IShellLink* psl; 
 
-static int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg, LPARAM lParam, LPARAM lpData) {
+    hres = CoInitialize(nullptr);
+    if (!SUCCEEDED(hres))
+        return hres;
+ 
+    // Get a pointer to the IShellLink interface. It is assumed that CoInitialize
+    // has already been called.
+    hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl); 
+    if (SUCCEEDED(hres)) { 
+        IPersistFile* ppf; 
+ 
+        // Set the path to the shortcut target and add the description. 
+        psl->SetPath(lpszPathObj); 
+        psl->SetDescription(lpszDesc); 
+        psl->SetWorkingDirectory(lpszWorkingDir);
+ 
+        // Query IShellLink for the IPersistFile interface, used for saving the 
+        // shortcut in persistent storage. 
+        hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf); 
+ 
+        if (SUCCEEDED(hres)) { 
+            WCHAR wsz[MAX_PATH]; 
+ 
+            // Ensure that the string is Unicode. 
+            MultiByteToWideChar(CP_ACP, 0, lpszPathLink, -1, wsz, MAX_PATH); 
+            
+            // Add code here to check return value from MultiByteWideChar 
+            // for success.
+ 
+            // Save the link by calling IPersistFile::Save. 
+            hres = ppf->Save(wsz, TRUE); 
+            ppf->Release(); 
+        } 
+        psl->Release(); 
+    } 
 
-    if(uMsg == BFFM_INITIALIZED) {
-        // std::string tmp = (const char *) lpData;
-        // std::cout << "path: " << tmp << std::endl;
-        SendMessageA(hwnd, BFFM_SETSELECTION, TRUE, lpData);
-    }
+    CoUninitialize();
 
-    return 0;
+    return hres;
 }
 
-std::string BrowseFolder(std::string saved_path) {
-    char  path[MAX_PATH];
-    const char* path_param = saved_path.c_str();
+// ~~ ExtractResource 
+//    extracts a resource from the exe to the target
+bool ExtractResource(const char* resourceType, const char* resourceName, const std::string& outputPath) {
+    HMODULE hModule = GetModuleHandleA(nullptr);
+    if (!hModule) return false;
 
-    BROWSEINFOA bi = { 0 };
-    bi.lpszTitle = "Select install location";
-    bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
-    bi.lpfn = BrowseCallbackProc;
-    bi.lParam = (LPARAM)path_param;
+    HRSRC hRes = FindResourceA(hModule, resourceName, resourceType);
+    if (!hRes) return false;
 
-    LPITEMIDLIST pidl = SHBrowseForFolderA(&bi);
+    HGLOBAL hResLoad = LoadResource(hModule, hRes);
+    if (!hResLoad) return false;
 
-    if (pidl != 0) {
-        // get the name of the folder and put it in path
-        SHGetPathFromIDList ( pidl, path );
+    auto pResLock = (char*)LockResource(hResLoad);
+    if (!pResLock) return false;
 
-        // free memory used
-        IMalloc* imalloc = 0;
-        if (SUCCEEDED(SHGetMalloc(&imalloc))) {
-            imalloc->Free(pidl);
-            imalloc->Release();
+    DWORD resSize = SizeofResource(hModule, hRes);
+    if (resSize == 0) return false;
+
+    std::ofstream outFile(outputPath, std::ios::out | std::ios::binary);
+    outFile.write(pResLock, resSize);
+
+    return true;
+}
+
+std::filesystem::path GetTempFolderPath() {
+    char tempPath[MAX_PATH];
+    GetTempPathA(MAX_PATH, tempPath);
+    return std::filesystem::path(tempPath) / "league++.cache";
+}
+
+// ~~ CreateShortcut
+//    creates a shortcut in the start menu ui
+bool CreateShortcut(const std::string& clientPath) {
+    char path[MAX_PATH];
+    SHGetFolderPathA(nullptr, CSIDL_COMMON_PROGRAMS, nullptr, 0, path);
+    PathAppendA(path, "\\league++.lnk");
+    return SUCCEEDED(CreateLink((clientPath + "\\league++.exe").c_str(), path, "testlink", clientPath.c_str()));
+}
+
+bool InstallClient(const std::string& target) {
+    std::filesystem::path tempFolder = GetTempFolderPath();
+    
+    // create a temp folder for out data
+    if (!CreateDirectoryA(tempFolder.string().c_str(), nullptr)) {
+        DWORD err = GetLastError();
+        switch (err) {
+            case ERROR_ALREADY_EXISTS:
+                break;
+            case ERROR_PATH_NOT_FOUND:
+            default:
+                CreateMessageBox("error", 1, "installer_icon.png", "failed to create temp dir", message_box_type::MB_ERROR);
+                return false;
         }
-
-        return path;
     }
 
-    return "";
+    std::string tempTarget = (tempFolder / "league++.zip").string();
+
+    if (!ExtractResource("ZIPFILE", "LEAGUEPP_ZIP", tempTarget)) {
+        CreateMessageBox("error", 1, "installer_icon.png", "failed to extract the client", message_box_type::MB_ERROR);
+        return false;
+    }
+
+    STARTUPINFO startupInfo{};
+    startupInfo.cb = sizeof(STARTUPINFO);
+    startupInfo.dwFlags = STARTF_USESHOWWINDOW;
+    startupInfo.wShowWindow = SW_HIDE;
+
+    std::string command = std::format("cmd.exe /c powershell.exe -nologo -noprofile -command Expand-Archive -Path \"{}\" -DestinationPath \"{}\"", tempTarget.c_str(), target.c_str());
+
+    PROCESS_INFORMATION processInfo{};
+
+    if (!CreateProcessA(nullptr, (char*)command.c_str(), nullptr, nullptr, true, 0, nullptr, nullptr, &startupInfo, &processInfo)) {
+        CreateMessageBox("error", 1, "installer_icon.png", "failed to create sub process", message_box_type::MB_ERROR);
+        return false;
+    }
+
+    WaitForSingleObject(processInfo.hProcess, INFINITE);
+    CloseHandle(processInfo.hProcess);
+    CloseHandle(processInfo.hThread);
+
+    return true;
 }
 
-int main(int, char** argv) {
-    std::string path = BrowseFolder(argv[0]);
-    std::cout << path << std::endl;
-    // std::filesystem::path tempFolder = GetTempFolderPath();
+int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+    WINDOW_CONFIG config{};
+    config.flags = { WINDOW_FLAG_SHOW, WINDOW_FLAG_HIDE_TITLE_BAR };
+    config.size = { 450, 200 };
+    config.name = "league++ installer";
+    config.iconId = 1;
+    config.iconName = "installer_icon.png";
 
-    // CreateDirectoryA(tempFolder.string().c_str(), nullptr);
-
-    // std::string zipFile = (tempFolder / "league++.zip").string();
-
-    // bool r = ExtractResource("LEAGUEPP_ZIP", zipFile.c_str());
-
-    // // Path to the zip file
-    // const char* zipFilePath = zipFile.c_str();
-    // // Path to the directory where you want to extract the files
-    // const char* extractPath = "PATH_TO_OUT";
-
-    // // Construct the full PowerShell command
-    // char fullCommand[MAX_PATH];
-    // sprintf(fullCommand, "cmd.exe /c powershell.exe -nologo -noprofile -command Expand-Archive -Path \"%s\" -DestinationPath \"%s\"", zipFilePath, extractPath);
-
-    // // SHELLEXECUTEINFOA sei{};
-    // // sei.lpVerb = "open";
-    // // sei.lpFile = "cmd.exe";
-    // // sei.lpParameters = fullCommand;
-    // // sei.nShow = SW_SHOW;
-
-    // // if (!ShellExecuteExA(&sei)) {
-    // //     std::cout << "failed\n";
-    // //     std::cout << GetLastError() << "\n";
-    // //     ERROR_ACCESS_DENIED;
-    // //     return 1;
-    // // }
-
-    // PROCESS_INFORMATION pi;
-    // ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
-
-    // // Startup information
-    // STARTUPINFO si;
-    // ZeroMemory(&si, sizeof(STARTUPINFO));
-    // si.cb = sizeof(STARTUPINFO);
-    // si.dwFlags = STARTF_USESHOWWINDOW;
-    // si.wShowWindow = SW_HIDE; // Hide the window
-
-    // // Create the process
-    // if (!CreateProcess(NULL, (LPSTR)fullCommand, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)) {
-    //     std::cerr << "Failed to create process. Error code: " << GetLastError() << std::endl;
-    //     return 1;
-    // }
-
-    // WaitForSingleObject(pi.hProcess, INFINITE);
-    // CloseHandle(pi.hProcess);
-    // CloseHandle(pi.hThread);
-
-    // std::cout << tempFolder << "\n";
-
-    // WINDOW_CONFIG config{};
-    // config.flags = { WINDOW_FLAG_SHOW, WINDOW_FLAG_HIDE_TITLE_BAR };
-    // config.size = { 500, 400 };
-    // config.name = "league++ uninstaller";
-    // config.iconId = 1;
-    // config.iconName = "installer_icon.png";
-
-    // BROWSER_CONFIG bwConfig{};
+    BROWSER_CONFIG bwConfig{};
+    // for debugging
     // bwConfig.flags = { BROWSER_FLAG_DEV_TOOLS };
 
-    // auto systemWindow = CreateSystemWindow(config, bwConfig, component::LAYOUT::VERTICAL);
-    // systemWindow->EnableContextMenu(false);
-    
-    // auto frameMain = systemWindow->GetWindowFrame()->AddFrame("", false, component::LAYOUT::VERTICAL, component::ALIGN::CENTER);
+    auto systemWindow = CreateSystemWindow(config, bwConfig, component::LAYOUT::VERTICAL);
+    systemWindow->EnableContextMenu(false);
 
-    // frameMain->AddLabel("are you sure you want to uninstall league++?");
-    // auto container = frameMain->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO, component::ALIGN::CENTER);
-    // container->AddButton("yes", [](){});
-    // container->AddButton("no", [](){});
+    auto frameMain = systemWindow->GetWindowFrame()->AddFrame("", false, component::LAYOUT::VERTICAL, component::ALIGN::NONE);
 
-    // SystemPollWindowEvents();
+    auto contentFrame = frameMain->AddFrame("", false, component::LAYOUT::HORIZONTAL, component::ALIGN::NONE);
 
-    // char path[MAX_PATH];
-    // SHGetFolderPathA(nullptr, CSIDL_COMMON_PROGRAMS, nullptr, 0, path);
-    // PathAppendA(path, "\\league++.lnk");
+    contentFrame
+        ->AddFrame("", false, component::LAYOUT::VERTICAL_AUTO, component::ALIGN::NONE)
+        ->AddImage("disc_icon_2.png", { 100, 100 });
 
-    // char lpppath[MAX_PATH] = {};
-    // GetFullPathNameA("league++.exe", MAX_PATH, lpppath, nullptr);
+    auto container = contentFrame->AddFrame("", false, component::LAYOUT::VERTICAL);
 
-    // auto hr = CreateLink(lpppath, path, "testlink");
-    // std::cout << std::hex << hr << "\n";
+    container
+        ->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO)
+        ->AddLabel("to install league++ you will need to select a folder to install to");
 
-    // PathAppendA(lpppath, "..");
+    auto checkbox = container
+                ->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO)
+                ->AddCheckbox("start menu shortcut", true);
 
-    // for (const auto& entry : std::filesystem::directory_iterator(lpppath)) {
+    auto selector = container
+                        ->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO)
+                        ->AddFolderSelector("location");
+
+    auto controlsFrame = frameMain->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO, component::ALIGN::NONE);
+    controlsFrame->AddButton("install", [&]() {
+            auto path = selector->GetPath();
+            if (path.empty()) {
+                CreateMessageBox("error", 1, "installer_icon.png", "path cannot be empty", message_box_type::MB_ERROR);
+                return;
+            }
+
+            // TODO: update ui to display that we are installing
+
+            if (!InstallClient(path))
+                return;
+            
+            if (checkbox->GetState() && !CreateShortcut(path))
+                return;
+                
+            CreateMessageBox("sucess", 1, "installer_icon.png", "league++ has been installed", message_box_type::MB_INFO);
+        });
+
+    controlsFrame->AddButton("cancel", [&]() { systemWindow->CloseWindow(); });
+
+    SystemPollWindowEvents();
+
+    // uninstaller vv
+
+    // for (const auto& entry : std::filesystem::directory_iterator("league++ installdir")) {
     //     if (!entry.is_directory()) {
     //         DeleteFileA(entry.path().string().c_str());
     //     }
     // }
 
-    // RemoveDirectoryA(lpppath);
+    // RemoveDirectoryA("league++ installdir");
 
-    // std::cout << path << "\n";
-    // std::cout << lpppath << "\n";
+    // DeleteFileA("shortcut path");
 
-    // DeleteFileA(path);
+    return 0;
 }
