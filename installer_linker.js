@@ -3,16 +3,7 @@ const fse = require('fs-extra');
 const path = require('path');
 const AdmZip = require('adm-zip');
 const zip = new AdmZip();
-const { exec, execSync } = require('child_process');
-
-// call "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat"
-// rc /fo installer.res ..\..\resources\installer.dbg.rc
-// link ..\src\installer\installer.dir\Debug\main.obj installer.res ..\src\installer\installer.dir\Debug\resources.installer.res /out:"..\Debug\installer.exe"
-
-// exec(`"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat" && rc /h`, (e, o, eo) => {
-//     console.log(e);
-//     console.log(o);
-// })
+const { execSync } = require('child_process');
 
 const adminUAC = `
     <?xml version="1.0" encoding="utf-8"?>
@@ -74,11 +65,11 @@ function main(argc, argv) {
     fs.writeFileSync(path.join(installerLinkerTempDir, "resource.rc"), `LEAGUEPP_ZIP ZIPFILE "league++.zip"`)
 
     const RC_CMD = "rc /fo resource.res resource.rc";
-    const LINK_CMD = `link "..\\src\\installer\\installer.dir\\Debug\\main.obj" resource.res "..\\src\\installer\\installer.dir\\Debug\\resources.installer.res" /out:"..\\Debug\\installer.exe"`;
-    const MT_CMD = `mt -manifest uac.manifest -outputresource:"..\\Debug\\installer.exe"`;
+    // const LINK_CMD = `link "..\\src\\installer\\installer.dir\\Debug\\main.obj" resource.res ..\\Debug\\uiframework.lib "..\\src\\installer\\installer.dir\\Debug\\resources.installer.res" /out:"..\\Debug\\installer.exe"`;
+    // const MT_CMD = `mt -manifest uac.manifest -outputresource:"..\\Debug\\installer.exe"`;
 
     try {
-        execSync(`cd ${installerLinkerTempDir.toString()} && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat" && ${RC_CMD} && ${LINK_CMD} && ${MT_CMD}`);
+        execSync(`cd ${installerLinkerTempDir.toString()} && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat" && ${RC_CMD}`); //  && ${LINK_CMD} && ${MT_CMD}
     } catch (error) {
         console.log(error.message);
         return error.status;
