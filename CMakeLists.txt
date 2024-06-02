@@ -22,7 +22,6 @@ set(SHARED_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/shared)
 # ~~ projects
 
 add_subdirectory(src/uiframework)
-add_subdirectory(src/service)
 add_subdirectory(src/gui)
 add_subdirectory(src/installer)
 
