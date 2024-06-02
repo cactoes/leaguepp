@@ -17,8 +17,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE ${UIFRAMEWORK_LIB})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:CONSOLE")
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /D "_MBCS")
