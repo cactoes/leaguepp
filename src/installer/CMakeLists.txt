@@ -28,6 +28,10 @@ add_custom_command(
 
 add_custom_target(prebuild ALL DEPENDS ${RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}.exe)
 
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE APP_GUID="{${APP_GUID}}"
+    PRIVATE BUILD_STRING="${BUILD_STRING}")
+
 add_dependencies(${PROJECT_NAME} ${LEAGUEPP_GUI} ${LEAGUEPP_SERVICE})
 
 if(MSVC)

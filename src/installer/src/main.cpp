@@ -6,7 +6,12 @@
 #include <ShlObj.h>
 #include <Shlwapi.h>
 #include <format>
+#include <numeric>
 #include <uiframework.hpp>
+#include <shared/win32.hpp>
+#include <shared/general.hpp>
+
+static const char* g_registryPath = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" APP_GUID;
 
 // from official docs
 HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszPathLink, LPCSTR lpszDesc, LPCSTR lpszWorkingDir) { 
@@ -53,8 +58,7 @@ HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszPathLink, LPCSTR lpszDesc, LPC
     return hres;
 }
 
-// ~~ ExtractResource 
-//    extracts a resource from the exe to the target
+// extracts a resource from the exe to the target
 bool ExtractResource(const char* resourceType, const char* resourceName, const std::string& outputPath) {
     HMODULE hModule = GetModuleHandleA(nullptr);
     if (!hModule) return false;
@@ -83,15 +87,39 @@ std::filesystem::path GetTempFolderPath() {
     return std::filesystem::path(tempPath) / "league++.cache";
 }
 
-// ~~ CreateShortcut
-//    creates a shortcut in the start menu ui
-bool CreateShortcut(const std::string& clientPath) {
+bool InitInstallDir(const std::string& clientPath) {
+    if (!CreateDirectoryA(clientPath.c_str(), nullptr)) {
+        DWORD err = GetLastError();
+        switch (err) {
+            case ERROR_ALREADY_EXISTS:
+                break;
+            case ERROR_PATH_NOT_FOUND:
+            default:
+                CreateMessageBox("error", 1, "installer_icon.png", "failed to create install dir", message_box_type::MB_ERROR);
+                return false;
+        }
+    }
+
+    return true;
+}
+
+// creates a shortcut in the start menu ui
+bool CreateStartMenuShortcut(const std::string& clientPath) {
     char path[MAX_PATH];
     SHGetFolderPathA(nullptr, CSIDL_COMMON_PROGRAMS, nullptr, 0, path);
     PathAppendA(path, "\\league++.lnk");
-    return SUCCEEDED(CreateLink((clientPath + "\\league++.exe").c_str(), path, "testlink", clientPath.c_str()));
+    return SUCCEEDED(CreateLink((clientPath + "\\league++.exe").c_str(), path, "league++ shortcut", clientPath.c_str()));
 }
 
+// creates a desktop shortcut
+bool CreateDesktopShortcut(const std::string& clientPath) {
+    char path[MAX_PATH];
+    SHGetFolderPathA(nullptr, CSIDL_DESKTOP, nullptr, 0, path);
+    PathAppendA(path, "\\league++.lnk");
+    return SUCCEEDED(CreateLink((clientPath + "\\league++.exe").c_str(), path, "league++ shortcut", clientPath.c_str()));
+}
+
+// installs the actual files from the install to the target
 bool InstallClient(const std::string& target) {
     std::filesystem::path tempFolder = GetTempFolderPath();
     
@@ -132,11 +160,63 @@ bool InstallClient(const std::string& target) {
     WaitForSingleObject(processInfo.hProcess, INFINITE);
     CloseHandle(processInfo.hProcess);
     CloseHandle(processInfo.hThread);
-
     return true;
 }
 
-int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+uintmax_t CalculateFolderSize(const std::string& path) {
+    auto iterator = std::filesystem::recursive_directory_iterator(path);
+    return std::accumulate(
+        std::filesystem::begin(iterator), std::filesystem::end(iterator), 0ull,
+        [](std::uintmax_t total, const std::filesystem::directory_entry& entry) {
+            return total + (std::filesystem::is_regular_file(entry) ? std::filesystem::file_size(entry) : 0);
+        });
+}
+
+// initializes windows registery values
+bool SetupRegistry(const std::string& clientPath) {
+    auto entry = win32::RegistryEntry(g_registryPath);
+    if (!entry.Init(true))
+        return false;
+
+    entry.SetRegValue<REG_EXPAND_SZ>("DisplayIcon",      clientPath + "\\league++.exe");
+    entry.SetRegValue<REG_SZ>(       "DisplayName",      "league++ client");
+    entry.SetRegValue<REG_SZ>(       "DisplayVersion",   (char*)BUILD_STRING);
+    entry.SetRegValue<REG_EXPAND_SZ>("UninstallString",  clientPath + "\\uninstall.exe");
+    entry.SetRegValue<REG_EXPAND_SZ>("InstallLocation",  clientPath);
+    entry.SetRegValue<REG_SZ>(       "Publisher",        "NERV");
+    entry.SetRegValue<REG_DWORD>(    "EstimatedSize",    (DWORD)((CalculateFolderSize(clientPath) + 1023) / 1024));
+    return true;
+}
+
+int WinMain(HINSTANCE, HINSTANCE, LPSTR lpCmdLine, int) {
+    bool checkBuildVersion = !IsDebug();
+    std::vector<std::string> argv = win32::CommandLineToArgvExA(lpCmdLine);
+
+    for (const auto& arg : argv) {
+        if (arg == "-nobuildchk")
+            checkBuildVersion = false;
+    }
+
+    auto entry = win32::RegistryEntry(g_registryPath);
+
+    std::string installLocation {};
+    if (entry.Init()) {
+        entry.GetRegValue("InstallLocation", installLocation);
+        if (!installLocation.empty())
+            installLocation = (std::filesystem::path(installLocation) / "..").string();
+
+        if (checkBuildVersion) {
+            std::string targetVersion {};
+            entry.GetRegValue("DisplayVersion", targetVersion);
+
+            if (targetVersion == BUILD_STRING) {
+                CreateMessageBox("info", 1, "installer_icon.png", "the latest league++ version has already been installed", message_box_type::MB_INFO);
+                SystemPollWindowEvents();
+                return 0;
+            }
+        }
+    }
+
     WINDOW_CONFIG config{};
     config.flags = { WINDOW_FLAG_SHOW, WINDOW_FLAG_HIDE_TITLE_BAR };
     config.size = { 450, 200 };
@@ -165,17 +245,21 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO)
         ->AddLabel("to install league++ you will need to select a folder to install to");
 
-    auto checkbox = container
+    auto startMenuShortcutCheckbox = container
                 ->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO)
                 ->AddCheckbox("start menu shortcut", true);
 
+    auto desktopShortcutCheckbox = container
+                ->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO)
+                ->AddCheckbox("dekstop shortcut", true);
+
     auto selector = container
                         ->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO)
-                        ->AddFolderSelector("location");
+                        ->AddFolderSelector("location", installLocation);
 
     auto controlsFrame = frameMain->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO, component::ALIGN::NONE);
     controlsFrame->AddButton("install", [&]() {
-            auto path = selector->GetPath();
+            auto path = selector->GetPath() + "\\league++";
             if (path.empty()) {
                 CreateMessageBox("error", 1, "installer_icon.png", "path cannot be empty", message_box_type::MB_ERROR);
                 return;
@@ -183,16 +267,25 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             // TODO: update ui to display that we are installing
 
+            if (!InitInstallDir(path))
+                return;
+
+            if (!SetupRegistry(path))
+                return;
+
             if (!InstallClient(path))
                 return;
             
-            if (checkbox->GetState() && !CreateShortcut(path))
+            if (startMenuShortcutCheckbox->GetState() && !CreateStartMenuShortcut(path))
+                return;
+
+            if (desktopShortcutCheckbox->GetState() && !CreateDesktopShortcut(path))
                 return;
                 
             CreateMessageBox("sucess", 1, "installer_icon.png", "league++ has been installed", message_box_type::MB_INFO);
         });
 
-    controlsFrame->AddButton("cancel", [&]() { systemWindow->CloseWindow(); });
+    controlsFrame->AddButton("exit", [&]() { systemWindow->CloseWindow(); });
 
     SystemPollWindowEvents();
 
