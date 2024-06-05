@@ -15,6 +15,7 @@ set(DEPENDENCY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(APP_RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 set(SHARED_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/shared)
+set(APP_GUID "9b600a37-c3e8-403a-9b7e-02fc0bda07a9")
 
 # math(EXPR PLATFORM_BITS "8*${CMAKE_SIZEOF_VOID_P}")
 # set(PLATFORM "x${PLATFORM_BITS}")
@@ -22,6 +23,7 @@ set(SHARED_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/shared)
 # ~~ projects
 
 add_subdirectory(src/uiframework)
+add_subdirectory(src/service)
 add_subdirectory(src/gui)
 add_subdirectory(src/installer)
 
