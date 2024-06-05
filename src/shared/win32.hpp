@@ -4,6 +4,8 @@
 #define __WIN32_HPP__
 
 #include <Windows.h>
+#include <vector>
+#include <string>
 
 // ~~ win32 wrapper functions
 
@@ -144,7 +146,7 @@ namespace win32 {
             char buff[MAX_PATH];
             if (!GetRegValue(name, buff, size))
                 return false;
-                
+
             out.assign(buff, buff + size - 1);
             return true;
         }
@@ -153,6 +155,66 @@ namespace win32 {
         std::string m_path = "";
         win32::hkey m_key = nullptr;
     };
+
+    
+    // http://alter.org.ua/en/docs/win/args/
+    std::vector<std::string> CommandLineToArgvExA(const std::string& cmdLine) {
+        std::vector<std::string> argv;
+        std::string currentArg;
+        bool inQuote = false;
+        bool inText = false;
+        bool inSpace = true;
+
+        for (char a : cmdLine) {
+            if (inQuote) {
+                if (a == '\"')
+                    inQuote = false;
+                else
+                    currentArg += a;
+                continue;
+            }
+
+            switch (a) {
+                case '\"':
+                    inQuote = true;
+                    inText = true;
+                    if (inSpace) {
+                        if (!currentArg.empty()) {
+                            argv.push_back(currentArg);
+                            currentArg.clear();
+                        }
+                    }
+                    inSpace = false;
+                    break;
+                case ' ':
+                case '\t':
+                case '\n':
+                case '\r':
+                    if (inText && !currentArg.empty()) {
+                        argv.push_back(currentArg);
+                        currentArg.clear();
+                    }
+                    inText = false;
+                    inSpace = true;
+                    break;
+                default:
+                    inText = true;
+                    if (inSpace && !currentArg.empty()) {
+                        argv.push_back(currentArg);
+                        currentArg.clear();
+                    }
+                    currentArg += a;
+                    inSpace = false;
+                    break;
+            }
+        }
+
+        if (!currentArg.empty()) {
+            argv.push_back(currentArg);
+        }
+
+        return argv;
+    }
 }; // namespace win32
 
 #endif // __WIN32_HPP__
