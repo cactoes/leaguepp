@@ -6,6 +6,9 @@
 #include <Windows.h>
 #include <vector>
 #include <string>
+#include <iostream>
+#include <filesystem>
+#include <ShlObj.h>
 
 // ~~ win32 wrapper functions
 
@@ -214,6 +217,12 @@ namespace win32 {
         }
 
         return argv;
+    }
+
+    std::filesystem::path GetFolderPath(int csidl) {
+        char path[MAX_PATH];
+        SHGetFolderPathA(nullptr, csidl, nullptr, 0, path);
+        return std::filesystem::path(path);
     }
 }; // namespace win32
 
