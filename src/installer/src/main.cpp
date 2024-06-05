@@ -105,18 +105,14 @@ bool InitInstallDir(const std::string& clientPath) {
 
 // creates a shortcut in the start menu ui
 bool CreateStartMenuShortcut(const std::string& clientPath) {
-    char path[MAX_PATH];
-    SHGetFolderPathA(nullptr, CSIDL_COMMON_PROGRAMS, nullptr, 0, path);
-    PathAppendA(path, "\\league++.lnk");
-    return SUCCEEDED(CreateLink((clientPath + "\\league++.exe").c_str(), path, "league++ shortcut", clientPath.c_str()));
+    auto path = win32::GetFolderPath(CSIDL_COMMON_PROGRAMS) / "league++.lnk";
+    return SUCCEEDED(CreateLink((clientPath + "\\league++.exe").c_str(), path.string().c_str(), "league++ shortcut", clientPath.c_str()));
 }
 
 // creates a desktop shortcut
 bool CreateDesktopShortcut(const std::string& clientPath) {
-    char path[MAX_PATH];
-    SHGetFolderPathA(nullptr, CSIDL_DESKTOP, nullptr, 0, path);
-    PathAppendA(path, "\\league++.lnk");
-    return SUCCEEDED(CreateLink((clientPath + "\\league++.exe").c_str(), path, "league++ shortcut", clientPath.c_str()));
+    auto path = win32::GetFolderPath(CSIDL_DESKTOP) / "league++.lnk";
+    return SUCCEEDED(CreateLink((clientPath + "\\league++.exe").c_str(), path.string().c_str(), "league++ shortcut", clientPath.c_str()));
 }
 
 // installs the actual files from the install to the target
@@ -255,7 +251,7 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR lpCmdLine, int) {
 
     auto selector = container
                         ->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO)
-                        ->AddFolderSelector("location", installLocation);
+                        ->AddFolderSelector("location", win32::GetFolderPath(CSIDL_PROGRAM_FILES).string());
 
     auto controlsFrame = frameMain->AddFrame("", false, component::LAYOUT::HORIZONTAL_AUTO, component::ALIGN::NONE);
     controlsFrame->AddButton("install", [&]() {
@@ -288,18 +284,6 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR lpCmdLine, int) {
     controlsFrame->AddButton("exit", [&]() { systemWindow->CloseWindow(); });
 
     SystemPollWindowEvents();
-
-    // uninstaller vv
-
-    // for (const auto& entry : std::filesystem::directory_iterator("league++ installdir")) {
-    //     if (!entry.is_directory()) {
-    //         DeleteFileA(entry.path().string().c_str());
-    //     }
-    // }
-
-    // RemoveDirectoryA("league++ installdir");
-
-    // DeleteFileA("shortcut path");
-
+    
     return 0;
 }
