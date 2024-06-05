@@ -5,6 +5,7 @@
         "files": [
             "league++.exe",
             "lppservice.exe",
+            "uninstaller.exe",
             "view"
         ]
     },
@@ -14,6 +15,7 @@
         "files": [
             "league++.exe",
             "lppservice.exe",
+            "uninstaller.exe",
             "view"
         ]
     }

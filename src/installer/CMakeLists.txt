@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(installer)
 
-# ~~ uninstaller to cleanup any traces
+# ~~ installer for league++ ww
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*)
 add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES} ${APP_RESOURCES_DIR}/resources.installer.rc)
@@ -32,7 +32,7 @@ target_compile_definitions(${PROJECT_NAME}
     PRIVATE APP_GUID="{${APP_GUID}}"
     PRIVATE BUILD_STRING="${BUILD_STRING}")
 
-add_dependencies(${PROJECT_NAME} ${LEAGUEPP_GUI} ${LEAGUEPP_SERVICE})
+add_dependencies(${PROJECT_NAME} ${LEAGUEPP_GUI} ${LEAGUEPP_SERVICE} ${LEAGUEPP_UNINSTALLER})
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /D "_MBCS")

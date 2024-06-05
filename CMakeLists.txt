@@ -25,6 +25,7 @@ set(PLATFORM "x64")
 add_subdirectory(src/uiframework)
 add_subdirectory(src/service)
 add_subdirectory(src/gui)
+add_subdirectory(src/uninstaller)
 add_subdirectory(src/installer)
 
 # # ================
