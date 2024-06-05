@@ -5,7 +5,7 @@
 
 #include <string>
 #include <memory>
-#include <bitfield.hpp>
+#include <shared/bitfield.hpp>
 
 #include "components/frame.hpp"
 

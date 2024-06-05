@@ -19,7 +19,7 @@ public:
         SetStatus(1, SERVICE_RUNNING, SERVICE_ACCEPT_STOP);
 
         // main loop
-        m_server->Start([](const service_packet* packet) {
+        m_server->Start([&](const service_packet* packet) {
             service_debug << "recieved packet (cmd: " << packet->m_cmd << ")" << std::endl;
         });
 

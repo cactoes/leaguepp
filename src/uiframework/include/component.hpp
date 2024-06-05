@@ -5,8 +5,8 @@
 
 #include <string>
 #include <memory>
-#include <random.hpp>
-#include <callback.hpp>
+#include <shared/random.hpp>
+#include <shared/callback.hpp>
 
 // ~~ the component base
 

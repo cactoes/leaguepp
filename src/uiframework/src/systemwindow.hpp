@@ -8,7 +8,7 @@
 #include "browser.hpp"
 
 #include <map>
-#include <random.hpp>
+#include <shared/random.hpp>
 
 class SystemWindow : public ISystemWindow {
 public:

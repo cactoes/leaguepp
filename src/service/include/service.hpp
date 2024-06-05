@@ -7,7 +7,7 @@
 #include <Windows.h>
 #include <sstream>
 #include <format>
-#include <win32.hpp>
+#include <shared/win32.hpp>
 
 // ~~ shared service header
 //    global consts & methods
