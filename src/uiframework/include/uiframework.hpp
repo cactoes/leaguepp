@@ -22,13 +22,13 @@ struct WINDOW_CONFIG {
     int iconId = -1;
     std::string iconName = "";
     std::string name = "window";
-    BitField<unsigned long> flags = {};
+    BitField flags = {};
 };
 
 #define BROWSER_FLAG_DEV_TOOLS 0ul
 
 struct BROWSER_CONFIG {
-    BitField<unsigned long> flags = {};
+    BitField flags = {};
 };
 
 // ~~ ISystemWindow base class
