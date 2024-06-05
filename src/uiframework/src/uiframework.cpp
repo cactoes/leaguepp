@@ -20,7 +20,13 @@ std::shared_ptr<ISystemWindow> CreateSystemWindow(const WINDOW_CONFIG& wc, const
 std::shared_ptr<ISystemWindow> CreateMessageBox(const std::string& title, int iconId, const std::string& iconName, const std::string& message, message_box_type type) {
     WINDOW_CONFIG config{};
     config.flags = { WINDOW_FLAG_SHOW, WINDOW_FLAG_HIDE_TITLE_BAR };
-    config.size = { 200, 150 };
+
+    int extraWidth = 0;
+    if (message.size() > 30)
+        // 1 is the scaling factor
+        extraWidth = (int)((double)message.size() * 1);
+
+    config.size = { 200 + extraWidth, 150 };
     config.name = title;
     config.iconId = iconId;
     config.iconName = iconName;
