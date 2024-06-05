@@ -59,8 +59,8 @@ namespace component {
             return AddComponent<Image>(name, size);
         }
 
-        std::shared_ptr<IFolderSelector> AddFolderSelector(const std::string& name) override {
-            return AddComponent<FolderSelector>(name);
+        std::shared_ptr<IFolderSelector> AddFolderSelector(const std::string& name, const std::string& defaultPath) override {
+            return AddComponent<FolderSelector>(name, defaultPath);
         }
 
         std::shared_ptr<ICheckbox> AddCheckbox(const std::string& name, bool state) override {

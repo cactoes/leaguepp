@@ -274,8 +274,9 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg, LPARAM lParam, LPARA
 }
 
 std::string Browser::OpenFolderSelector(Browser *, JSArgs args) {
-    char  path[MAX_PATH];
-    const char* path_param = args.at(0).As<std::string>().c_str();
+    char path[MAX_PATH];
+    auto str = args.at(0).As<std::string>();
+    const char* path_param = str.c_str();
 
     BROWSEINFOA bi = { 0 };
     bi.lpszTitle = "Select folder";

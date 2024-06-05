@@ -9,10 +9,11 @@
 namespace component {
     class FolderSelector : public IFolderSelector {
     public:
-        FolderSelector(const std::string& name, Browser* browser, const std::string& target) {
+        FolderSelector(const std::string& name, Browser* browser, const std::string& target, const std::string& defaultPath) {
             m_name = name;
             m_browser = browser;
             m_target = target;
+            m_path = defaultPath;
         }
 
         void Update(void) override {}
