@@ -8,34 +8,28 @@
 
 // ~~ bitfield helper class
 
-template <typename Ty = unsigned long, int nmax = sizeof(Ty) * 8>
 class BitField {
 public:
+    typedef uint64_t field_type;
+    static constexpr int nmax = sizeof(field_type) * 8;
+
     BitField(void) = default;
 
-    template <int N>
-    BitField(std::array<Ty, N> fields) {
-        for (Ty v : fields)
+    BitField(const std::initializer_list<field_type>& fields) {
+        for (field_type v : fields)
             Set(v);
     }
 
-    template <typename... Args, typename = std::enable_if_t<std::conjunction_v<std::is_same<Args, Ty>...>>>
-    BitField(Args... args) {
-        (Set(args), ...);
-    }
-
-    template <Ty N>
+    template <uint64_t N>
     bool Set(void) { return Set(N); }
 
-    template <Ty N>
+    template <uint64_t N>
     bool Clear(void) { return Clear(N); }
 
-    template <Ty N>
+    template <uint64_t N>
     bool Has(void) const { return Has(N); }
 
-    Ty Get(void) {
-        return m_field;
-    }
+    auto Get(void) { return m_field; }
 
     std::string ToString(void) const {
         std::string out = "[ ";
@@ -49,31 +43,33 @@ public:
     }
 
 private:
-    bool Set(Ty n) {
-        if (n < 0 || n > (nmax - 1))
+    bool is_valid_index(uint64_t n) const { return n < 0 || n > (nmax - 1); }
+
+    bool Set(uint64_t n) {
+        if (is_valid_index(n))
             return false;
 
-        m_field |= ((Ty)1 << n);
+        m_field |= ((field_type)1 << n);
         return true;
     }
     
-    bool Clear(Ty n) {
-        if (n < 0 || n > (nmax - 1))
+    bool Clear(uint64_t n) {
+        if (is_valid_index(n))
             return false;
 
-        m_field &= ~((Ty)1 << n);
+        m_field &= ~((field_type)1 << n);
         return true;
     }
 
-    bool Has(Ty n) const {
-        if (n < 0 || n > (nmax - 1))
+    bool Has(uint64_t n) const {
+        if (is_valid_index(n))
             return false;
 
-        return (m_field >> n) & (Ty)1;
+        return (m_field >> n) & (field_type)1;
     }
 
 private:
-    Ty m_field = (Ty)0;
+    field_type m_field = (field_type)0;
 };
 
 #endif // __BITFIELD_HPP__
