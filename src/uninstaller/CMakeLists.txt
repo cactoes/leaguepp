@@ -9,6 +9,7 @@ add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES} ${APP_RESOURCES_DIR}/resour
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${UIFRAMEWORK_INCLUDE}
+    PRIVATE ${SERVICE_INCLUDE}
     PRIVATE ${SHARED_HEADERS})
 
 target_link_libraries(${PROJECT_NAME}
