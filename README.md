@@ -7,9 +7,9 @@ A league client written in c++
 * Auto pick & ban champs
 
 ### Profile controller
-* set rank
-* set mastery
-* clear tokens
+* Set rank
+* Set mastery
+* Clear tokens
 
 ### Lobby controller
 * Auto accept match
