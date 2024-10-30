@@ -5,7 +5,7 @@
 #include "managers/window_manager.hpp"
 #include "endpoint_mappers.hpp"
 
-void feature::lobby_controller::setup(std::shared_ptr<vui::component::abstract_frame> frame) {
+void feature::lobby_controller::setup(std::shared_ptr<reflection::component::abstract_frame> frame) {
     auto lcm = manager::instance<league_connector_manager>();
     auto cm = manager::instance<config_manager>();
     auto config = cm->get_config(USER_SETTINGS_CONFIG);
@@ -77,7 +77,7 @@ void feature::lobby_controller::handle_auto_dodge(uint64_t gameflow_hash) {
         return;
     }
 
-    auto result = lcm->request<200>(connector::request_type::GET, "/lol-champ-select/v1/session");
+    auto result = lcm->request<200>(connector::RT_GET, "/lol-champ-select/v1/session");
     if (!result.has_value())
         return;
 

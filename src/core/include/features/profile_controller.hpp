@@ -8,11 +8,11 @@
 namespace feature {
     class profile_controller : public abstract_feature {
     public:
-        void setup(std::shared_ptr<vui::component::abstract_frame> frame) override;
+        void setup(std::shared_ptr<reflection::component::abstract_frame> frame) override;
 
     private:
-        std::shared_ptr<vui::component::abstract_button> m_button_update_profile = nullptr;
-        std::shared_ptr<vui::component::abstract_button> m_button_clear_tokens = nullptr;
+        std::shared_ptr<reflection::component::abstract_button> m_button_update_profile = nullptr;
+        std::shared_ptr<reflection::component::abstract_button> m_button_clear_tokens = nullptr;
     };
 } // namespace feature
 

@@ -11,7 +11,7 @@
 #include <memory>
 #include <filesystem>
 
-#include <vui/utils.hpp>
+#include <reflection/utils.hpp>
 
 #include "manager.hpp"
 
@@ -119,7 +119,7 @@ public:
 
     template <typename Ty>
     void add_cvar(const char* key, Ty data) {
-        const auto key_hash = vu_hash_fnv1a_64(key);
+        const auto key_hash = ru_hash_fnv1a_64(key);
         m_cvars[key_hash] = std::make_unique<cvar<Ty>>(data);
     }
 
@@ -128,13 +128,18 @@ public:
         add_cvar(key, Ty{});
     }
 
+    template <typename Ty>
+    void add_template(const std::string& key) {
+        add_cvar(key.c_str(), Ty{});
+    }
+
     bool has_cvar(uint64_t key) {
         return m_cvars.contains(key);
     }
 
     template <typename Ty>
     std::optional<cvar<Ty>*> get_cvar(const char* key) {
-        const auto key_hash = vu_hash_fnv1a_64(key);
+        const auto key_hash = ru_hash_fnv1a_64(key);
         if (!m_cvars.contains(key_hash))
             return std::nullopt;
         
@@ -144,6 +149,11 @@ public:
     template <typename Ty>
     cvar<Ty>* get_cvar_u(const char* key) {
         return get_cvar<Ty>(key).value();
+    }
+
+    template <typename Ty>
+    cvar<Ty>* get_cvar_u(const std::string& key) {
+        return get_cvar<Ty>(key.c_str()).value();
     }
 
     template <typename Ty>

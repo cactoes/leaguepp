@@ -7,7 +7,7 @@
 
 #include <Windows.h>
 #include <string>
-#include <vui/vui_core.hpp>
+#include <reflection/reflection.hpp>
 
 #define COLOR_SCEME_HEX "#728ab3"
 
@@ -34,8 +34,8 @@ namespace window_manager {
     HWND create_window(const window_options_t& options);
     HWND create_window_ex(const window_options_ex_t& options_ex);
 
-    std::shared_ptr<vui::browser_window> create_window(const vui::component::frame_options_t& frame_options, const window_options_t& window_options);
-    std::shared_ptr<vui::browser_window> create_window(const vui::component::frame_options_t& frame_options, const window_options_ex_t& window_options_ex);
+    std::shared_ptr<reflection::browser_window> create_window(const reflection::component::frame_options_t& frame_options, const window_options_t& window_options);
+    std::shared_ptr<reflection::browser_window> create_window(const reflection::component::frame_options_t& frame_options, const window_options_ex_t& window_options_ex);
 
     void create_notification(const std::string& title, const std::string& message);
 

@@ -1,5 +1,5 @@
 #include <iostream>
-#include <vui/vui_core.hpp>
+#include <reflection/reflection.hpp>
 
 #include "managers/window_manager.hpp"
 #include "managers/league_connector_manager.hpp"
@@ -29,24 +29,27 @@ void _m_main(HINSTANCE) {
     _config_handle->add_template<std::string>("str_mastery");
     _config_handle->add_template<bool>("b_auto_update_profile");
 
-    _config_handle->add_template<feature::champion_select_controller::mode_t>("e_csc_state_machine_mode");
-    _config_handle->add_template<feature::champion_select_controller::strictness_t>("e_csc_state_machine_strictness");
+    _config_handle->add_template<feature::champion_select_controller::mode_t>("e_csc_state_manager_mode");
+    _config_handle->add_template<feature::champion_select_controller::strictness_t>("e_csc_state_manager_strictness");
     _config_handle->add_template<int>("i_pref_line_blind");
     _config_handle->add_template<bool>("b_auto_picker_enabled");
     _config_handle->add_template<bool>("b_early_declare_enabled");
 
-    // TODO: vec_auto_picker_lane_*lane*_ban_ids & vec_auto_picker_lane_*lane*_pick_ids
+    for (auto& lane : lc::lanes::list) {
+        _config_handle->add_template<std::vector<int>>("vec_csc_picks_" + std::to_string(lane.index));
+        _config_handle->add_template<std::vector<int>>("vec_csc_bans_" + std::to_string(lane.index));
+    }
 
     if (!cm->load_config(_config_handle))
         cm->dump_config(_config_handle);
 
-    vui::component::frame_options_t options {};
-    options.layout = vui::component::fl_horizontal;
+    reflection::component::frame_options_t options {};
+    options.layout = reflection::component::fl_horizontal;
     
     wm::window_options_t window_options {};
     window_options.name = "League++";
 
-    std::shared_ptr<vui::browser_window> window = wm::create_window(options, window_options);
+    std::shared_ptr<reflection::browser_window> window = wm::create_window(options, window_options);
 
     auto main_frame = window->get_frame();
 
@@ -64,6 +67,18 @@ void _m_main(HINSTANCE) {
     //     return m_current_color;
     // });
 
+    auto lcm = manager::instance<league_connector_manager>();
+
+    lcm->setup();
+
+    lcm->add_connect_handler([&]() {
+        window->set_icon(IDI_ICON_CONNECTED);
+    });
+
+    lcm->add_disconnect_handler([&]() {
+        window->set_icon(IDI_ICON_DISCONNECTED);
+    });
+
     auto fm = manager::instance<feature_manager>();
 
     fm->add_feature<feature::lobby_controller>(lc_frame);
@@ -72,18 +87,8 @@ void _m_main(HINSTANCE) {
 
     window->start();
 
-    window->register_event_handler(vui::event_t::E_ON_RENDER_FINISHED, [](auto) {
+    window->register_event_handler(reflection::event_t::E_ON_RENDER_FINISHED, [](auto) {
         manager::instance<league_connector_manager>()->setup();
-    });
-
-    auto lcm = manager::instance<league_connector_manager>();
-
-    lcm->add_connect_handler([&]() {
-        window->set_icon(IDI_ICON_CONNECTED);
-    });
-
-    lcm->add_disconnect_handler([&]() {
-        window->set_icon(IDI_ICON_DISCONNECTED);
     });
 
     MSG msg{};

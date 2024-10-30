@@ -1,14 +1,14 @@
 #include "managers/window_manager.hpp"
 
-#include <vui/vui_core.hpp>
+#include <reflection/reflection.hpp>
 #include <map>
 #include <iostream>
 
-std::map<HWND, std::shared_ptr<vui::browser_window>> g_windows {};
+std::map<HWND, std::shared_ptr<reflection::browser_window>> g_windows {};
 HWND g_main_window = nullptr;
 
 LRESULT CALLBACK window_manager::handle_window_message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (vui::handle_window_message(hWnd, msg, wParam, lParam))
+    if (reflection::handle_window_message(hWnd, msg, wParam, lParam))
         return TRUE;
 
     switch (msg) {
@@ -90,14 +90,14 @@ HWND window_manager::create_window_ex(const window_options_ex_t& options_ex) {
     return window_handle;
 }
 
-std::shared_ptr<vui::browser_window> window_manager::create_window(const vui::component::frame_options_t& frame_options, const window_options_t& window_options) {
+std::shared_ptr<reflection::browser_window> window_manager::create_window(const reflection::component::frame_options_t& frame_options, const window_options_t& window_options) {
     window_options_ex_t _window_options_ex { window_options };
     return create_window(frame_options, _window_options_ex);
 }
 
-std::shared_ptr<vui::browser_window> window_manager::create_window(const vui::component::frame_options_t& frame_options, const window_options_ex_t& window_options_ex) {
+std::shared_ptr<reflection::browser_window> window_manager::create_window(const reflection::component::frame_options_t& frame_options, const window_options_ex_t& window_options_ex) {
     HWND hwnd = wm::create_window_ex(window_options_ex);
-    auto browser_window_ptr = std::make_shared<vui::browser_window>(hwnd, frame_options);
+    auto browser_window_ptr = std::make_shared<reflection::browser_window>(hwnd, frame_options);
     browser_window_ptr->set_color(COLOR_SCEME_HEX);
     g_windows[hwnd] = browser_window_ptr;
     return browser_window_ptr;
@@ -108,9 +108,9 @@ void window_manager::create_notification(const std::string& title, const std::st
         detail::post_nc_req(detail::_nc_req_t{ title, message });
         PostMessageA(g_main_window, (WM_USER + 0x0003), 0, 0);
     } else {
-        vui::component::frame_options_t frame_options {};
-        frame_options.layout = vui::component::fl_vertical;
-        frame_options.align = vui::component::fa_center;
+        reflection::component::frame_options_t frame_options {};
+        frame_options.layout = reflection::component::fl_vertical;
+        frame_options.align = reflection::component::fa_center;
 
         window_options_t window_options {};
         window_options.name = title;

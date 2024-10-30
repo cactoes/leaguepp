@@ -1,7 +1,7 @@
 #include "managers/config_manager.hpp"
 
 bool config_manager::load_config(config_handle config) {
-    std::ifstream stream(config->m_name + ".bin", std::ios::binary | std::ios::ate);
+    std::ifstream stream(config->m_name + ".lcf", std::ios::binary | std::ios::ate);
 
     if (!stream.is_open())
         return false;
@@ -19,7 +19,7 @@ bool config_manager::load_config(config_handle config) {
 }
 
 bool config_manager::dump_config(config_handle config) {
-    std::ofstream stream(config->m_name + ".bin", std::ios::binary);
+    std::ofstream stream(config->m_name + ".lcf", std::ios::binary);
 
     auto config_data_raw = config->dump();
     stream.write((char*)config_data_raw.data.get(), config_data_raw.size);

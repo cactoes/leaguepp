@@ -21,71 +21,66 @@ namespace feature {
             S_STRICT
         };
 
-        class state_machine {
-        public:
-            state_machine() {}
+        void setup(std::shared_ptr<reflection::component::abstract_frame> frame) override;
 
-            enum phase_t {
-                P_INVALID = 0,
+    private:
+        std::vector<int> get_locked_champions(const champselect::Session& session);
+        int get_next_id(const std::vector<int>& locks, const std::vector<int>& list);
 
-                P_DECLARING,
-                P_BANNING,
-                P_PICKING,
-                P_WAITING
-            };
-
-            enum lane_t {
-                L_INVALID = 0,
-
-                // only valid for now:
-                // - solo/duo
-                // - flex
-                // - draft
-                L_PRIMARY,
-                L_SECONDARY,
-
-                // filled
-                L_OTHER,
-
-                // assume when there are no lanes to pre pick
-                // so like draft mode etc
-                L_IMPOSSIBLE,
-            };
-
-            enum action_type_t {
-                AT_PICK = 0,
-                AT_BAN,
-            };
-
-            struct action_t {
-                action_type_t type;
-                bool commit;
-            };
-
-            void set_mode(mode_t mode);
-            void set_strictness(strictness_t strictness);
-
-            std::optional<action_t> get_current_state(const champselect::Session& session, const lobby::Lobby& lobby);
-
-        private:
-            lane_t get_lane_state(const champselect::Session& session, const lobby::Lobby& lobby);
-            bool check_lane_state(lane_t lane, strictness_t strictness);
-            phase_t get_phase(const champselect::Session& session);
-
-        private:
-            mode_t m_mode {};
-            strictness_t m_strictness {};
-        };
-
-        void setup(std::shared_ptr<vui::component::abstract_frame> frame) override;
+        void handle_frame(const champselect::Session& session, const lobby::Lobby& lobby);
 
     private:
         const std::vector<std::string> m_mode = { "manual", "semi", "auto" };
         const std::vector<std::string> m_strictness = { "none", "loose", "strict" };
-        state_machine m_state_machine {};
+        // state_machine m_state_machine {};
     };
 
-    typedef champion_select_controller::state_machine sm;
+    namespace state_manager {
+        enum phase_t {
+            P_INVALID = 0,
+
+            P_DECLARING,
+            P_BANNING,
+            P_PICKING,
+            P_WAITING
+        };
+
+        enum lane_t {
+            L_INVALID = 0,
+
+            // only valid for now:
+            // - solo/duo
+            // - flex
+            // - draft
+            L_PRIMARY,
+            L_SECONDARY,
+
+            // filled
+            L_OTHER,
+
+            // assume when there are no lanes to pre pick
+            // so like draft mode etc
+            L_IMPOSSIBLE,
+        };
+
+        enum action_type_t {
+            AT_PICK = 0,
+            AT_BAN,
+        };
+
+        struct action_t {
+            action_type_t type;
+            bool commit;
+        };
+
+        std::optional<action_t> get_current_state(const champselect::Session& session, const lobby::Lobby& lobby, champion_select_controller::mode_t mode, champion_select_controller::strictness_t strictness);
+
+        lane_t get_lane_state(const champselect::Session& session, const lobby::Lobby& lobby);
+        bool check_lane_state(lane_t lane, champion_select_controller::strictness_t strictness);
+        phase_t get_phase(const champselect::Session& session);
+    } // namespace state_manager
+
+    // typedef champion_select_controller::state_machine sm;
 } // namespace feature
 
 #endif // __FEATURE_CHAMPION_SELECT_CONTROLLER_HPP__

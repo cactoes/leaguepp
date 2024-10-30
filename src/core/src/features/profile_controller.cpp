@@ -8,7 +8,7 @@
 bool update_profile(std::function<bool(lolchat::Me&)> setter) {
     auto lcm = manager::instance<league_connector_manager>();
 
-    auto result = lcm->request<200>(connector::request_type::GET, "/lol-chat/v1/me");
+    auto result = lcm->request<200>(connector::RT_GET, "/lol-chat/v1/me");
     if (!result.has_value())
         return false;
 
@@ -17,10 +17,10 @@ bool update_profile(std::function<bool(lolchat::Me&)> setter) {
     if (!setter(data))
         return false;
 
-    return lcm->request<201>(connector::request_type::PUT, "/lol-chat/v1/me", nlohmann::json(data).dump()).has_value();
+    return lcm->request<201>(connector::RT_PUT, "/lol-chat/v1/me", nlohmann::json(data).dump()).has_value();
 }
 
-void feature::profile_controller::setup(std::shared_ptr<vui::component::abstract_frame> frame) {
+void feature::profile_controller::setup(std::shared_ptr<reflection::component::abstract_frame> frame) {
     auto lcm = manager::instance<league_connector_manager>();
     auto cm = manager::instance<config_manager>();
     auto config = cm->get_config(USER_SETTINGS_CONFIG);
@@ -77,7 +77,7 @@ void feature::profile_controller::setup(std::shared_ptr<vui::component::abstract
         });
     };
 
-    // auto btn_frame = frame->add_frame("", { .outline = false, .layout = vui::component::fl_horizontal });
+    // auto btn_frame = frame->add_frame("", { .outline = false, .layout = reflection::component::fl_horizontal });
     m_button_update_profile = frame->add_button("Update", [full_update_profile](auto) {
         if (!full_update_profile())
             wm::create_notification("Profile controller", "Failed to update profile...");

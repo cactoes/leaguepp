@@ -5,7 +5,7 @@
 
 #include <memory>
 #include <map>
-#include <vui/vui_core.hpp>
+#include <reflection/reflection.hpp>
 
 #include "manager.hpp"
 
@@ -13,7 +13,7 @@ class abstract_feature {
 public:
     ~abstract_feature() = default;
 
-    virtual void setup(std::shared_ptr<vui::component::abstract_frame> frame) = 0;
+    virtual void setup(std::shared_ptr<reflection::component::abstract_frame> frame) = 0;
 };
 
 class feature_manager : public manager::abstract {
@@ -22,7 +22,7 @@ public:
     bool shutdown() override { return true; }
 
     template <typename _feature_type>
-    std::enable_if_t<std::is_base_of_v<abstract_feature, _feature_type>, void> add_feature(std::shared_ptr<vui::component::abstract_frame> frame) {
+    std::enable_if_t<std::is_base_of_v<abstract_feature, _feature_type>, void> add_feature(std::shared_ptr<reflection::component::abstract_frame> frame) {
         std::unique_ptr<abstract_feature> feature = std::make_unique<_feature_type>();
         feature->setup(frame);
         m_features[typeid(_feature_type).hash_code()] = std::move(feature);
