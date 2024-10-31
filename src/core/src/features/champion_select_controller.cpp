@@ -220,6 +220,8 @@ void feature::champion_select_controller::handle_frame(const champselect::Sessio
             break;
     }
 
+    // TODO
+
     // if (state.has_value())
     //     std::cout << "{ state->type: " << state->type << ", state->commit: " << state->commit << " }\n";
 }

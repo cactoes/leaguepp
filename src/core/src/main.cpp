@@ -5,6 +5,7 @@
 #include "managers/league_connector_manager.hpp"
 #include "managers/config_manager.hpp"
 #include "managers/feature_manager.hpp"
+#include "managers/resource_manager.hpp"
 #include "managers/manager.hpp"
 
 #include "features/lobby_controller.hpp"
@@ -42,6 +43,8 @@ void _m_main(HINSTANCE) {
 
     if (!cm->load_config(_config_handle))
         cm->dump_config(_config_handle);
+
+    manager::instance<resource_manager>()->setup();
 
     reflection::component::frame_options_t options {};
     options.layout = reflection::component::fl_horizontal;
