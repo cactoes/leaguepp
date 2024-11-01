@@ -3,7 +3,7 @@
 #include "managers/config_manager.hpp"
 #include "managers/league_connector_manager.hpp"
 #include "managers/window_manager.hpp"
-#include "managers/console_manager.hpp"
+#include "managers/log_manager.hpp"
 #include "endpoint_mappers.hpp"
 
 bool update_profile(std::function<bool(lolchat::Me&)> setter) {
@@ -86,12 +86,12 @@ void feature::profile_controller::setup(std::shared_ptr<reflection::component::a
     // auto btn_frame = frame->add_frame("", { .outline = false, .layout = reflection::component::fl_horizontal });
     m_button_update_profile = frame->add_button("Update", [full_update_profile](auto) {
         if (!full_update_profile())
-            manager::instance<console_manager>()->add_log("[pc] Failed to update profile...");
+            manager::instance<log_manager>()->add_log("[pc] Failed to update profile...");
     }, { .disabled = true, .full_width = true }).value();
 
     m_button_clear_tokens = frame->add_button("Clear tokens", [](auto) {
         if (!lh::s_clear_tokens())
-            manager::instance<console_manager>()->add_log("[pc] Failed to clear tokens...");
+            manager::instance<log_manager>()->add_log("[pc] Failed to clear tokens...");
     }, { .disabled = true, .full_width = true }).value();
 
     lcm->add_endpoint_callback("/lol-chat/v1/me", [config, full_update_profile](std::string, nlohmann::json){

@@ -4,6 +4,7 @@
 #include "managers/league_connector_manager.hpp"
 #include "managers/window_manager.hpp"
 #include "managers/resource_manager.hpp"
+#include "managers/log_manager.hpp"
 #include "endpoint_mappers.hpp"
 
 #include <iostream>
@@ -171,8 +172,8 @@ void feature::champion_select_controller::setup(std::shared_ptr<reflection::comp
         std::vector<int64_t>& items_pick = config->get_cvar_u<std::vector<int64_t>>("vec_csc_picks_" + active_index)->get();
         std::vector<int64_t>& items_ban = config->get_cvar_u<std::vector<int64_t>>("vec_csc_bans_" + active_index)->get();
 
-        m_bans_list->set_items(rm->champion_map_ids_to_names(items_pick));
-        m_picks_list->set_items(rm->champion_map_ids_to_names(items_ban));
+        m_picks_list->set_items(rm->champion_map_ids_to_names(items_pick));
+        m_bans_list->set_items(rm->champion_map_ids_to_names(items_ban));
     }).value();
 
     frame->add_label("Picks");
@@ -213,7 +214,7 @@ void feature::champion_select_controller::setup(std::shared_ptr<reflection::comp
         return std::string();
     }, { .submit_button_text = "Add" }).value();
 
-    m_bans_list = frame->add_list("picks", rm->champion_map_ids_to_names(config->get_cvar_u<std::vector<int64_t>>("vec_csc_bans_" + std::to_string(config->get_cvar_u<int>("i_pref_line_blind")->get()))->get()), [this, rm, cm, config](auto, int clicked_item) {
+    m_bans_list = frame->add_list("bans", rm->champion_map_ids_to_names(config->get_cvar_u<std::vector<int64_t>>("vec_csc_bans_" + std::to_string(config->get_cvar_u<int>("i_pref_line_blind")->get()))->get()), [this, rm, cm, config](auto, int clicked_item) {
         std::vector<int64_t>& items = config->get_cvar_u<std::vector<int64_t>>("vec_csc_bans_" + std::to_string(m_lane_selector->get_active_index().at(0)))->get();
         items.erase(items.begin() + clicked_item);
         cm->dump_config(config);
@@ -221,8 +222,11 @@ void feature::champion_select_controller::setup(std::shared_ptr<reflection::comp
         m_bans_list->set_items(rm->champion_map_ids_to_names(items));
     }).value();
 
-    lcm->add_endpoint_callback("/lol-gameflow/v1/gameflow-phase", [this](std::string, nlohmann::json data) {
+    lcm->add_endpoint_callback("/lol-gameflow/v1/gameflow-phase", [this, config](std::string, nlohmann::json data) {
         if (lc::hash_constant(data.get<std::string>()) != lc::gameflow::champselect)
+            return;
+
+        if (!config->get_cvar_u<bool>("b_early_declare_enabled")->get())
             return;
 
         auto lcm = manager::instance<league_connector_manager>();
@@ -266,8 +270,12 @@ int64_t feature::champion_select_controller::get_next_id(const std::vector<int64
 
 void feature::champion_select_controller::handle_frame(const champselect::Session& session, const lobby::Lobby& lobby) {
     auto lcm = manager::instance<league_connector_manager>();
+    auto _log_manager = manager::instance<log_manager>();
     auto cm = manager::instance<config_manager>();
     auto config = cm->get_config(USER_SETTINGS_CONFIG);
+
+    if (!config->get_cvar_u<bool>("b_auto_picker_enabled")->get())
+        return;
 
     auto mode = config->get_cvar_u<mode_t>("e_csc_state_manager_mode")->get();
     auto strictness = config->get_cvar_u<strictness_t>("e_csc_state_manager_strictness")->get();
@@ -280,25 +288,53 @@ void feature::champion_select_controller::handle_frame(const champselect::Sessio
     auto assigned_position = lh::get_assigned_position(session);
 
     if (!assigned_position.has_value())
-        return;
+        assigned_position = lc::lanes::list.at(config->get_cvar_u<int>("i_pref_line_blind")->get());
 
     const std::vector<int64_t>& picks = config->get_cvar_u<std::vector<int64_t>>("vec_csc_picks_" + std::to_string(assigned_position->index))->get();
     const std::vector<int64_t>& bans = config->get_cvar_u<std::vector<int64_t>>("vec_csc_bans_" + std::to_string(assigned_position->index))->get();
 
-    int next_pick = get_next_id(locked_champions, picks);
-    int next_ban = get_next_id(locked_champions, bans);
+    int64_t next_pick_id = state->type == state_manager::action_type_t::AT_PICK
+        ? get_next_id(locked_champions, picks)
+        : get_next_id(locked_champions, bans);
 
-    switch (state->type) {
-        case state_manager::action_type_t::AT_PICK:
-            break;
-        case state_manager::action_type_t::AT_BAN:
-            break;
-        default:
-            break;
+    if (next_pick_id == -1) {
+        _log_manager->add_log("[csc] No more picks / bans ...");
+        return;
     }
 
-    // TODO
+    const auto& local_player_cell_id = session.localPlayerCellId.value();
 
-    // if (state.has_value())
-    //     std::cout << "{ state->type: " << state->type << ", state->commit: " << state->commit << " }\n";
+    for (const auto& pair : session.actions.value()) {
+        for (const auto& action : pair) {
+            if (action.completed.value())
+                continue;
+
+            if (action.actorCellId.value() != local_player_cell_id)
+                continue;
+
+            if ((state->type == state_manager::action_type_t::AT_PICK && action.type.value() != "pick") ||
+                (state->type == state_manager::action_type_t::AT_BAN && action.type.value() != "ban"))
+                continue;
+
+            // da_action
+            {
+                const auto declareResult = lcm->request<204>(
+                    connector::request_type::PATCH,
+                    std::format("/lol-champ-select/v1/session/actions/{}", action.id.value()),
+                    std::format("{}\"championId\":{}{}", "{", next_pick_id, "}")
+                );
+
+                if (!declareResult.has_value())
+                    return;
+
+                if (state->commit) {
+                    const auto commitResult = lcm->request<204>(
+                        connector::request_type::POST,
+                        std::format("/lol-champ-select/v1/session/actions/{}/complete", action.id.value()),
+                        std::format("{}\"championId\":{}{}", "{", next_pick_id, "}")
+                    );
+                }
+            }
+        }
+    }
 }
