@@ -3,12 +3,13 @@
 #include "managers/config_manager.hpp"
 #include "managers/league_connector_manager.hpp"
 #include "managers/window_manager.hpp"
+#include "managers/console_manager.hpp"
 #include "endpoint_mappers.hpp"
 
 bool update_profile(std::function<bool(lolchat::Me&)> setter) {
     auto lcm = manager::instance<league_connector_manager>();
 
-    auto result = lcm->request<200>(connector::RT_GET, "/lol-chat/v1/me");
+    auto result = lcm->request<200>(connector::request_type::GET, "/lol-chat/v1/me");
     if (!result.has_value())
         return false;
 
@@ -17,7 +18,7 @@ bool update_profile(std::function<bool(lolchat::Me&)> setter) {
     if (!setter(data))
         return false;
 
-    return lcm->request<201>(connector::RT_PUT, "/lol-chat/v1/me", nlohmann::json(data).dump()).has_value();
+    return lcm->request<201>(connector::request_type::PUT, "/lol-chat/v1/me", nlohmann::json(data).dump()).has_value();
 }
 
 void feature::profile_controller::setup(std::shared_ptr<reflection::component::abstract_frame> frame) {
@@ -25,8 +26,13 @@ void feature::profile_controller::setup(std::shared_ptr<reflection::component::a
     auto cm = manager::instance<config_manager>();
     auto config = cm->get_config(USER_SETTINGS_CONFIG);
 
-    frame->add_label("Profile tier");
-    frame->add_selector("", lc::get_names(lc::tier::list), { (int)lc::get_index_of(config->get_cvar_u<std::string>("str_tier")->get(), lc::tier::list).value_or(0) }, [cm, config](auto, std::vector<int> active_items){
+    auto bb_parent = frame->add_frame("", { .outline = false, .layout = reflection::component::fl_horizontal, .overflow = true, .border = false });
+
+    auto b1_ = bb_parent->add_frame("", { .outline = false, .overflow = true, .border = false });
+    auto b2_ = bb_parent->add_frame("", { .outline = false, .overflow = true, .border = false });
+
+    b1_->add_label("Tier");
+    b1_->add_selector("", lc::get_names(lc::tier::list), { (int)lc::get_index_of(config->get_cvar_u<std::string>("str_tier")->get(), lc::tier::list).value_or(0) }, [cm, config](auto, std::vector<int> active_items){
         auto new_tier = lc::tier::list.at(active_items.at(0)).name;
         cm->tracked_set_cvar<std::string>(config, "str_tier", new_tier);
 
@@ -37,8 +43,8 @@ void feature::profile_controller::setup(std::shared_ptr<reflection::component::a
         });
     });
 
-    frame->add_label("Profile division");
-    frame->add_selector("", lc::get_names(lc::division::list), { (int)lc::get_index_of(config->get_cvar_u<std::string>("str_division")->get(), lc::division::list).value_or(0) }, [cm, config](auto, std::vector<int> active_items){
+    b2_->add_label("Division");
+    b2_->add_selector("", lc::get_names(lc::division::list), { (int)lc::get_index_of(config->get_cvar_u<std::string>("str_division")->get(), lc::division::list).value_or(0) }, [cm, config](auto, std::vector<int> active_items){
         auto new_division = lc::division::list.at(active_items.at(0)).name;
         cm->tracked_set_cvar<std::string>(config, "str_division", new_division);
 
@@ -49,7 +55,7 @@ void feature::profile_controller::setup(std::shared_ptr<reflection::component::a
         });
     });
 
-    frame->add_label("Profile mastery points");
+    frame->add_label("Mastery points");
     frame->add_input(config->get_cvar_u<std::string>("str_mastery")->get(), [cm, config](auto, std::string v) {
         std::string fixed_mastery_score = std::to_string(lpp_core_utils::parse_number<uint64_t>(v).value_or(0));
         cm->tracked_set_cvar<std::string>(config, "str_mastery", fixed_mastery_score);
@@ -63,7 +69,7 @@ void feature::profile_controller::setup(std::shared_ptr<reflection::component::a
         return fixed_mastery_score;
     }, { .submit_button_text = "Set" });
 
-    frame->add_checkbox("Auto update profile", config->get_cvar_u<bool>("b_auto_update_profile")->get(), [cm, config](auto, bool state){
+    frame->add_checkbox("Auto update", config->get_cvar_u<bool>("b_auto_update_profile")->get(), [cm, config](auto, bool state){
         cm->tracked_set_cvar<bool>(config, "b_auto_update_profile", state);
     });
 
@@ -80,12 +86,12 @@ void feature::profile_controller::setup(std::shared_ptr<reflection::component::a
     // auto btn_frame = frame->add_frame("", { .outline = false, .layout = reflection::component::fl_horizontal });
     m_button_update_profile = frame->add_button("Update", [full_update_profile](auto) {
         if (!full_update_profile())
-            wm::create_notification("Profile controller", "Failed to update profile...");
+            manager::instance<console_manager>()->add_log("[pc] Failed to update profile...");
     }, { .disabled = true, .full_width = true }).value();
 
     m_button_clear_tokens = frame->add_button("Clear tokens", [](auto) {
         if (!lh::s_clear_tokens())
-            wm::create_notification("Profile controller", "Failed to clear tokens...");
+            manager::instance<console_manager>()->add_log("[pc] Failed to clear tokens...");
     }, { .disabled = true, .full_width = true }).value();
 
     lcm->add_endpoint_callback("/lol-chat/v1/me", [config, full_update_profile](std::string, nlohmann::json){

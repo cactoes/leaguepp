@@ -1,0 +1,3 @@
+[submodule "lib/leaguepp-connector"]
+	path = lib/leaguepp-connector
+	url = https://github.com/cactoes/leaguepp-connector

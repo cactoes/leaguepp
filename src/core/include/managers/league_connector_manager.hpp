@@ -3,7 +3,7 @@
 #ifndef __LEAGUE_CONNECTOR_MANAGER_HPP__
 #define __LEAGUE_CONNECTOR_MANAGER_HPP__
 
-#include <connector/connector.hpp>
+#include <connector.hpp>
 #include <reflection/utils.hpp>
 
 #include "../endpoint_mappers.hpp"
@@ -296,15 +296,14 @@ public:
     void add_endpoint_callback(const std::string& endpoint, ru_function<void, std::string, nlohmann::json> callback);
 
     template <int _return_code = 200>
-    std::optional<nlohmann::json> request(connector::request_type_t type, const std::string& endpoint, const std::string& data = "") {
-        const auto result = m_connector->make_request(type, endpoint, data);
-        return result.status_code == _return_code
-            ? std::optional(nlohmann::json::parse(result.data))
+    std::optional<nlohmann::json> request(connector::request_type type, const std::string& endpoint, const std::string& data = "") {
+        const auto result = connector::MakeRequest(type, endpoint, data);
+        return result.status == _return_code
+            ? std::optional(result.data)
             : std::nullopt;
     }
 
 private:
-    std::unique_ptr<connector::connector> m_connector = nullptr;
     bool m_is_setup = false;
     std::vector<ru_function<void>> m_connect_handlers {};
     std::vector<ru_function<void>> m_disconnect_handlers {};
@@ -313,12 +312,12 @@ private:
 namespace league_helpers {
     lpp_c_u_no_discard inline bool dodge_queue() {
         auto lcm = manager::instance<league_connector_manager>();
-        return lcm->request<200>(connector::RT_POST, "/lol-login/v1/session/invoke?destination=lcdsServiceProxy&method=call&args=[\"\",\"teambuilder-draft\",\"quitV2\",\"\"]", "[\"\",\"teambuilder-draft\",\"quitV2\",\"\"]").has_value();
+        return lcm->request<200>(connector::request_type::POST, "/lol-login/v1/session/invoke?destination=lcdsServiceProxy&method=call&args=[\"\",\"teambuilder-draft\",\"quitV2\",\"\"]", "[\"\",\"teambuilder-draft\",\"quitV2\",\"\"]").has_value();
     }
 
     lpp_c_u_no_discard inline bool accept_match() {
         auto lcm = manager::instance<league_connector_manager>();
-        return lcm->request<204>(connector::RT_POST, "/lol-matchmaking/v1/ready-check/accept").has_value();
+        return lcm->request<204>(connector::request_type::POST, "/lol-matchmaking/v1/ready-check/accept").has_value();
     }
 
     lpp_c_u_no_discard inline std::optional<lc::kv_t> get_assigned_position(const champselect::Session& session) {
@@ -334,13 +333,13 @@ namespace league_helpers {
 
     lpp_c_u_no_discard inline bool start_search() {
         auto lcm = manager::instance<league_connector_manager>();
-        return lcm->request<204>(connector::RT_POST, "/lol-lobby/v2/lobby/matchmaking/search").has_value();
+        return lcm->request<204>(connector::request_type::POST, "/lol-lobby/v2/lobby/matchmaking/search").has_value();
     }
 
     lpp_c_u_no_discard inline bool s_clear_tokens() {
         auto lcm = manager::instance<league_connector_manager>();
         
-        auto player_data_request = lcm->request<200>(connector::RT_GET, "/lol-challenges/v1/summary-player-data/local-player");
+        auto player_data_request = lcm->request<200>(connector::request_type::GET, "/lol-challenges/v1/summary-player-data/local-player");
         if (!player_data_request.has_value())
             return false;
 
@@ -348,7 +347,7 @@ namespace league_helpers {
         const auto& banner_id = player_data.bannerId.value();
         const auto& title_id = player_data.title->itemId.value();
 
-        return lcm->request<204>(connector::RT_POST, "/lol-challenges/v1/update-player-preferences", "{\"bannerAccent\":\"" + banner_id + "\",\"challengeIds\":[],\"title\":\"" + std::to_string(title_id) + "\"}").has_value();
+        return lcm->request<204>(connector::request_type::POST, "/lol-challenges/v1/update-player-preferences", "{\"bannerAccent\":\"" + banner_id + "\",\"challengeIds\":[],\"title\":\"" + std::to_string(title_id) + "\"}").has_value();
     }
 } // namespace league_helpers
 

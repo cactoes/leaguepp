@@ -6,6 +6,7 @@
 #include "managers/config_manager.hpp"
 #include "managers/feature_manager.hpp"
 #include "managers/resource_manager.hpp"
+#include "managers/console_manager.hpp"
 #include "managers/manager.hpp"
 
 #include "features/lobby_controller.hpp"
@@ -37,8 +38,8 @@ void _m_main(HINSTANCE) {
     _config_handle->add_template<bool>("b_early_declare_enabled");
 
     for (auto& lane : lc::lanes::list) {
-        _config_handle->add_template<std::vector<int>>("vec_csc_picks_" + std::to_string(lane.index));
-        _config_handle->add_template<std::vector<int>>("vec_csc_bans_" + std::to_string(lane.index));
+        _config_handle->add_template<std::vector<int64_t>>("vec_csc_picks_" + std::to_string(lane.index));
+        _config_handle->add_template<std::vector<int64_t>>("vec_csc_bans_" + std::to_string(lane.index));
     }
 
     if (!cm->load_config(_config_handle))
@@ -61,7 +62,11 @@ void _m_main(HINSTANCE) {
     
     auto right_frame = main_frame->add_frame("", { .outline = false, .max_size = true });
     auto pc_frame = right_frame->add_frame("Profile controller", { .outline = true, .max_size = false });
-    auto lc_frame = right_frame->add_frame("Lobby controller", { .outline = true, .max_size = true });
+    auto lc_frame = right_frame->add_frame("Lobby controller", { .outline = true, .max_size = false });
+    auto console_frame = right_frame->add_frame("Console", { .max_size = true });
+
+    auto _console_manager = manager::instance<console_manager>();
+    _console_manager->setup_frame(console_frame);
 
     // std::string m_current_color = "#728ab3";
     // frame1_1_parent->add_input(m_current_color, [&](auto, std::string v) {
@@ -72,14 +77,14 @@ void _m_main(HINSTANCE) {
 
     auto lcm = manager::instance<league_connector_manager>();
 
-    lcm->setup();
-
     lcm->add_connect_handler([&]() {
         window->set_icon(IDI_ICON_CONNECTED);
+        _console_manager->add_log("[lcm] Connected to league");
     });
 
     lcm->add_disconnect_handler([&]() {
         window->set_icon(IDI_ICON_DISCONNECTED);
+        _console_manager->add_log("[pc] Disconnected from league");
     });
 
     auto fm = manager::instance<feature_manager>();
@@ -90,8 +95,8 @@ void _m_main(HINSTANCE) {
 
     window->start();
 
-    window->register_event_handler(reflection::event_t::E_ON_RENDER_FINISHED, [](auto) {
-        manager::instance<league_connector_manager>()->setup();
+    window->register_event_handler(reflection::event_t::E_ON_RENDER_FINISHED, [&](auto) {
+        lcm->setup();
     });
 
     MSG msg{};

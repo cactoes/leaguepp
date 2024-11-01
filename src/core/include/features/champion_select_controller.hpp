@@ -24,15 +24,20 @@ namespace feature {
         void setup(std::shared_ptr<reflection::component::abstract_frame> frame) override;
 
     private:
-        std::vector<int> get_locked_champions(const champselect::Session& session);
-        int get_next_id(const std::vector<int>& locks, const std::vector<int>& list);
+        std::vector<int64_t> get_locked_champions(const champselect::Session& session);
+        int64_t get_next_id(const std::vector<int64_t>& locks, const std::vector<int64_t>& list);
 
         void handle_frame(const champselect::Session& session, const lobby::Lobby& lobby);
 
     private:
         const std::vector<std::string> m_mode = { "manual", "semi", "auto" };
         const std::vector<std::string> m_strictness = { "none", "loose", "strict" };
-        // state_machine m_state_machine {};
+
+        std::shared_ptr<reflection::component::abstract_input> m_picks_input = nullptr;
+        std::shared_ptr<reflection::component::abstract_list> m_picks_list = nullptr;
+        std::shared_ptr<reflection::component::abstract_input> m_bans_input = nullptr;
+        std::shared_ptr<reflection::component::abstract_list> m_bans_list = nullptr;
+        std::shared_ptr<reflection::component::abstract_selector> m_lane_selector = nullptr;
     };
 
     namespace state_manager {

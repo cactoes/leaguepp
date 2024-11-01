@@ -3,6 +3,7 @@
 #include "managers/config_manager.hpp"
 #include "managers/league_connector_manager.hpp"
 #include "managers/window_manager.hpp"
+#include "managers/resource_manager.hpp"
 #include "endpoint_mappers.hpp"
 
 #include <iostream>
@@ -128,29 +129,105 @@ std::optional<feature::state_manager::action_t> feature::state_manager::get_curr
 }
 
 void feature::champion_select_controller::setup(std::shared_ptr<reflection::component::abstract_frame> frame) {
+    auto rm = manager::instance<resource_manager>();
     auto lcm = manager::instance<league_connector_manager>();
     auto cm = manager::instance<config_manager>();
     auto config = cm->get_config(USER_SETTINGS_CONFIG);
 
-    frame->add_label("Mode");
-    frame->add_selector("Mode", m_mode, { config->get_cvar_u<mode_t>("e_csc_state_manager_mode")->get() }, [cm, config, this](auto, std::vector<int> active_items) {
+    frame->add_checkbox("Enabled", config->get_cvar_u<bool>("b_auto_picker_enabled")->get(), [cm, config](auto, bool state) {
+        cm->tracked_set_cvar(config, "b_auto_picker_enabled", state);
+    });
+
+    frame->add_checkbox("Early decalare", config->get_cvar_u<bool>("b_early_declare_enabled")->get(), [cm, config](auto, bool state) {
+        cm->tracked_set_cvar(config, "b_early_declare_enabled", state);
+    });
+
+    auto bb_parent = frame->add_frame("", { .outline = false, .layout = reflection::component::fl_horizontal, .overflow = true, .border = false });
+
+    auto b1_ = bb_parent->add_frame("", { .outline = false, .overflow = true, .border = false });
+    auto b2_ = bb_parent->add_frame("", { .outline = false, .overflow = true, .border = false });
+
+    b1_->add_label("Mode");
+    b1_->add_selector("Mode", m_mode, { config->get_cvar_u<mode_t>("e_csc_state_manager_mode")->get() }, [cm, config, this](auto, std::vector<int> active_items) {
         auto new_mode = static_cast<mode_t>(active_items.at(0));
         cm->tracked_set_cvar<mode_t>(config, "e_csc_state_manager_mode", new_mode);
     });
 
-    frame->add_label("Strictness");
-    frame->add_selector("Strictness", m_strictness, { config->get_cvar_u<strictness_t>("e_csc_state_manager_strictness")->get() }, [cm, config, this](auto, std::vector<int> active_items) {
+    b2_->add_label("Strictness");
+    b2_->add_selector("Strictness", m_strictness, { config->get_cvar_u<strictness_t>("e_csc_state_manager_strictness")->get() }, [cm, config, this](auto, std::vector<int> active_items) {
         auto new_strictness = static_cast<strictness_t>(active_items.at(0));
         cm->tracked_set_cvar<strictness_t>(config, "e_csc_state_manager_strictness", new_strictness);
     });
+
+    frame->add_label("Preferred lane (blind)");
+    frame->add_selector("Preferred lane (blind)", lc::get_names(lc::lanes::list), { config->get_cvar_u<int>("i_pref_line_blind")->get() }, [cm, config](auto, std::vector<int> active_items) {
+        cm->tracked_set_cvar<int>(config, "i_pref_line_blind", active_items.at(0));
+    });
+
+    frame->add_label("Lane (picks/bans)");
+    m_lane_selector = frame->add_selector("Lane", lc::get_names(lc::lanes::list), { config->get_cvar_u<int>("i_pref_line_blind")->get() }, [this, rm, cm, config](auto, std::vector<int> active_items) {
+        std::string active_index = std::to_string(active_items.at(0));
+
+        std::vector<int64_t>& items_pick = config->get_cvar_u<std::vector<int64_t>>("vec_csc_picks_" + active_index)->get();
+        std::vector<int64_t>& items_ban = config->get_cvar_u<std::vector<int64_t>>("vec_csc_bans_" + active_index)->get();
+
+        m_bans_list->set_items(rm->champion_map_ids_to_names(items_pick));
+        m_picks_list->set_items(rm->champion_map_ids_to_names(items_ban));
+    }).value();
+
+    frame->add_label("Picks");
+    m_picks_input = frame->add_input("", [this, rm, cm, config](auto, std::string v) {
+        auto result = rm->champion_name_to_id(v);
+
+        if (!result.has_value())
+            return v;
+
+        std::vector<int64_t>& items = config->get_cvar_u<std::vector<int64_t>>("vec_csc_picks_" + std::to_string(m_lane_selector->get_active_index().at(0)))->get();
+        items.push_back(result.value());
+        cm->dump_config(config);
+        m_picks_list->set_items(rm->champion_map_ids_to_names(items));
+
+        return std::string();
+    }, { .submit_button_text = "Add" }).value();
+
+    m_picks_list = frame->add_list("picks", rm->champion_map_ids_to_names(config->get_cvar_u<std::vector<int64_t>>("vec_csc_picks_" + std::to_string(config->get_cvar_u<int>("i_pref_line_blind")->get()))->get()), [this, rm, cm, config](auto, int clicked_item) {
+        std::vector<int64_t>& items = config->get_cvar_u<std::vector<int64_t>>("vec_csc_picks_" + std::to_string(m_lane_selector->get_active_index().at(0)))->get();
+        items.erase(items.begin() + clicked_item);
+        cm->dump_config(config);
+
+        m_picks_list->set_items(rm->champion_map_ids_to_names(items));
+    }).value();
+
+    frame->add_label("Bans");
+    m_bans_input = frame->add_input("", [this, rm, cm, config](auto, std::string v) {
+        auto result = rm->champion_name_to_id(v);
+
+        if (!result.has_value())
+            return v;
+
+        std::vector<int64_t>& items = config->get_cvar_u<std::vector<int64_t>>("vec_csc_bans_" + std::to_string(m_lane_selector->get_active_index().at(0)))->get();
+        items.push_back(result.value());
+        cm->dump_config(config);
+        m_bans_list->set_items(rm->champion_map_ids_to_names(items));
+
+        return std::string();
+    }, { .submit_button_text = "Add" }).value();
+
+    m_bans_list = frame->add_list("picks", rm->champion_map_ids_to_names(config->get_cvar_u<std::vector<int64_t>>("vec_csc_bans_" + std::to_string(config->get_cvar_u<int>("i_pref_line_blind")->get()))->get()), [this, rm, cm, config](auto, int clicked_item) {
+        std::vector<int64_t>& items = config->get_cvar_u<std::vector<int64_t>>("vec_csc_bans_" + std::to_string(m_lane_selector->get_active_index().at(0)))->get();
+        items.erase(items.begin() + clicked_item);
+        cm->dump_config(config);
+
+        m_bans_list->set_items(rm->champion_map_ids_to_names(items));
+    }).value();
 
     lcm->add_endpoint_callback("/lol-gameflow/v1/gameflow-phase", [this](std::string, nlohmann::json data) {
         if (lc::hash_constant(data.get<std::string>()) != lc::gameflow::champselect)
             return;
 
         auto lcm = manager::instance<league_connector_manager>();
-        const auto session_data_result = lcm->request<200>(connector::RT_GET, "/lol-champ-select/v1/session");
-        const auto lobby_data_result = lcm->request<200>(connector::RT_GET, "/lol-lobby/v2/lobby");
+        const auto session_data_result = lcm->request<200>(connector::request_type::GET, "/lol-champ-select/v1/session");
+        const auto lobby_data_result = lcm->request<200>(connector::request_type::GET, "/lol-lobby/v2/lobby");
 
         if (!lobby_data_result.has_value() || !session_data_result.has_value())
             return;
@@ -160,7 +237,7 @@ void feature::champion_select_controller::setup(std::shared_ptr<reflection::comp
 
     lcm->add_endpoint_callback("/lol-champ-select/v1/session", [this](std::string, nlohmann::json session_data) {
         auto lcm = manager::instance<league_connector_manager>();
-        const auto lobby_data_result = lcm->request<200>(connector::RT_GET, "/lol-lobby/v2/lobby");
+        const auto lobby_data_result = lcm->request<200>(connector::request_type::GET, "/lol-lobby/v2/lobby");
 
         if (!lobby_data_result.has_value())
             return;
@@ -169,17 +246,17 @@ void feature::champion_select_controller::setup(std::shared_ptr<reflection::comp
     });
 }
 
-std::vector<int> feature::champion_select_controller::get_locked_champions(const champselect::Session& session) {
-    std::vector<int> locked_champions = {};
+std::vector<int64_t> feature::champion_select_controller::get_locked_champions(const champselect::Session& session) {
+    std::vector<int64_t> locked_champions = {};
     for (const auto& pair : session.actions.value())
         for (const auto& action : pair)
             if (action.completed.value())
-                locked_champions.push_back(static_cast<int>(action.championId.value()));
+                locked_champions.push_back(action.championId.value());
 
     return locked_champions;
 }
 
-int feature::champion_select_controller::get_next_id(const std::vector<int>& locks, const std::vector<int>& list) {
+int64_t feature::champion_select_controller::get_next_id(const std::vector<int64_t>& locks, const std::vector<int64_t>& list) {
     for (const auto& id : list)
         if (!std::ranges::count(locks, id) && id != -1)
             return id;
@@ -205,8 +282,8 @@ void feature::champion_select_controller::handle_frame(const champselect::Sessio
     if (!assigned_position.has_value())
         return;
 
-    const std::vector<int>& picks = config->get_cvar_u<std::vector<int>>("vec_csc_picks_" + std::to_string(assigned_position->index))->get();
-    const std::vector<int>& bans = config->get_cvar_u<std::vector<int>>("vec_csc_bans_" + std::to_string(assigned_position->index))->get();
+    const std::vector<int64_t>& picks = config->get_cvar_u<std::vector<int64_t>>("vec_csc_picks_" + std::to_string(assigned_position->index))->get();
+    const std::vector<int64_t>& bans = config->get_cvar_u<std::vector<int64_t>>("vec_csc_bans_" + std::to_string(assigned_position->index))->get();
 
     int next_pick = get_next_id(locked_champions, picks);
     int next_ban = get_next_id(locked_champions, bans);

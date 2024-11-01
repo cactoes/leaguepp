@@ -6,10 +6,10 @@ bool league_connector_manager::setup() {
     if (m_is_setup)
         return false;
 
-    connector::settings_t settings{};
-    m_connector = std::make_unique<connector::connector>(settings);
-    m_connector->set_connect_handler([this]() { for (auto& handler : m_connect_handlers) handler(); });
-    m_connector->set_disconnect_handler([this]() { for (auto& handler : m_disconnect_handlers) handler(); });
+    connector::config_t config{};
+    config.connectHandler = [this]() { for (auto& handler : m_connect_handlers) handler(); };
+    config.disconnectHandler = [this]() { for (auto& handler : m_disconnect_handlers) handler(); };
+    connector::Connect(config);
 
     m_is_setup = true;
     return true;
@@ -27,11 +27,11 @@ bool league_connector_manager::shutdown() {
     if (!m_is_setup)
         return false;
 
-    m_connector->disconnect();
+    connector::Disconnect();
     m_is_setup = false;
     return true;
 }
 
 void league_connector_manager::add_endpoint_callback(const std::string& endpoint, ru_function<void, std::string, nlohmann::json> callback) {
-    m_connector->add_event_listener(endpoint, callback.get().value());
+    connector::AddEventHandler(endpoint, callback.get().value());
 }

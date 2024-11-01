@@ -6,16 +6,13 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES} resources/resources.gui.rc) # WIN
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${ALL_LIB_INCLUDES}
-    PRIVATE include)
+    PRIVATE include
+    PRIVATE ${LIB_DIR}/leaguepp-connector/lib/json/single_include)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         $<$<CONFIG:Debug>:${LIB_DIR}/reflection/lib/reflection_core.debug.lib>
-        $<$<CONFIG:Release>:${LIB_DIR}/reflection/lib/reflection_core.release.lib>
-
-    PRIVATE
-        $<$<CONFIG:Debug>:${LIB_DIR}/leaguepp_connector/lib/connector.debug.lib>
-        $<$<CONFIG:Release>:${LIB_DIR}/leaguepp_connector/lib/connector.release.lib>)
+        $<$<CONFIG:Release>:${LIB_DIR}/reflection/lib/reflection_core.release.lib>)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
@@ -28,3 +25,14 @@ target_compile_options(${PROJECT_NAME} PRIVATE ${CUSTOM_COMPILE_OPTIONS})
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL)
+
+# ~~ boost
+set(Boost_USE_STATIC_LIBS ON)
+add_definitions("-D_WEBSOCKETPP_CPP11_STL_")
+find_package(Boost REQUIRED COMPONENTS system)
+target_include_directories(${PROJECT_NAME} PRIVATE Boost::headers)
+target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
+
+# ~~ league++connector
+add_subdirectory(${LIB_DIR}/leaguepp-connector ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lppc)
+target_link_libraries(${PROJECT_NAME} PRIVATE leaguepp_connector)

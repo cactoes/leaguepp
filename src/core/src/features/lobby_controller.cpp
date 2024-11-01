@@ -3,6 +3,7 @@
 #include "managers/config_manager.hpp"
 #include "managers/league_connector_manager.hpp"
 #include "managers/window_manager.hpp"
+#include "managers/console_manager.hpp"
 #include "endpoint_mappers.hpp"
 
 void feature::lobby_controller::setup(std::shared_ptr<reflection::component::abstract_frame> frame) {
@@ -29,7 +30,7 @@ void feature::lobby_controller::setup(std::shared_ptr<reflection::component::abs
 
     m_button_dodge = frame->add_button("Dodge", [](auto) {
         if (!lh::dodge_queue())
-            wm::create_notification("Lobby controller", "Failed to dodge match...");
+            manager::instance<console_manager>()->add_log("[lc] Failed to dodge match...");
     }, { .disabled = true, .full_width = true }).value();
 
     lcm->add_endpoint_callback("/lol-gameflow/v1/gameflow-phase", [this](std::string, nlohmann::json data) {
@@ -51,7 +52,7 @@ void feature::lobby_controller::handle_auto_accept(uint64_t gameflow_hash) {
         return;
 
     if (!lh::accept_match())
-        wm::create_notification("Lobby controller", "Failed to accept match...");
+        manager::instance<console_manager>()->add_log("[lc] Failed to accept match...");
 }
 
 void feature::lobby_controller::handle_auto_dodge(uint64_t gameflow_hash) {
@@ -72,12 +73,12 @@ void feature::lobby_controller::handle_auto_dodge(uint64_t gameflow_hash) {
     // dodge on all lanes
     if (lane_dodge_ids.size() == lc::lanes::list.size()) {
         if (!lh::dodge_queue())
-            wm::create_notification("Lobby controller", "Failed to dodge match...");
+            manager::instance<console_manager>()->add_log("[lc] Failed to dodge match...");
 
         return;
     }
 
-    auto result = lcm->request<200>(connector::RT_GET, "/lol-champ-select/v1/session");
+    auto result = lcm->request<200>(connector::request_type::GET, "/lol-champ-select/v1/session");
     if (!result.has_value())
         return;
 
@@ -90,7 +91,7 @@ void feature::lobby_controller::handle_auto_dodge(uint64_t gameflow_hash) {
         return;
 
     if (!lh::dodge_queue())
-        wm::create_notification("Lobby controller", "Failed to dodge match...");
+        manager::instance<console_manager>()->add_log("[lc] Failed to dodge match...");
 }
 
 void feature::lobby_controller::handle_auto_search(uint64_t gameflow_hash) {
@@ -101,5 +102,5 @@ void feature::lobby_controller::handle_auto_search(uint64_t gameflow_hash) {
         return;
 
     if (!lh::start_search())
-        wm::create_notification("Lobby controller", "Failed to start search...");
+        manager::instance<console_manager>()->add_log("[lc] Failed to start search...");
 }
