@@ -134,6 +134,8 @@ bool window_manager::window_manager::setup() {
     
     window_options_t window_options {};
     window_options.name = "League++";
+    window_options.width = 700;
+    window_options.height = 650;
 
     m_window = create_window(options, window_options);
 
