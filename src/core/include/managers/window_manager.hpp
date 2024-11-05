@@ -8,6 +8,7 @@
 #include <Windows.h>
 #include <string>
 #include <reflection/reflection.hpp>
+#include "manager.hpp"
 
 #define COLOR_SCEME_HEX "#728ab3"
 
@@ -66,10 +67,19 @@ namespace window_manager {
             return true;
         }
     } // namespace detail
+    
+    class window_manager : manager::abstract {
+    public:
+        bool setup() override;
+        bool shutdown() override;
+
+        std::shared_ptr<reflection::browser_window> get_window();
+
+    private:
+        std::shared_ptr<reflection::browser_window> m_window = nullptr;
+    };
 } // namespace window_manager
 
-
-
-namespace wm = window_manager;
+using wm = window_manager::window_manager;
 
 #endif // __WINDOW_MANAGER_HPP__

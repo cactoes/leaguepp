@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 project(core)
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*)
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} resources/resources.gui.rc) # WIN32
+add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES} resources/resources.gui.rc)
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${ALL_LIB_INCLUDES}

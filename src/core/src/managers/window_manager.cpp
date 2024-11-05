@@ -96,7 +96,7 @@ std::shared_ptr<reflection::browser_window> window_manager::create_window(const 
 }
 
 std::shared_ptr<reflection::browser_window> window_manager::create_window(const reflection::component::frame_options_t& frame_options, const window_options_ex_t& window_options_ex) {
-    HWND hwnd = wm::create_window_ex(window_options_ex);
+    HWND hwnd = create_window_ex(window_options_ex);
     auto browser_window_ptr = std::make_shared<reflection::browser_window>(hwnd, frame_options);
     browser_window_ptr->set_color(COLOR_SCEME_HEX);
     g_windows[hwnd] = browser_window_ptr;
@@ -126,4 +126,26 @@ void window_manager::create_notification(const std::string& title, const std::st
 
         browser_window->start();
     }
+}
+
+bool window_manager::window_manager::setup() {
+    reflection::component::frame_options_t options {};
+    options.layout = reflection::component::fl_horizontal;
+    
+    window_options_t window_options {};
+    window_options.name = "League++";
+
+    m_window = create_window(options, window_options);
+
+    return true;
+}
+
+bool window_manager::window_manager::shutdown() {
+    // no need to call
+    // m_window->close();
+    return true;
+}
+
+std::shared_ptr<reflection::browser_window> window_manager::window_manager::get_window() {
+    return m_window;
 }
