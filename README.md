@@ -1,6 +1,8 @@
 ## League++
 A league client written in c++
 
+![](./media/preview.png)
+
 ## features
 
 ### Champion select controller
